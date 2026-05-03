@@ -1,0 +1,683 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/technical-practice-node.schema.json",
+  "title": "Technical Practice Node Schema",
+  "description": "Schema for representing concepts that constitute technical practice (Philosophia Artium Technicarum et Operis), enabling modeling of agentic operations, artifacts, processes, and their interrelations.",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "category",
+    "inheritanceLevel",
+    "description",
+    "functionalRoles",
+    "realityDomains",
+    "historicalContext",
+    "specific",
+    "relationships",
+    "metadata"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the node."
+    },
+    "name": {
+      "type": "string",
+      "description": "Canonical name of the technical concept."
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Reality",
+        "ActionInterfaceAndActuation",
+        "ConcreteTechnicalArtifact",
+        "TechnicalBlueprint",
+        "TechnicalAgent",
+        "TechnicalProcess",
+        "TechnicalStandard",
+        "TechnicalConstraint",
+        "TechnicalInfrastructure",
+        "TechnicalFeedback",
+        "TechnicalAct",
+        "TechnicalPrinciple",
+        "TechnicalStrategy",
+        "TechnicalFramework",
+        "TechnicalOperator",
+        "ProductionTechnicalObject",
+        "ConstitutiveTechnicalObject",
+        "Technique",
+        "OperativeTechnique",
+        "ConstitutiveTechnique",
+        "TechnicalPurpose",
+        "TechnicalFunction",
+        "TechnicalArchitecture",
+        "TechnicalSpecification",
+        "TechnicalEvolution",
+        "TechnicalLabor",
+        "TechnicalInstitution",
+        "TechnicalResearch",
+        "TechnicalCompetence",
+        "TechnicalFailure",
+        "TechnicalRequirement",
+        "Verification",
+        "Maintenance",
+        "Security",
+        "Resource",
+        "TechnicalObsolescence"
+      ],
+      "description": "Ontological classification of the node within the technical practice framework."
+    },
+    "layer": {
+      "type": "string",
+      "enum": [
+        "Problem Space",
+        "Capability Space",
+        "Execution Space",
+        "Artifact Space",
+        "Governance Space",
+        "Evolutionary Space"
+      ],
+      "description": "Macro layer representing the primary operational stratum in which the technical concept functions. Problem Space captures requirements, purposes, constraints, and desired states that initiate technical practice. Capability Space captures agents, competencies, techniques, resources, and infrastructural capacities enabling intervention. Execution Space captures situated acts, operators, operative techniques, processes, and real-time transformations performed on reality. Artifact Space captures blueprints, specifications, constitutive components, production objects, architectures, and functional structures generated or manipulated through technical practice. Governance Space captures standards, principles, security regimes, institutions, verification systems, and regulatory structures that constrain, validate, and coordinate technical operation. Evolutionary Space captures technical research, obsolescence, historical progression, innovation trajectories, and long-term transformation of technical systems over time."
+    },
+    "inheritanceLevel": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Depth within conceptual or taxonomic inheritance hierarchy."
+    },
+    "description": {
+      "type": "string",
+      "description": "Formal description of the technical concept."
+    },
+    "longDescription": {
+      "type": "string",
+      "description": "Extended technical exposition providing deeper operational, historical, and epistemic detail."
+    },
+    "functionalRoles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Primary functional roles served by this node within technical practice."
+    },
+    "realityDomains": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Domains of reality or systems in which this node operates."
+    },
+    "historicalContext": {
+      "type": "object",
+      "required": ["summary", "chronology"],
+      "properties": {
+        "summary": {
+          "type": "string"
+        },
+        "chronology": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["year", "event", "associatedContext"],
+            "properties": {
+              "year": { "type": "number" },
+              "event": { "type": "string" },
+              "associatedContext": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "specific": {
+      "type": "object",
+      "description": "Category-specific extension fields."
+    },
+    "relationships": {
+      "type": "array",
+      "description": "Typed edges connecting this node to others.",
+      "items": {
+        "type": "object",
+        "required": ["relationshipType", "targetNodeId", "description"],
+        "properties": {
+          "relationshipFamily": {
+            "type": "string",
+            "enum": [
+              "TeleologicalAndFunctional",
+              "GenerativeAndStructural",
+              "AgenticAndOperative",
+              "NormativeAndRegulative",
+              "EvaluativeAndCorrective",
+              "StrategicAndContextual",
+              "TemporalAndEvolutionary",
+              "ConstitutiveAndMereological"
+            ],
+            "description": "High-level family of the relationship."
+          },
+          "relationshipType": {
+            "type": "string",
+            "enum": [
+              "REALIZES",
+              "EMBODIES",
+              "SATISFIES",
+              "PRESCRIBES",
+              "INTEGRATES",
+              "YIELDS",
+              "PERFORMS",
+              "UTILIZES",
+              "CONSUMES",
+              "CONSTRAINED_BY",
+              "GOVERNED_BY",
+              "PROTECTS",
+              "GENERATES",
+              "INDICATES",
+              "MITIGATES",
+              "VALIDATES_AGAINST",
+              "ORCHESTRATED_BY",
+              "SUPPORTED_BY",
+              "EMBEDDED_IN",
+              "EVOLVES_FROM",
+              "SUPERSEDES",
+              "EXPANDS",
+              "INTEGRATES_INTO",
+              "LOCALIZES_FUNCTION",
+              "SPECIALIZES_TECHNIQUE",
+              "YIELDS_CONSTITUENT",
+              "CONSTITUENT_GOVERNED_BY",
+              "COMPOSED_BY_CONSTITUENT"
+            ],
+            "description": "Specific typed relationship."
+          },
+          "targetNodeId": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["tags", "confidenceScore", "sourceReference", "createdAt", "auditTrail"],
+      "properties": {
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "categoryAmbiguity": {
+          "type": "object",
+          "description": "Captures alternative plausible category classifications when the node spans multiple technical layers.",
+          "required": ["isAmbiguous", "primaryJustification", "alternativeCategories"],
+          "properties": {
+            "isAmbiguous": { "type": "boolean" },
+            "primaryJustification": { "type": "string" },
+            "alternativeCategories": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["category", "justification", "confidence"],
+                "properties": {
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "Reality", "ActionInterfaceAndActuation", "ConcreteTechnicalArtifact",
+                      "TechnicalBlueprint", "TechnicalAgent", "TechnicalProcess",
+                      "TechnicalStandard", "TechnicalConstraint", "TechnicalInfrastructure",
+                      "TechnicalFeedback", "TechnicalAct", "TechnicalPrinciple",
+                      "TechnicalStrategy", "TechnicalFramework", "TechnicalOperator",
+                      "ProductionTechnicalObject", "ConstitutiveTechnicalObject", "Technique",
+                      "OperativeTechnique", "ConstitutiveTechnique", "TechnicalPurpose",
+                      "TechnicalFunction", "TechnicalArchitecture", "TechnicalSpecification",
+                      "TechnicalEvolution", "TechnicalLabor", "TechnicalInstitution",
+                      "TechnicalResearch", "TechnicalCompetence", "TechnicalFailure",
+                      "TechnicalRequirement", "Verification", "Maintenance", "Security",
+                      "Resource", "TechnicalObsolescence"
+                    ]
+                  },
+                  "justification": { "type": "string" },
+                  "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "confidenceScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "sourceReference": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "auditTrail": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["reviewDate", "reviewNote"],
+            "properties": {
+              "reviewDate": { "type": "string", "format": "date" },
+              "reviewNote": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    { "if": { "properties": { "category": { "const": "Reality" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/RealitySpecific" } } } },
+    { "if": { "properties": { "category": { "const": "ActionInterfaceAndActuation" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/ActionInterfaceAndActuationSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "ConcreteTechnicalArtifact" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/ConcreteTechnicalArtifactSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalBlueprint" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalBlueprintSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalAgent" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalAgentSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalProcess" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalProcessSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalStandard" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalStandardSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalConstraint" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalConstraintSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalInfrastructure" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalInfrastructureSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalFeedback" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalFeedbackSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalAct" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalActSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalPrinciple" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalPrincipleSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalStrategy" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalStrategySpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalFramework" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalFrameworkSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalOperator" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalOperatorSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "ProductionTechnicalObject" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/ProductionTechnicalObjectSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "ConstitutiveTechnicalObject" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/ConstitutiveTechnicalObjectSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "Technique" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechniqueSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "OperativeTechnique" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/OperativeTechniqueSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "ConstitutiveTechnique" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/ConstitutiveTechniqueSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalPurpose" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalPurposeSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalFunction" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalFunctionSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalArchitecture" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalArchitectureSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalSpecification" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalSpecificationSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalEvolution" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalEvolutionSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalLabor" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalLaborSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalInstitution" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalInstitutionSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalResearch" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalResearchSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalCompetence" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalCompetenceSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalFailure" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalFailureSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalRequirement" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalRequirementSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "Verification" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/VerificationSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "Maintenance" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/MaintenanceSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "Security" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/SecuritySpecific" } } } },
+    { "if": { "properties": { "category": { "const": "Resource" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/ResourceSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalObsolescence" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalObsolescenceSpecific" } } } }
+  ],
+  "$defs": {
+    "RealitySpecific": {
+      "type": "object",
+      "required": ["ontologicalClass", "observability", "temporalProfile", "levelOfExistence", "conceptEvaluationNote"],
+      "properties": {
+        "ontologicalClass": {
+          "type": "string",
+          "enum": ["Ontic.Existential.Substantive", "Ontic.Existential.Processual", "Ontic.Existential.Entity", "Ontic.Existential.Mechanism", "Ontic.Dynamical.Event", "Ontic.Dynamical.Process", "Ontic.Dynamical.Stochastic", "Ontic.Dynamical.EventStream", "Ontic.Dynamical.MixtureEventStream", "Ontic.Dynamical.Phenomena", "Ontic.Dynamical.Epiphenomena", "Ontic.Agency.Agent", "Synontic.Property", "Synontic.Aspect", "Synontic.StateModel", "Synontic.VariableAspect"],
+          "description": "Primary ontological class from controlled vocabulary."
+        },
+        "observability": { "type": "string", "enum": ["observable", "latent", "partiallyObservable"] },
+        "temporalProfile": { "type": "string", "enum": ["endurant", "perdurant", "transient"] },
+        "levelOfExistence": { "type": "string", "enum": ["zero-order", "first-order", "second-order", "third-order"] },
+        "conceptEvaluationNote": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "ActionInterfaceAndActuationSpecific": {
+      "type": "object",
+      "required": ["transductionMethod", "actuationMechanism", "encodingFormat"],
+      "properties": {
+        "transductionMethod": { "type": "string", "description": "How energy/information is converted into action." },
+        "actuationMechanism": { "type": "string", "description": "Physical or logical effector (e.g., robotic gripper, CNC spindle)." },
+        "encodingFormat": { "type": "string", "description": "Syntax or protocol for intent encoding (e.g., G-code, API call)." }
+      },
+      "additionalProperties": false
+    },
+    "ConcreteTechnicalArtifactSpecific": {
+      "type": "object",
+      "required": ["materialComposition", "dimensions", "interfaceSpec", "functionalState"],
+      "properties": {
+        "materialComposition": { "type": "string" },
+        "dimensions": { "type": "string" },
+        "interfaceSpec": { "type": "string" },
+        "functionalState": { "type": "string", "enum": ["operational", "malfunctional", "degraded", "inoperative"] }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalBlueprintSpecific": {
+      "type": "object",
+      "required": ["representationFormat", "formalism", "generativeRules"],
+      "properties": {
+        "representationFormat": { "type": "string", "description": "CAD, source code, PCB Gerber, BOM, etc." },
+        "formalism": { "type": "string", "description": "Underlying language or schema." },
+        "generativeRules": { "type": "array", "items": { "type": "string" }, "description": "Constraints that guide instantiation." }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalAgentSpecific": {
+      "type": "object",
+      "required": ["agentType", "capabilities", "autonomyLevel", "goalStructure"],
+      "properties": {
+        "agentType": { "type": "string", "enum": ["human", "machine", "hybridSystem", "institution"] },
+        "capabilities": { "type": "array", "items": { "type": "string" } },
+        "autonomyLevel": { "type": "string" },
+        "goalStructure": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalProcessSpecific": {
+      "type": "object",
+      "required": ["processType", "inputs", "outputs", "validationMethod"],
+      "properties": {
+        "processType": { "type": "string" },
+        "inputs": { "type": "array", "items": { "type": "string" } },
+        "outputs": { "type": "array", "items": { "type": "string" } },
+        "validationMethod": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalStandardSpecific": {
+      "type": "object",
+      "required": ["standardType", "complianceCriteria", "measurementBasis"],
+      "properties": {
+        "standardType": { "type": "string" },
+        "complianceCriteria": { "type": "string" },
+        "measurementBasis": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalConstraintSpecific": {
+      "type": "object",
+      "required": ["constraintType", "boundedResource", "failureMode"],
+      "properties": {
+        "constraintType": { "type": "string" },
+        "boundedResource": { "type": "string" },
+        "failureMode": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalInfrastructureSpecific": {
+      "type": "object",
+      "required": ["infrastructureType", "storageMechanism", "communicationMode"],
+      "properties": {
+        "infrastructureType": { "type": "string" },
+        "storageMechanism": { "type": "string" },
+        "communicationMode": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalFeedbackSpecific": {
+      "type": "object",
+      "required": ["feedbackType", "signalSource", "adaptationTarget"],
+      "properties": {
+        "feedbackType": { "type": "string" },
+        "signalSource": { "type": "string" },
+        "adaptationTarget": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalActSpecific": {
+      "type": "object",
+      "required": ["actType", "intent", "target", "outcome"],
+      "properties": {
+        "actType": { "type": "string" },
+        "intent": { "type": "string" },
+        "target": { "type": "string" },
+        "outcome": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalPrincipleSpecific": {
+      "type": "object",
+      "required": ["principleType", "formalStatement", "applicability"],
+      "properties": {
+        "principleType": { "type": "string" },
+        "formalStatement": { "type": "string" },
+        "applicability": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalStrategySpecific": {
+      "type": "object",
+      "required": ["strategyType", "optimizationGoal", "decisionHeuristic"],
+      "properties": {
+        "strategyType": { "type": "string" },
+        "optimizationGoal": { "type": "string" },
+        "decisionHeuristic": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalFrameworkSpecific": {
+      "type": "object",
+      "required": ["frameworkType", "coreAssumptions", "integrationScope"],
+      "properties": {
+        "frameworkType": { "type": "string" },
+        "coreAssumptions": { "type": "string" },
+        "integrationScope": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalOperatorSpecific": {
+      "type": "object",
+      "required": ["operatorType", "transformationRule", "operandType"],
+      "properties": {
+        "operatorType": { "type": "string" },
+        "transformationRule": { "type": "string" },
+        "operandType": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "ProductionTechnicalObjectSpecific": {
+      "type": "object",
+      "required": ["deploymentContext", "operationalEnvironment", "valueDelivery"],
+      "properties": {
+        "deploymentContext": { "type": "string" },
+        "operationalEnvironment": { "type": "string" },
+        "valueDelivery": { "type": "string", "description": "Ultimate purpose or service provided." }
+      },
+      "additionalProperties": false
+    },
+    "ConstitutiveTechnicalObjectSpecific": {
+      "type": "object",
+      "required": ["roleInAssembly", "integrationInterface", "dependencyDepth"],
+      "properties": {
+        "roleInAssembly": { "type": "string" },
+        "integrationInterface": { "type": "string" },
+        "dependencyDepth": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "TechniqueSpecific": {
+      "type": "object",
+      "required": ["knowledgeDomain", "codificationLevel", "transmissionMethod"],
+      "properties": {
+        "knowledgeDomain": { "type": "string" },
+        "codificationLevel": { "type": "string", "enum": ["tacit", "explicit", "mixed"] },
+        "transmissionMethod": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "OperativeTechniqueSpecific": {
+      "type": "object",
+      "required": ["contextualParameters", "agentSkillLevel", "situatedOutcome"],
+      "properties": {
+        "contextualParameters": { "type": "string" },
+        "agentSkillLevel": { "type": "string" },
+        "situatedOutcome": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "ConstitutiveTechniqueSpecific": {
+      "type": "object",
+      "required": ["targetArtifactType", "precisionClass", "qualityAssurance"],
+      "properties": {
+        "targetArtifactType": { "type": "string" },
+        "precisionClass": { "type": "string" },
+        "qualityAssurance": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalPurposeSpecific": {
+      "type": "object",
+      "required": ["teleologicalStatement", "stakeholder", "successCriteria"],
+      "properties": {
+        "teleologicalStatement": { "type": "string" },
+        "stakeholder": { "type": "string" },
+        "successCriteria": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalFunctionSpecific": {
+      "type": "object",
+      "required": ["inputOutputMapping", "physicalLaw", "abstractionLevel"],
+      "properties": {
+        "inputOutputMapping": { "type": "string" },
+        "physicalLaw": { "type": "string" },
+        "abstractionLevel": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalArchitectureSpecific": {
+      "type": "object",
+      "required": ["topology", "decompositionStyle", "interfaceProtocol"],
+      "properties": {
+        "topology": { "type": "string" },
+        "decompositionStyle": { "type": "string" },
+        "interfaceProtocol": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalSpecificationSpecific": {
+      "type": "object",
+      "required": ["metric", "valueRange", "testMethod"],
+      "properties": {
+        "metric": { "type": "string" },
+        "valueRange": { "type": "string" },
+        "testMethod": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalEvolutionSpecific": {
+      "type": "object",
+      "required": ["generation", "drivingForces", "keyInnovations"],
+      "properties": {
+        "generation": { "type": "string" },
+        "drivingForces": { "type": "array", "items": { "type": "string" } },
+        "keyInnovations": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalLaborSpecific": {
+      "type": "object",
+      "required": ["laborType", "skillIntensity", "compensationModel"],
+      "properties": {
+        "laborType": { "type": "string" },
+        "skillIntensity": { "type": "string" },
+        "compensationModel": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalInstitutionSpecific": {
+      "type": "object",
+      "required": ["institutionType", "governanceStructure", "standardizationRole"],
+      "properties": {
+        "institutionType": { "type": "string" },
+        "governanceStructure": { "type": "string" },
+        "standardizationRole": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalResearchSpecific": {
+      "type": "object",
+      "required": ["researchMethod", "knowledgeOutput", "technologyReadinessLevel"],
+      "properties": {
+        "researchMethod": { "type": "string" },
+        "knowledgeOutput": { "type": "string" },
+        "technologyReadinessLevel": { "type": "integer", "minimum": 1, "maximum": 9 }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalCompetenceSpecific": {
+      "type": "object",
+      "required": ["competenceArea", "proficiencyLevel", "assessmentMethod"],
+      "properties": {
+        "competenceArea": { "type": "string" },
+        "proficiencyLevel": { "type": "string" },
+        "assessmentMethod": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalFailureSpecific": {
+      "type": "object",
+      "required": ["failureMode", "rootCause", "severityClass"],
+      "properties": {
+        "failureMode": { "type": "string" },
+        "rootCause": { "type": "string" },
+        "severityClass": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalRequirementSpecific": {
+      "type": "object",
+      "required": ["requirementType", "priority", "verificationMethod"],
+      "properties": {
+        "requirementType": { "type": "string" },
+        "priority": { "type": "string" },
+        "verificationMethod": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "VerificationSpecific": {
+      "type": "object",
+      "required": ["verificationType", "testProcedure", "acceptanceCriteria"],
+      "properties": {
+        "verificationType": { "type": "string" },
+        "testProcedure": { "type": "string" },
+        "acceptanceCriteria": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "MaintenanceSpecific": {
+      "type": "object",
+      "required": ["maintenanceType", "schedule", "interventionActions"],
+      "properties": {
+        "maintenanceType": { "type": "string", "enum": ["preventive", "corrective", "predictive"] },
+        "schedule": { "type": "string" },
+        "interventionActions": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "SecuritySpecific": {
+      "type": "object",
+      "required": ["securityAttribute", "threatModel", "controlMechanism"],
+      "properties": {
+        "securityAttribute": { "type": "string", "enum": ["confidentiality", "integrity", "availability", "authenticity"] },
+        "threatModel": { "type": "string" },
+        "controlMechanism": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "ResourceSpecific": {
+      "type": "object",
+      "required": ["resourceType", "measurableUnit", "consumptionProfile"],
+      "properties": {
+        "resourceType": { "type": "string" },
+        "measurableUnit": { "type": "string" },
+        "consumptionProfile": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalObsolescenceSpecific": {
+      "type": "object",
+      "required": ["obsolescenceType", "triggerEvent", "replacementArtifact"],
+      "properties": {
+        "obsolescenceType": { "type": "string", "enum": ["technological", "economic", "social"] },
+        "triggerEvent": { "type": "string" },
+        "replacementArtifact": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

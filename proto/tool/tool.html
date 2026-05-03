@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Epistemic Toolbox - Tool Name</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-deep: #060a10;
+            --bg-primary: #0a1019;
+            --bg-elevated: #0f1621;
+            --bg-card: rgba(15, 22, 33, 0.7);
+            --fg-primary: #e8eef5;
+            --fg-secondary: #8a96a8;
+            --fg-muted: #4a5567;
+            --accent-primary: #d4a056;
+            --accent-secondary: #7dd3c0;
+            --accent-glow: rgba(212, 160, 86, 0.25);
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-elevated: rgba(255, 255, 255, 0.1);
+            --border-accent: rgba(212, 160, 86, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-deep);
+            color: var(--fg-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--fg-muted);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-primary);
+        }
+
+        .font-display {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Background & Atmosphere */
+        .bg-atmosphere {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(212, 160, 86, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 60%, rgba(125, 211, 192, 0.05) 0%, transparent 50%),
+                linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-primary) 100%);
+        }
+
+        .bg-pattern {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            opacity: 0.4;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 100% 70% at 50% 30%, black, transparent);
+        }
+
+        /* Navigation */
+        .nav-blur {
+            background: rgba(6, 10, 16, 0.92);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            position: relative;
+        }
+
+        .nav-blur::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, var(--accent-primary) 50%, transparent 100%);
+            opacity: 0.3;
+        }
+
+        .nav-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+            background: transparent;
+            color: var(--fg-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0, 0.2, 1);
+            text-decoration: none;
+        }
+
+        .nav-back-btn:hover {
+            background: rgba(212, 160, 86, 0.1);
+            border-color: var(--border-accent);
+            color: var(--accent-primary);
+            box-shadow: 0 0 15px rgba(212, 160, 86, 0.1);
+        }
+
+        .nav-back-btn svg {
+            transition: transform 0.2s;
+        }
+
+        .nav-back-btn:hover svg {
+            transform: translateX(-3px);
+        }
+
+        .nav-context {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+        }
+
+        .nav-context span {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Animations */
+        .animate-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.7s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+
+        .accent-line {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .accent-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 200%; }
+        }
+
+        /* Placeholder Container */
+        .placeholder-container {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            min-height: 60vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .placeholder-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        }
+
+        /* Footer */
+        .footer-upgrade {
+            position: relative;
+            border-top: 1px solid transparent;
+            background: radial-gradient(ellipse 80% 50% at 50% 100%, rgba(212, 160, 86, 0.04) 0%, transparent 70%);
+        }
+
+        .footer-upgrade::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-elevated), transparent);
+        }
+
+        .footer-link {
+            position: relative;
+            color: var(--fg-secondary);
+            transition: color 0.3s;
+            text-decoration: none;
+        }
+
+        .footer-link:hover { color: var(--accent-primary); }
+
+        .footer-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent-primary);
+            transition: width 0.3s ease;
+        }
+
+        .footer-link:hover::after { width: 100%; }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .hero-title { font-size: 2.5rem; }
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Background Layers -->
+    <div class="bg-atmosphere"></div>
+    <div class="bg-pattern"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 nav-blur">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <!-- Left Side: Back Button -->
+            <a href="#" class="nav-back-btn" onclick="history.back(); return false;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Back</span>
+            </a>
+
+            <!-- Right Side: Context Title -->
+            <div class="nav-context">
+                <span class="text-[var(--fg-muted)]">Toolbox</span>
+                <span class="w-px h-3 bg-[var(--border-elevated)]"></span>
+                <!-- Generic Name Replacement -->
+                <span class="text-[var(--accent-primary)]">Tool Name</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="pt-32 pb-8 px-6">
+        <div class="max-w-7xl mx-auto">
+            <!-- Generic Name Replacement -->
+            <h1 class="font-display text-5xl md:text-6xl lg:text-7xl font-semibold mb-6 animate-in stagger-2 hero-title"
+                style="letter-spacing: -0.03em; line-height: 1.1;">
+                Tool Name
+            </h1>
+
+            <p class="text-[var(--fg-secondary)] text-lg md:text-xl max-w-2xl mb-10 animate-in stagger-3"
+                style="line-height: 1.7;">
+                A description of the tool goes here. Explain the function, methodology, and output of the tool.
+            </p>
+        </div>
+    </header>
+
+    <!-- Accent Line -->
+    <div class="accent-line max-w-7xl mx-auto mb-12"></div>
+
+    <!-- Main Content -->
+    <main class="pb-24 px-6">
+        <div class="max-w-7xl mx-auto animate-in stagger-4">
+            
+            <!-- Placeholder Div for Tool Interface -->
+            <div class="placeholder-container">
+                <div class="text-center p-8">
+                    <div class="w-16 h-16 rounded-full bg-[var(--bg-elevated)] border border-[var(--border-subtle)] flex items-center justify-center mb-4 mx-auto">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--fg-muted)" stroke-width="1.5">
+                            <path d="M12 5v14M5 12h14" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h2 class="font-display text-xl text-[var(--fg-secondary)]">Tool Interface Area</h2>
+                    <p class="text-[var(--fg-muted)] mt-2 text-sm max-w-sm mx-auto">
+                        Insert tool controls, inputs, and visualization components here.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-upgrade py-16 px-6 mt-auto">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+                
+                <!-- Brand & Description -->
+                <div>
+                    <h3 class="font-display text-xl font-semibold text-[var(--fg-primary)] mb-3 tracking-tight">Epistemic Toolbox</h3>
+                    <p class="text-sm text-[var(--fg-muted)] leading-relaxed max-w-md">A comprehensive library of cognitive tools. Enhancing reasoning and analysis through structured methodologies.</p>
+                </div>
+
+                <!-- Navigation Links -->
+                <div class="flex justify-start md:justify-end">
+                    <div>
+                        <h4 class="font-mono text-xs text-[var(--accent-primary)] uppercase tracking-widest mb-5">Library</h4>
+                        <ul class="space-y-3">
+                            <li><a href="#" class="footer-link text-sm">Documentation</a></li>
+                            <li><a href="#" class="footer-link text-sm">API Reference</a></li>
+                            <li><a href="#" class="footer-link text-sm">Contributing</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Placeholder for future tool logic
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Tool template loaded.');
+        });
+    </script>
+</body>
+
+</html>

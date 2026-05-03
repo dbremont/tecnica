@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Epistemic Toolbox</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Understanding reality through computational tools and systematic inquiry. Learn about the Epistemic Toolbox.">
+    <meta name="keywords" content="Epistemic Toolbox, Data Analysis, Modeling, Reality, Tools, Statistics">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="About - Epistemic Toolbox">
+    <meta property="og:description" content="Understanding reality through computational tools and systematic inquiry.">
+    
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-deep: #080a0f;
+            --bg-primary: #0d1117;
+            --bg-elevated: #151b24;
+            --bg-card: rgba(20, 26, 35, 0.65);
+            --fg-primary: #f0f4f8;
+            --fg-secondary: #b0b8c4;
+            --fg-muted: #4a5568;
+            --accent-primary: #d4a84b;
+            --accent-secondary: #5ec4b2;
+            --accent-glow: rgba(212, 168, 75, 0.15);
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-elevated: rgba(255, 255, 255, 0.1);
+            --border-accent: rgba(212, 168, 75, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-deep);
+            color: var(--fg-primary);
+            line-height: 1.8;
+            font-size: 1.125rem;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        main { flex: 1; }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { 
+            background: var(--fg-muted); 
+            border-radius: 10px;
+            border: 2px solid var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
+
+        .font-display { font-family: 'Space Grotesk', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        .bg-atmosphere {
+            position: fixed; inset: 0; z-index: -2;
+            background: 
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(212, 168, 75, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 80%, rgba(94, 196, 178, 0.05) 0%, transparent 50%),
+                linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-primary) 100%);
+        }
+        
+        .bg-pattern {
+            position: fixed; inset: 0; z-index: -1; opacity: 0.4;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 95% 70% at 50% 30%, black, transparent);
+        }
+        
+        .bg-noise {
+            position: fixed; inset: 0; z-index: -1; opacity: 0.035;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3A%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        /* Navigation & Footer Shared Style */
+        .nav-blur {
+            background: rgba(8, 10, 15, 0.85);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid var(--border-subtle);
+            height: 72px;
+            display: flex;
+            align-items: center;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+            position: relative;
+            padding: 0.5rem 1.25rem;
+            border-radius: 12px;
+            transition: all 0.4s cubic-bezier(0.15, 0.8, 0.3, 1);
+        }
+
+        .brand-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            background: radial-gradient(ellipse at center, rgba(212, 168, 75, 0.08), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .brand-container:hover::before { opacity: 1; }
+
+        .brand-icon {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-icon svg {
+            width: 28px;
+            height: 28px;
+            stroke: var(--accent-primary);
+            stroke-width: 1.5;
+            fill: none;
+            filter: drop-shadow(0 0 6px rgba(212, 168, 75, 0.4));
+            transition: all 0.4s ease;
+        }
+
+        .brand-container:hover .brand-icon svg {
+            filter: drop-shadow(0 0 12px rgba(212, 168, 75, 0.6));
+            transform: rotate(10deg) scale(1.05);
+        }
+
+        .brand-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            color: var(--fg-primary);
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-text span {
+            color: var(--fg-secondary);
+            font-weight: 400;
+            margin-right: 0.25em;
+        }
+
+        /* Content Cards & Typography */
+        .content-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .content-card::before {
+            content: ''; 
+            position: absolute; 
+            inset: 0; 
+            border-radius: 16px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            color: var(--fg-primary);
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            margin-top: 0;
+            color: var(--fg-primary);
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 0.75rem;
+        }
+
+        h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-top: 3rem;
+            margin-bottom: 1.25rem;
+            color: var(--fg-primary);
+        }
+
+        p {
+            color: var(--fg-secondary);
+            margin-bottom: 1.75rem;
+            line-height: 1.8;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 2rem;
+        }
+
+        li {
+            color: var(--fg-secondary);
+            padding-left: 1.75rem;
+            position: relative;
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+
+        li::before {
+            content: '↬';
+            position: absolute;
+            left: 0;
+            top: 2px;
+            color: var(--accent-primary);
+            font-size: 1.1rem;
+        }
+
+        a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            transition: color 0.2s;
+            border-bottom: 1px solid transparent;
+        }
+
+        a:hover { 
+            color: var(--accent-secondary); 
+            border-bottom-color: var(--accent-secondary);
+        }
+
+        a:focus-visible, button:focus-visible {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(212, 168, 75, 0.08), rgba(125, 211, 192, 0.04));
+            border: 1px solid rgba(212, 168, 75, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .highlight-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0.3rem 0.65rem;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 0.2rem;
+        }
+
+        .tag-primary {
+            background: rgba(212, 168, 75, 0.12);
+            border: 1px solid rgba(212, 168, 75, 0.3);
+            color: var(--accent-primary);
+        }
+
+        .tag-secondary {
+            background: rgba(94, 196, 178, 0.08);
+            border: 1px solid rgba(94, 196, 178, 0.2);
+            color: var(--accent-secondary);
+        }
+
+        .accent-line {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+            position: relative;
+            overflow: hidden;
+            margin: 2rem 0;
+        }
+
+        .animate-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.7s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+
+        /* Footer - Updated to match Header Style */
+        .site-footer {
+            position: relative;
+            padding: 0;
+            margin-top: auto;
+            background: rgba(8, 10, 15, 0.85);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            height: 72px; /* Match header height */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .footer-brand {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--fg-primary);
+            letter-spacing: -0.02em;
+        }
+        
+        .footer-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .footer-link {
+            position: relative;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--fg-secondary);
+            transition: all 0.25s ease;
+            cursor: pointer;
+            text-decoration: none;
+            background: none;
+            border: none;
+            padding: 0.5rem 0;
+        }
+        
+        .footer-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0.25rem;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent-primary);
+            transition: width 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--fg-primary);
+        }
+        
+        .footer-link:hover::after {
+            width: 100%;
+        }
+
+        @media (max-width: 640px) {
+            .footer-inner {
+                flex-direction: column;
+                height: auto;
+                padding: 1.5rem 1rem;
+                gap: 1.5rem;
+            }
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 1.5rem; }
+        }
+
+        /* Help Modal */
+        .help-overlay {
+            position: fixed; inset: 0;
+            background: rgba(8, 10, 15, 0.92);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            opacity: 0; visibility: hidden;
+            transition: all 0.4s;
+        }
+        .help-overlay.active { opacity: 1; visibility: visible; }
+        
+        .help-modal-container {
+            position: fixed; inset: 0; z-index: 1001;
+            display: flex; align-items: center; justify-content: center;
+            padding: 1.5rem;
+            opacity: 0; visibility: hidden;
+            transition: all 0.4s;
+        }
+        .help-modal-container.active { opacity: 1; visibility: visible; }
+        
+        .help-modal {
+            width: 100%; max-width: 500px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-elevated);
+            border-radius: 12px;
+            padding: 2rem;
+            transform: scale(0.9);
+            transition: transform 0.4s;
+        }
+        .help-modal-container.active .help-modal { transform: scale(1); }
+    </style>
+</head>
+<body>
+    <div class="bg-atmosphere"></div>
+    <div class="bg-pattern"></div>
+    <div class="bg-noise"></div>
+
+    <!-- Nav -->
+    <nav class="fixed top-0 left-0 right-0 z-50 nav-blur">
+        <div class="max-w-7xl px-6 h-full flex items-center justify-center" style="margin-left: 19%;">
+            <a href="index.html" class="brand-container">
+                <div class="brand-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <div class="brand-text"><span>Epistemic</span>Toolbox</div>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-28 pb-16 px-6">
+        <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <header class="mb-12 animate-in stagger-1">
+                <h1 class="font-display text-5xl md:text-6xl font-semibold mb-4" style="letter-spacing: -0.03em; line-height: 1.1;">
+                    About the<br/><span class="text-[var(--fg-secondary)]">Epistemic Toolbox</span>
+                </h1>
+                <p class="text-xl text-[var(--fg-secondary)]">
+                    Understanding reality through computational tools and systematic inquiry
+                </p>
+            </header>
+
+            <div class="accent-line animate-in stagger-2"></div>
+
+            <!-- What is it? -->
+            <section class="content-card animate-in stagger-2">
+                <h2>What is the Epistemic Toolbox?</h2>
+                <p>
+                    The Epistemic Toolbox is a curated collection of computational tools designed to help you understand, analyze, and represent complex aspects of reality. Each tool in this collection is an <strong>epistemic instrument</strong>—a method or construct that enables us to extract compressed descriptions and meaningful insights from data.
+                </p>
+                <p>
+                    Unlike traditional software libraries or frameworks, this toolbox focuses on the <em>philosophical</em> and <em>representational</em> aspects of data analysis. Each tool is presented not just as a mathematical technique, but as a lens through which we can view and make affirmations about reality.
+                </p>
+                <div class="highlight-box">
+                    <h3 class="font-mono text-sm text-[var(--accent-primary)] mb-2">Core Philosophy</h3>
+                    <p class="text-sm mb-0" style="color: var(--fg-secondary);">
+                        An epistemic tool is any instrument, construct, or method used to represent aspects of reality and extract compressed descriptions at multiple levels. It enables the exploration of the space of possible affirmations about that reality.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Purpose -->
+            <section class="content-card animate-in stagger-3">
+                <h2>Purpose & Vision</h2>
+                <p>
+                    The toolbox serves multiple purposes for researchers, analysts, and curious minds:
+                </p>
+                <ul>
+                    <li><strong>Representation:</strong> Transform raw data into structured, interpretable forms that reveal underlying patterns and structures</li>
+                    <li><strong>Exploration:</strong> Navigate the space of possible affirmations about a given domain or phenomenon</li>
+                    <li><strong>Compression:</strong> Extract essential features from complex datasets, enabling efficient reasoning</li>
+                    <li><strong>Discovery:</strong> Uncover latent structures, relationships, and dynamics that might otherwise remain hidden</li>
+                    <li><strong>Communication:</strong> Provide shared conceptual frameworks for discussing and reasoning about complex systems</li>
+                </ul>
+            </section>
+
+            <!-- The Tools -->
+            <section class="content-card animate-in stagger-4">
+                <h2>The Collection</h2>
+                <p>
+                    Currently, the toolbox includes tools across several domains of inquiry:
+                </p>
+                <div class="mb-4">
+                    <span class="tag tag-primary">Data Visualization</span>
+                    <span class="tag tag-primary">Statistical Analysis</span>
+                    <span class="tag tag-primary">Pattern Detection</span>
+                    <span class="tag tag-primary">Network Analysis</span>
+                    <span class="tag tag-primary">Probabilistic Reasoning</span>
+                    <span class="tag tag-primary">Temporal Analysis</span>
+                </div>
+                <p>
+                    Each tool is accompanied by interactive visualizations, explanations of its epistemic role, and guidance on when and how to apply it effectively. The tools range from fundamental statistical measures like <em>Standard Deviation</em> to complex frameworks like <em>Bayesian Inference</em> and <em>Monte Carlo Simulation</em>.
+                </p>
+            </section>
+
+            <!-- Affirmation Space -->
+            <section class="content-card animate-in stagger-4">
+                <h2>The Affirmation Space</h2>
+                <p>
+                    Central to this project is the concept of the <strong>Affirmation Space</strong>—the set of all possible statements or claims we can make about a given reality. Epistemic tools help us navigate this space by:
+                </p>
+                <ul>
+                    <li>Identifying which affirmations are <em>supported</em> by the available evidence</li>
+                    <li>Quantifying the <em>confidence</em> or <em>uncertainty</em> associated with different claims</li>
+                    <li>Revealing <em>relationships</em> between different affirmations</li>
+                    <li>Highlighting the <em>boundaries</em> of what can be reasonably asserted given current knowledge</li>
+                </ul>
+                <div class="highlight-box">
+                    <h3 class="font-mono text-sm text-[var(--accent-secondary)] mb-2">Further Reading</h3>
+                    <p class="text-sm mb-0" style="color: var(--fg-secondary);">
+                        Explore the theoretical foundations in the <a href="https://www.notion.so/Affirmation-Space-336c0f5171ec80928f75ddbde09d7121?source=copy_link" target="_blank">Affirmation Space</a> and <a href="https://www.notion.so/Framework-334c0f5171ec803e8cfbe7f0bc02c575?source=copy_link" target="_blank">Modelling Modelling</a> documentation.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Future Development -->
+            <section class="content-card animate-in stagger-4">
+                <h2>Future Development</h2>
+                <p>
+                    This is an ongoing project. Future enhancements may include:
+                </p>
+                <ul>
+                    <li>Additional tools covering more domains of inquiry</li>
+                    <li>Integration capabilities for combining multiple tools in analysis workflows</li>
+                    <li>Export and documentation features for sharing insights</li>
+                    <li>Community contributions and curated use cases</li>
+                    <li>Advanced tutorials and guided explorations</li>
+                </ul>
+            </section>
+
+            <!-- Contact -->
+            <section class="content-card animate-in stagger-4">
+                <h2>Get Involved</h2>
+                <p>
+                    The Epistemic Toolbox is open to feedback, suggestions, and contributions. Whether you've found a bug, have an idea for a new tool, or simply want to discuss the philosophical implications of epistemic tools, we'd love to hear from you.
+                </p>
+                <p>
+                    This project is maintained with the belief that better tools for understanding reality lead to better decisions and deeper insights across all domains of human inquiry.
+                </p>
+            </section>
+
+            <div class="accent-line animate-in stagger-4"></div>
+
+        </div>
+    </main>
+
+    <!-- Updated Footer -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <span class="footer-brand" style="margin-left: 10%;"> <a href="index.html"> Epistemic Toolbox</a> </span>
+            <div class="footer-links">
+                <a href="about.html" class="footer-link">About</a>
+                <a href="docs.html" class="footer-link">Documentation</a>
+                <a href="terminology.html" class="footer-link">Terminology</a>
+                <button class="footer-link" id="footer-help-btn">Help</button>
+            </div>
+        </div>
+    </footer>
+
+    <div class="help-overlay" id="help-overlay"></div>
+    <div class="help-modal-container" id="help-modal-container" role="dialog" aria-modal="true">
+        <div class="help-modal">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-display text-lg">Navigation Help</h3>
+                <button class="text-[var(--fg-muted)] hover:text-white transition-colors" id="modal-close" aria-label="Close modal">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <p class="text-sm text-[var(--fg-secondary)]">
+                Use the navigation links in the footer to browse different sections of the site. For detailed guides and documentation, please visit the Documentation page.
+            </p>
+            <div class="mt-4 text-center">
+                 <span class="text-xs text-[var(--fg-muted)]">Press <code class="text-xs">ESC</code> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const helpBtn = document.getElementById('footer-help-btn');
+        const modal = document.getElementById('help-modal-container');
+        const overlay = document.getElementById('help-overlay');
+        const closeBtn = document.getElementById('modal-close');
+
+        function openModal() {
+            modal.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        helpBtn.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
+        overlay.addEventListener('click', closeModal);
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>

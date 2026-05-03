@@ -1,0 +1,2082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hawkes Process — Epistemic Tool Notebook</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #080c14;
+      --bg-surface: #0f1520;
+      --bg-elevated: #161d2a;
+      --bg-highlight: #1e2838;
+      --fg-primary: #e4eaf4;
+      --fg-secondary: #8fa3c0;
+      --fg-muted: #4a5d78;
+      --accent: #00e5b8;
+      --accent-dim: #00b894;
+      --accent-glow: rgba(0, 229, 184, 0.12);
+      --trigger: #f472b6;
+      --trigger-glow: rgba(244, 114, 182, 0.15);
+      --warning: #fbbf24;
+      --error: #f87171;
+      --border: #243044;
+      --border-subtle: #1a2435;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg-deep);
+      color: var(--fg-primary);
+      line-height: 1.65;
+      min-height: 100vh;
+    }
+
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    .bg-atmosphere {
+      background-image: 
+        radial-gradient(ellipse at 15% 10%, rgba(0, 229, 184, 0.06) 0%, transparent 45%),
+        radial-gradient(ellipse at 85% 90%, rgba(244, 114, 182, 0.04) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.3) 0%, transparent 100%);
+    }
+
+    .section-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .section-card:hover { border-color: var(--border); }
+    .section-card:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .param-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      background: var(--bg-elevated);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .param-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .param-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.25);
+      box-shadow: 0 0 16px var(--accent);
+    }
+
+    .param-slider:focus::-webkit-slider-thumb {
+      box-shadow: 0 0 0 4px var(--accent-glow);
+    }
+
+    .param-slider::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+    }
+
+    canvas { display: block; border-radius: 8px; }
+
+    .tab-btn {
+      padding: 0.5rem 1rem;
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--fg-secondary);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.875rem;
+    }
+
+    .tab-btn:hover {
+      border-color: var(--border);
+      color: var(--fg-primary);
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--bg-deep);
+    }
+
+    .tab-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .subtab-btn {
+      padding: 0.375rem 0.75rem;
+      background: var(--bg-elevated);
+      border: none;
+      color: var(--fg-muted);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.75rem;
+    }
+
+    .subtab-btn:hover { color: var(--fg-secondary); }
+    .subtab-btn.active {
+      background: var(--accent-glow);
+      color: var(--accent);
+    }
+
+    .collapsible-header { cursor: pointer; user-select: none; }
+
+    .collapsible-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+    }
+
+    .collapsible-content.open { max-height: 4000px; }
+
+    .nav-link {
+      color: var(--fg-muted);
+      text-decoration: none;
+      padding: 0.25rem 0;
+      border-left: 2px solid transparent;
+      padding-left: 0.75rem;
+      transition: all 0.2s ease;
+      display: block;
+      font-size: 0.75rem;
+    }
+
+    .nav-link:hover {
+      color: var(--fg-secondary);
+      border-color: var(--border);
+    }
+
+    .nav-link.active {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-in {
+      opacity: 0;
+      animation: fadeInUp 0.5s ease forwards;
+    }
+
+    .stagger-1 { animation-delay: 0.05s; }
+    .stagger-2 { animation-delay: 0.1s; }
+    .stagger-3 { animation-delay: 0.15s; }
+    .stagger-4 { animation-delay: 0.2s; }
+    .stagger-5 { animation-delay: 0.25s; }
+
+    .formula {
+      background: var(--bg-elevated);
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      border-left: 3px solid var(--accent);
+      overflow-x: auto;
+    }
+
+    .intensity-tooltip {
+      position: fixed;
+      background: var(--bg-highlight);
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      z-index: 1000;
+      max-width: 280px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    .intensity-tooltip.visible { opacity: 1; }
+
+    .contribution-bar {
+      height: 6px;
+      border-radius: 3px;
+      background: var(--bg-elevated);
+      overflow: hidden;
+    }
+
+    .contribution-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    .event-row {
+      display: grid;
+      grid-template-columns: 60px 80px 1fr 80px;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      border-radius: 6px;
+      transition: background 0.2s ease;
+      font-size: 0.75rem;
+    }
+
+    .event-row:hover { background: var(--bg-elevated); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.125rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.625rem;
+      font-weight: 500;
+    }
+
+    .badge-exogenous {
+      background: var(--accent-glow);
+      color: var(--accent);
+      border: 1px solid var(--accent-dim);
+    }
+
+    .badge-endogenous {
+      background: var(--trigger-glow);
+      color: var(--trigger);
+      border: 1px solid rgba(244, 114, 182, 0.3);
+    }
+
+    .phase-diagram {
+      position: relative;
+      background: var(--bg-deep);
+      border-radius: 8px;
+    }
+
+    .phase-point {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 12px var(--accent);
+      transition: all 0.3s ease;
+    }
+
+    .ensemble-line {
+      stroke: var(--accent);
+      stroke-width: 1;
+      fill: none;
+      opacity: 0.3;
+    }
+
+    .ensemble-mean {
+      stroke: var(--accent);
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .kernel-comparison {
+      transition: stroke 0.3s ease, stroke-width 0.3s ease;
+    }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-deep); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--fg-muted); }
+
+    .kv-pair {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.875rem;
+    }
+
+    .kv-pair:last-child { border-bottom: none; }
+
+    .validation-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.625rem 0.875rem;
+      border-radius: 6px;
+      font-size: 0.8125rem;
+    }
+
+    .validation-status.pass {
+      background: rgba(0, 229, 184, 0.08);
+      border: 1px solid rgba(0, 229, 184, 0.2);
+      color: var(--accent);
+    }
+
+    .validation-status.fail {
+      background: rgba(248, 113, 113, 0.08);
+      border: 1px solid rgba(248, 113, 113, 0.2);
+      color: var(--error);
+    }
+
+    .validation-status.warn {
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.2);
+      color: var(--warning);
+    }
+  </style>
+</head>
+<body class="bg-atmosphere">
+  <!-- Intensity Tooltip (Global) -->
+  <div class="intensity-tooltip" id="intensity-tooltip">
+    <div class="font-medium mb-2">Intensity at t = <span id="tooltip-time">0.00</span></div>
+    <div class="mono text-lg font-bold text-[var(--accent)] mb-2">λ*(t) = <span id="tooltip-intensity">0.00</span></div>
+    <div class="space-y-1 text-[var(--fg-secondary)]">
+      <div class="flex justify-between">
+        <span>Base contribution:</span>
+        <span class="mono" id="tooltip-base">0.00</span>
+      </div>
+      <div class="flex justify-between">
+        <span>Excitation sum:</span>
+        <span class="mono" id="tooltip-excitation">0.00</span>
+      </div>
+      <div class="flex justify-between">
+        <span>Past events contributing:</span>
+        <span class="mono" id="tooltip-contributors">0</span>
+      </div>
+    </div>
+    <div class="mt-2 pt-2 border-t border-[var(--border-subtle)]">
+      <div class="text-xs text-[var(--fg-muted)]">Click to freeze this point</div>
+    </div>
+  </div>
+
+  <!-- Navigation Sidebar -->
+  <nav class="fixed left-0 top-0 h-full w-56 p-5 border-r border-[var(--border-subtle)] hidden lg:block overflow-y-auto z-50 bg-[var(--bg-deep)]" id="sidebar">
+    <div class="mb-6">
+      <div class="text-xs uppercase tracking-wider text-[var(--fg-muted)] mb-1">Epistemic Tool</div>
+      <div class="text-lg font-semibold text-[var(--accent)]">Hawkes Process</div>
+    </div>
+    <div class="space-y-0.5" id="nav-links">
+      <a href="#identity" class="nav-link">Identity</a>
+      <a href="#formal" class="nav-link">Formal Characterization</a>
+      <a href="#mechanism" class="nav-link">Mechanism</a>
+      <a href="#simulation" class="nav-link">Interactive Simulation</a>
+      <a href="#epistemic-role" class="nav-link">Epistemic Role</a>
+      <a href="#validation" class="nav-link">Validation</a>
+      <a href="#limits" class="nav-link">Scope & Limits</a>
+      <a href="#qa" class="nav-link">Diagnostic QA</a>
+    </div>
+    <div class="mt-6 pt-6 border-t border-[var(--border-subtle)]">
+      <div class="text-xs text-[var(--fg-muted)] mb-2">Process Status</div>
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center" id="status-indicator" style="border-color: var(--accent);">
+          <div class="w-3 h-3 rounded-full" id="status-dot" style="background: var(--accent);"></div>
+        </div>
+        <div>
+          <div class="text-sm font-medium" id="stability-label">Stationary</div>
+          <div class="text-xs text-[var(--fg-muted)]" id="stability-sublabel">n = 0.80</div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-4 pt-4 border-t border-[var(--border-subtle)]">
+      <div class="text-xs text-[var(--fg-muted)] mb-2">Quick Stats</div>
+      <div class="space-y-1">
+        <div class="flex justify-between text-xs">
+          <span class="text-[var(--fg-muted)]">Events</span>
+          <span class="mono" id="quick-events">0</span>
+        </div>
+        <div class="flex justify-between text-xs">
+          <span class="text-[var(--fg-muted)]">λ*(t)</span>
+          <span class="mono" id="quick-intensity">0.00</span>
+        </div>
+        <div class="flex justify-between text-xs">
+          <span class="text-[var(--fg-muted)]">E[λ]</span>
+          <span class="mono" id="quick-mean">0.00</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="lg:ml-56 min-h-screen">
+    <div class="max-w-5xl mx-auto px-6 py-12">
+      
+      <!-- Header -->
+      <header class="mb-12 animate-in">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-2 h-2 rounded-full bg-[var(--accent)]"></div>
+          <span class="mono text-xs text-[var(--fg-muted)] uppercase tracking-widest">Epistemic Tool Notebook</span>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 tracking-tight">Hawkes Process</h1>
+        <p class="text-lg text-[var(--fg-secondary)] max-w-2xl">A self-exciting point process for modeling temporal clustering. Each event increases future event probability, with influence decaying exponentially over time.</p>
+      </header>
+
+      <!-- Identity Section -->
+      <section id="identity" class="mb-10 animate-in stagger-1">
+        <div class="section-card p-5">
+          <div class="flex items-center justify-between mb-5">
+            <h2 class="text-xl font-semibold">Identity</h2>
+            <div class="flex gap-1.5">
+              <span class="badge badge-exogenous">Generative</span>
+              <span class="badge badge-endogenous">Inferential</span>
+            </div>
+          </div>
+          
+          <div class="grid md:grid-cols-2 gap-5">
+            <div>
+              <div class="text-xs uppercase tracking-wider text-[var(--fg-muted)] mb-1">Name</div>
+              <div class="text-lg font-medium">Hawkes Process</div>
+              <div class="mono text-sm text-[var(--fg-secondary)]">Self-exciting point process</div>
+            </div>
+            <div>
+              <div class="text-xs uppercase tracking-wider text-[var(--fg-muted)] mb-2">One-line Summary</div>
+              <p class="text-sm text-[var(--fg-secondary)]">Transforms temporal event sequences into probabilistic models capturing self-excitation dynamics, enabling prediction and triggering structure inference.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Formal Characterization -->
+      <section id="formal" class="mb-10 animate-in stagger-2">
+        <div class="section-card">
+          <div class="collapsible-header p-5 flex items-center justify-between" onclick="toggleSection(this)">
+            <h2 class="text-xl font-semibold">Formal Characterization</h2>
+            <svg class="w-5 h-5 text-[var(--fg-muted)] transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </div>
+          <div class="collapsible-content open">
+            <div class="px-5 pb-5">
+              <!-- Input/Output -->
+              <div class="grid md:grid-cols-2 gap-5 mb-6">
+                <div class="bg-[var(--bg-elevated)] rounded-lg p-4">
+                  <div class="text-sm font-medium mb-3">Input Space</div>
+                  <div class="space-y-2 text-sm">
+                    <div>
+                      <span class="text-[var(--fg-muted)]">Event Timeline:</span>
+                      <span class="mono text-[var(--fg-secondary)]"> T = {"t₁, t₂, ..., tₙ"} ⊂ ℝ⁺</span>
+                    </div>
+                    <div>
+                      <span class="text-[var(--fg-muted)]">Observation Window:</span>
+                      <span class="mono text-[var(--fg-secondary)]"> [0, T]</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="bg-[var(--bg-elevated)] rounded-lg p-4">
+                  <div class="text-sm font-medium mb-3">Output Space</div>
+                  <div class="space-y-2 text-sm">
+                    <div>
+                      <span class="text-[var(--fg-muted)]">Intensity Function:</span>
+                      <span class="mono text-[var(--fg-secondary)]"> λ*(t) : ℝ⁺ → ℝ⁺</span>
+                    </div>
+                    <div>
+                      <span class="text-[var(--fg-muted)]">Parameters:</span>
+                      <span class="mono text-[var(--accent)]"> μ, α, β</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Transformation -->
+              <div class="mb-6">
+                <div class="text-sm font-medium mb-2">Transformation</div>
+                <div class="formula mono text-sm">
+                  <div class="mb-1 text-[var(--fg-secondary)]">λ*(t) = μ + Σᵢ α · e<sup>-β(t - tᵢ)</sup> · 𝟙(t > tᵢ)</div>
+                  <div class="text-xs text-[var(--fg-muted)]">Sum over all events tᵢ occurring before time t</div>
+                </div>
+              </div>
+
+              <!-- Assumptions -->
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="p-3 border border-[var(--border-subtle)] rounded-lg">
+                  <div class="text-sm font-medium text-[var(--warning)] mb-2">Structural Assumptions</div>
+                  <ul class="text-xs text-[var(--fg-secondary)] space-y-0.5">
+                    <li>• Events are instantaneous points</li>
+                    <li>• Excitation always positive (no inhibition)</li>
+                    <li>• Exponential decay kernel</li>
+                  </ul>
+                </div>
+                <div class="p-3 border border-[var(--border-subtle)] rounded-lg">
+                  <div class="text-sm font-medium text-[var(--warning)] mb-2">Stationarity Condition</div>
+                  <ul class="text-xs text-[var(--fg-secondary)] space-y-0.5">
+                    <li>• Branching ratio n = α/β < 1</li>
+                    <li>• Finite expected intensity</li>
+                    <li>• Time-invariant parameters</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mechanism -->
+      <section id="mechanism" class="mb-10 animate-in stagger-3">
+        <div class="section-card p-5">
+          <h2 class="text-xl font-semibold mb-5">Mechanism</h2>
+          <div class="flex flex-wrap gap-4 items-start">
+            <div class="flex-1 min-w-[200px]">
+              <div class="space-y-3">
+                <div class="flex gap-3 items-start">
+                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--accent)] text-[var(--bg-deep)] flex items-center justify-center text-xs font-bold">1</div>
+                  <div class="text-sm"><span class="font-medium">Initialize</span> <span class="text-[var(--fg-secondary)]">base intensity μ</span></div>
+                </div>
+                <div class="flex gap-3 items-start">
+                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--accent)] text-[var(--bg-deep)] flex items-center justify-center text-xs font-bold">2</div>
+                  <div class="text-sm"><span class="font-medium">Event occurs</span> <span class="text-[var(--fg-secondary)]">spontaneous or triggered</span></div>
+                </div>
+                <div class="flex gap-3 items-start">
+                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--accent)] text-[var(--bg-deep)] flex items-center justify-center text-xs font-bold">3</div>
+                  <div class="text-sm"><span class="font-medium">Excite</span> <span class="text-[var(--fg-secondary)]">add α to intensity, decay at rate β</span></div>
+                </div>
+                <div class="flex gap-3 items-start">
+                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--accent)] text-[var(--bg-deep)] flex items-center justify-center text-xs font-bold">4</div>
+                  <div class="text-sm"><span class="font-medium">Aggregate</span> <span class="text-[var(--fg-secondary)]">sum all contributions</span></div>
+                </div>
+                <div class="flex gap-3 items-start">
+                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--accent)] text-[var(--bg-deep)] flex items-center justify-center text-xs font-bold">5</div>
+                  <div class="text-sm"><span class="font-medium">Sample</span> <span class="text-[var(--fg-secondary)]">next event from Exp(λ*)</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="w-64 flex-shrink-0">
+              <div class="bg-[var(--bg-elevated)] rounded-lg p-3">
+                <div class="text-xs text-[var(--fg-muted)] mb-2">Dependencies</div>
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="px-2 py-0.5 bg-[var(--bg-highlight)] rounded text-xs">Poisson Process</span>
+                  <span class="px-2 py-0.5 bg-[var(--bg-highlight)] rounded text-xs">Exponential Dist.</span>
+                  <span class="px-2 py-0.5 bg-[var(--bg-highlight)] rounded text-xs">Ogata Thinning</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Interactive Simulation -->
+      <section id="simulation" class="mb-10 animate-in stagger-4">
+        <div class="section-card p-5">
+          <div class="flex items-center justify-between mb-5">
+            <h2 class="text-xl font-semibold">Interactive Simulation</h2>
+            <div class="flex gap-2">
+              <button class="tab-btn active" data-tab="simulate" onclick="switchMainTab(this)">Simulate</button>
+              <button class="tab-btn" data-tab="explore" onclick="switchMainTab(this)">Explore</button>
+            </div>
+          </div>
+
+          <!-- SIMULATE TAB -->
+          <div id="tab-simulate">
+            <!-- Parameters -->
+            <div class="grid md:grid-cols-3 gap-5 mb-5">
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium">Base Rate (μ)</label>
+                  <span class="mono text-sm text-[var(--accent)]" id="mu-value">0.5</span>
+                </div>
+                <input type="range" class="param-slider" id="mu-slider" min="0.1" max="2" step="0.05" value="0.5" aria-label="Base rate parameter">
+              </div>
+              
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium">Excitation (α)</label>
+                  <span class="mono text-sm text-[var(--accent)]" id="alpha-value">0.8</span>
+                </div>
+                <input type="range" class="param-slider" id="alpha-slider" min="0.1" max="2" step="0.05" value="0.8" aria-label="Excitation parameter">
+              </div>
+              
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium">Decay Rate (β)</label>
+                  <span class="mono text-sm text-[var(--accent)]" id="beta-value">1.0</span>
+                </div>
+                <input type="range" class="param-slider" id="beta-slider" min="0.5" max="3" step="0.1" value="1.0" aria-label="Decay rate parameter">
+              </div>
+            </div>
+
+            <!-- Branching Ratio Display -->
+            <div class="bg-[var(--bg-elevated)] rounded-lg p-4 mb-5">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-xs text-[var(--fg-muted)]">Branching Ratio</div>
+                  <div class="mono text-2xl font-bold" id="branching-ratio">0.80</div>
+                  <div class="text-xs text-[var(--fg-muted)]">n = α/β</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-xs text-[var(--fg-muted)]">Regime</div>
+                  <div class="text-lg font-medium text-[var(--accent)]" id="process-type">Stationary</div>
+                  <div class="text-xs text-[var(--fg-muted)]" id="process-desc">Finite expected intensity</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Main Canvas -->
+            <div class="relative bg-[var(--bg-deep)] rounded-lg overflow-hidden mb-5" style="height: 300px;">
+              <canvas id="main-canvas" aria-label="Hawkes process visualization"></canvas>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex flex-wrap gap-3 mb-5">
+              <button class="px-4 py-2 bg-[var(--accent)] text-[var(--bg-deep)] rounded-lg font-medium hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" onclick="runSimulation()">
+                Generate New
+              </button>
+              <button class="px-4 py-2 bg-[var(--bg-elevated)] rounded-lg font-medium hover:bg-[var(--bg-highlight)] transition-colors" onclick="togglePause()">
+                <span id="pause-btn-text">Pause</span>
+              </button>
+              <button class="px-4 py-2 bg-[var(--bg-elevated)] rounded-lg font-medium hover:bg-[var(--bg-highlight)] transition-colors" onclick="resetSimulation()">
+                Reset
+              </button>
+              <div class="flex items-center gap-2 ml-auto">
+                <span class="text-xs text-[var(--fg-muted)]">Speed:</span>
+                <input type="range" class="param-slider w-24" id="speed-slider" min="0.005" max="0.1" step="0.005" value="0.02" aria-label="Simulation speed">
+              </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div class="bg-[var(--bg-elevated)] rounded-lg p-3">
+                <div class="text-xs text-[var(--fg-muted)]">Total Events</div>
+                <div class="mono text-xl font-bold" id="stat-events">0</div>
+              </div>
+              <div class="bg-[var(--bg-elevated)] rounded-lg p-3">
+                <div class="text-xs text-[var(--fg-muted)]">Current λ*(t)</div>
+                <div class="mono text-xl font-bold" id="stat-intensity">0.00</div>
+              </div>
+              <div class="bg-[var(--bg-elevated)] rounded-lg p-3">
+                <div class="text-xs text-[var(--fg-muted)]">Theoretical E[λ]</div>
+                <div class="mono text-xl font-bold" id="stat-mean">0.00</div>
+              </div>
+              <div class="bg-[var(--bg-elevated)] rounded-lg p-3">
+                <div class="text-xs text-[var(--fg-muted)]">Exogenous Ratio</div>
+                <div class="mono text-xl font-bold" id="stat-exogenous">0%</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- EXPLORE TAB -->
+          <div id="tab-explore" style="display: none;">
+            <div class="flex gap-2 mb-5 overflow-x-auto pb-2">
+              <button class="subtab-btn active" data-subtab="intensity" onclick="switchSubTab(this)">Intensity Decomposition</button>
+              <button class="subtab-btn" data-subtab="genealogy" onclick="switchSubTab(this)">Event Genealogy</button>
+              <button class="subtab-btn" data-subtab="phase" onclick="switchSubTab(this)">Phase Space</button>
+              <button class="subtab-btn" data-subtab="kernel" onclick="switchSubTab(this)">Kernel Comparison</button>
+              <button class="subtab-btn" data-subtab="ensemble" onclick="switchSubTab(this)">Ensemble Stats</button>
+            </div>
+
+            <!-- Intensity Decomposition -->
+            <div id="subtab-intensity" class="subtab-content">
+              <div class="grid md:grid-cols-2 gap-5">
+                <div>
+                  <h3 class="text-sm font-medium mb-3">Intensity Decomposition at Selected Point</h3>
+                  <div class="bg-[var(--bg-elevated)] rounded-lg p-4 mb-3">
+                    <div class="flex justify-between items-center mb-3">
+                      <span class="text-sm text-[var(--fg-muted)]">Selected Time:</span>
+                      <span class="mono text-sm" id="decomp-time">—</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-3">
+                      <span class="text-sm text-[var(--fg-muted)]">Total Intensity:</span>
+                      <span class="mono text-lg font-bold text-[var(--accent)]" id="decomp-total">—</span>
+                    </div>
+                    <div class="space-y-2">
+                      <div>
+                        <div class="flex justify-between text-xs mb-1">
+                          <span>Base (μ)</span>
+                          <span class="mono" id="decomp-base-val">—</span>
+                        </div>
+                        <div class="contribution-bar">
+                          <div class="contribution-fill" id="decomp-base-bar" style="width: 0%; background: var(--accent);"></div>
+                        </div>
+                      </div>
+                      <div>
+                        <div class="flex justify-between text-xs mb-1">
+                          <span>Excitation Sum</span>
+                          <span class="mono" id="decomp-excite-val">—</span>
+                        </div>
+                        <div class="contribution-bar">
+                          <div class="contribution-fill" id="decomp-excite-bar" style="width: 0%; background: var(--trigger);"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="text-xs text-[var(--fg-muted)]">Click on the main simulation canvas to select a time point and see the intensity decomposition.</p>
+                </div>
+                <div>
+                  <h3 class="text-sm font-medium mb-3">Individual Event Contributions</h3>
+                  <div class="bg-[var(--bg-elevated)] rounded-lg p-3 max-h-64 overflow-y-auto" id="contribution-list">
+                    <div class="text-xs text-[var(--fg-muted)] text-center py-4">Select a time point to see contributions</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Event Genealogy -->
+            <div id="subtab-genealogy" class="subtab-content" style="display: none;">
+              <div class="grid md:grid-cols-3 gap-5">
+                <div class="md:col-span-2">
+                  <h3 class="text-sm font-medium mb-3">Event Triggering Structure</h3>
+                  <div class="bg-[var(--bg-deep)] rounded-lg overflow-hidden" style="height: 280px;">
+                    <canvas id="genealogy-canvas"></canvas>
+                  </div>
+                </div>
+                <div>
+                  <h3 class="text-sm font-medium mb-3">Event Classification</h3>
+                  <div class="bg-[var(--bg-elevated)] rounded-lg p-4 mb-3">
+                    <div class="flex justify-between mb-2">
+                      <span class="text-xs text-[var(--fg-muted)]">Exogenous Events:</span>
+                      <span class="mono text-sm" id="exog-count">0</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                      <span class="text-xs text-[var(--fg-muted)]">Endogenous Events:</span>
+                      <span class="mono text-sm" id="endog-count">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-xs text-[var(--fg-muted)]">Avg Children per Event:</span>
+                      <span class="mono text-sm" id="avg-children">0.00</span>
+                    </div>
+                  </div>
+                  <h3 class="text-sm font-medium mb-3">Event Log</h3>
+                  <div class="bg-[var(--bg-elevated)] rounded-lg overflow-hidden max-h-40 overflow-y-auto" id="event-log">
+                    <div class="event-row bg-[var(--bg-highlight)] text-[var(--fg-muted)]">
+                      <span>#</span>
+                      <span>Time</span>
+                      <span>Type</span>
+                      <span>Children</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Phase Space -->
+            <div id="subtab-phase" class="subtab-content" style="display: none;">
+              <div class="grid md:grid-cols-2 gap-5">
+                <div>
+                  <h3 class="text-sm font-medium mb-3">Parameter Phase Diagram</h3>
+                  <div class="phase-diagram" style="height: 280px;">
+                    <canvas id="phase-canvas"></canvas>
+                    <div class="phase-point" id="phase-point"></div>
+                  </div>
+                  <p class="text-xs text-[var(--fg-muted)] mt-2">The diagonal line marks n = α/β = 1 (stationarity boundary). Green region = stationary, red region = explosive.</p>
+                </div>
+                <div>
+                  <h3 class="text-sm font-medium mb-3">Theoretical Properties</h3>
+                  <div class="bg-[var(--bg-elevated)] rounded-lg p-4 space-y-3">
+                    <div>
+                      <div class="text-xs text-[var(--fg-muted)] mb-1">Long-run Mean Intensity</div>
+                      <div class="formula mono text-sm">E[λ] = μ / (1 - n) = <span id="theoretical-mean">2.50</span></div>
+                    </div>
+                    <div>
+                      <div class="text-xs text-[var(--fg-muted)] mb-1">Expected Event Rate</div>
+                      <div class="formula mono text-sm">Λ(T) = E[λ] · T</div>
+                    </div>
+                    <div>
+                      <div class="text-xs text-[var(--fg-muted)] mb-1">Memory Horizon (e-folding time)</div>
+                      <div class="formula mono text-sm">τ = 1/β = <span id="memory-horizon">1.00</span> time units</div>
+                    </div>
+                    <div>
+                      <div class="text-xs text-[var(--fg-muted)] mb-1">Coefficient of Variation</div>
+                      <div class="formula mono text-sm">CV² = 1 + 2n²/(1-n²) = <span id="coeff-var">2.78</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Kernel Comparison -->
+            <div id="subtab-kernel" class="subtab-content" style="display: none;">
+              <div class="grid md:grid-cols-2 gap-5">
+                <div>
+                  <h3 class="text-sm font-medium mb-3">Excitation Kernel Shape</h3>
+                  <div class="bg-[var(--bg-deep)] rounded-lg" style="height: 240px;">
+                    <canvas id="kernel-canvas"></canvas>
+                  </div>
+                </div>
+                <div>
+                  <h3 class="text-sm font-medium mb-3">Kernel Selection</h3>
+                  <div class="space-y-2">
+                    <label class="flex items-center gap-3 p-3 bg-[var(--bg-elevated)] rounded-lg cursor-pointer hover:bg-[var(--bg-highlight)] transition-colors">
+                      <input type="radio" name="kernel" value="exponential" checked class="accent-[var(--accent)]">
+                      <div>
+                        <div class="text-sm font-medium">Exponential</div>
+                        <div class="mono text-xs text-[var(--fg-muted)]">g(t) = α · e<sup>-βt</sup></div>
+                      </div>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 bg-[var(--bg-elevated)] rounded-lg cursor-pointer hover:bg-[var(--bg-highlight)] transition-colors">
+                      <input type="radio" name="kernel" value="power" class="accent-[var(--accent)]">
+                      <div>
+                        <div class="text-sm font-medium">Power Law</div>
+                        <div class="mono text-xs text-[var(--fg-muted)]">g(t) = α · (1+t)<sup>-β</sup></div>
+                      </div>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 bg-[var(--bg-elevated)] rounded-lg cursor-pointer hover:bg-[var(--bg-highlight)] transition-colors">
+                      <input type="radio" name="kernel" value="gaussian" class="accent-[var(--accent)]">
+                      <div>
+                        <div class="text-sm font-medium">Gaussian</div>
+                        <div class="mono text-xs text-[var(--fg-muted)]">g(t) = α · e<sup>-βt²</sup></div>
+                      </div>
+                    </label>
+                  </div>
+                  <div class="mt-4 p-3 bg-[var(--bg-elevated)] rounded-lg">
+                    <div class="text-xs text-[var(--fg-muted)]">Kernel Selection Impact</div>
+                    <p class="text-xs text-[var(--fg-secondary)] mt-1">Different kernels capture different memory structures. Exponential assumes constant relative decay; power law captures long-range memory; Gaussian assumes fixed memory duration.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ensemble Statistics -->
+            <div id="subtab-ensemble" class="subtab-content" style="display: none;">
+              <div class="grid md:grid-cols-3 gap-5">
+                <div class="md:col-span-2">
+                  <h3 class="text-sm font-medium mb-3">Ensemble Simulation (N = <span id="ensemble-n">20</span> realizations)</h3>
+                  <div class="bg-[var(--bg-deep)] rounded-lg" style="height: 280px;">
+                    <canvas id="ensemble-canvas"></canvas>
+                  </div>
+                </div>
+                <div>
+                  <h3 class="text-sm font-medium mb-3">Distribution Statistics</h3>
+                  <div class="space-y-3">
+                    <div class="bg-[var(--bg-elevated)] rounded-lg p-3">
+                      <div class="text-xs text-[var(--fg-muted)]">Mean Event Count</div>
+                      <div class="mono text-lg font-bold" id="ensemble-mean-events">—</div>
+                    </div>
+                    <div class="bg-[var(--bg-elevated)] rounded-lg p-3">
+                      <div class="text-xs text-[var(--fg-muted)]">Std Dev</div>
+                      <div class="mono text-lg font-bold" id="ensemble-std-events">—</div>
+                    </div>
+                    <div class="bg-[var(--bg-elevated)] rounded-lg p-3">
+                      <div class="text-xs text-[var(--fg-muted)]">Theoretical E[N(T)]</div>
+                      <div class="mono text-lg font-bold text-[var(--accent)]" id="theoretical-n">—</div>
+                    </div>
+                  </div>
+                  <button class="w-full mt-3 px-4 py-2 bg-[var(--bg-elevated)] rounded-lg text-sm font-medium hover:bg-[var(--bg-highlight)] transition-colors" onclick="runEnsemble()">
+                    Run Ensemble
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- Epistemic Role -->
+      <section id="epistemic-role" class="mb-10 animate-in stagger-5">
+        <div class="section-card p-5">
+          <h2 class="text-xl font-semibold mb-5">Epistemic Role</h2>
+          
+          <div class="grid md:grid-cols-2 gap-5 mb-5">
+            <div>
+              <h3 class="text-sm font-medium text-[var(--fg-muted)] uppercase tracking-wider mb-2">Function</h3>
+              <p class="text-sm text-[var(--fg-secondary)]">Resolves <strong class="text-[var(--fg-primary)]">temporal structure discovery</strong> — distinguishes endogenous dynamics (self-excitation) from exogenous factors (background rate).</p>
+            </div>
+            <div>
+              <h3 class="text-sm font-medium text-[var(--fg-muted)] uppercase tracking-wider mb-2">Preservation</h3>
+              <div class="text-sm text-[var(--fg-secondary)]">
+                <span class="text-[var(--accent)]">Preserves:</span> Temporal order, event count, clustering degree<br>
+                <span class="text-[var(--error)]">Destroys:</span> Individual causality, inhibition effects
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Validation -->
+      <section id="validation" class="mb-10 animate-in">
+        <div class="section-card p-5">
+          <h2 class="text-xl font-semibold mb-5">Validation</h2>
+          
+          <div class="grid md:grid-cols-3 gap-3 mb-5">
+            <div class="validation-status pass" id="val-stationarity">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span>Stationarity</span>
+            </div>
+            <div class="validation-status pass" id="val-positivity">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span>Intensity ≥ 0</span>
+            </div>
+            <div class="validation-status pass" id="val-residuals">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span>KS Test: p = <span id="ks-pval">1.00</span></span>
+            </div>
+          </div>
+
+          <div class="bg-[var(--bg-elevated)] rounded-lg p-4">
+            <h3 class="text-sm font-medium mb-2">Residual Analysis</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="text-sm text-[var(--fg-secondary)]">
+                <p>If the model is correct, transformed times Λ(tᵢ) should follow a unit Poisson process. The time transformation:</p>
+                <div class="formula mono text-xs mt-2">Λ(t) = μt + (α/β)Σᵢ(1 - e<sup>-β(t-tᵢ)</sup>)</div>
+              </div>
+              <div class="bg-[var(--bg-deep)] rounded-lg p-3" style="height: 120px;">
+                <canvas id="qq-canvas"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scope & Limits -->
+      <section id="limits" class="mb-10 animate-in">
+        <div class="section-card p-5">
+          <h2 class="text-xl font-semibold mb-5">Scope and Limits</h2>
+          
+          <div class="grid md:grid-cols-2 gap-5">
+            <div>
+              <h3 class="text-sm font-medium text-[var(--fg-muted)] uppercase tracking-wider mb-2">Applicability</h3>
+              <div class="space-y-1.5">
+                <div class="p-2 bg-[var(--bg-elevated)] rounded text-sm">Seismology (earthquake-aftershock)</div>
+                <div class="p-2 bg-[var(--bg-elevated)] rounded text-sm">High-frequency finance</div>
+                <div class="p-2 bg-[var(--bg-elevated)] rounded text-sm">Social media cascades</div>
+                <div class="p-2 bg-[var(--bg-elevated)] rounded text-sm">Neuronal spike trains</div>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-medium text-[var(--fg-muted)] uppercase tracking-wider mb-2">Structural Limits</h3>
+              <div class="space-y-1.5 text-sm text-[var(--fg-secondary)]">
+                <div class="p-2 border border-[var(--border-subtle)] rounded">No inhibition modeling</div>
+                <div class="p-2 border border-[var(--border-subtle)] rounded">Single temporal dimension</div>
+                <div class="p-2 border border-[var(--border-subtle)] rounded">Event marks not captured</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Diagnostic QA -->
+      <section id="qa" class="mb-10 animate-in">
+        <div class="section-card p-5">
+          <h2 class="text-xl font-semibold mb-5">Diagnostic Questions</h2>
+          
+          <div class="space-y-4">
+            <div class="border-l-2 border-[var(--accent)] pl-4">
+              <div class="font-medium text-sm mb-1">What happens if branching ratio exceeds 1?</div>
+              <p class="text-sm text-[var(--fg-secondary)]">Explosive regime: intensity grows without bound, infinite events in finite time. Estimation methods fail.</p>
+            </div>
+            <div class="border-l-2 border-[var(--warning)] pl-4">
+              <div class="font-medium text-sm mb-1">What invariant is most critical?</div>
+              <p class="text-sm text-[var(--fg-secondary)]">Exponential decay structure — encodes proportional influence decay. Violations require kernel modifications.</p>
+            </div>
+            <div class="border-l-2 border-[var(--fg-muted)] pl-4">
+              <div class="font-medium text-sm mb-1">Can different parameters produce indistinguishable sequences?</div>
+              <p class="text-sm text-[var(--fg-secondary)]">Yes — identifiability issues when long-run mean intensity λ̄ = μ/(1-n) is similar across parameter sets.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="text-center py-8 border-t border-[var(--border-subtle)]">
+        <div class="text-xs text-[var(--fg-muted)]">
+          Epistemic Tool Notebook — Hawkes Process
+        </div>
+      </footer>
+
+    </div>
+  </main>
+
+  <script>
+    // ========================================
+    // STATE INITIALIZATION (MUST BE FIRST)
+    // ========================================
+    
+    let mu = 0.5;
+    let alpha = 0.8;
+    let beta = 1.0;
+    let events = [];
+    let eventGenealogy = [];
+    let isPaused = false;
+    let currentTime = 0;
+    let simulationSpeed = 0.02;
+    let selectedTime = null;
+    let animationId = null;
+    let ensembleRuns = [];
+    let selectedKernel = 'exponential';
+    
+    // Canvas dimensions
+    let mainCanvasW = 800;
+    let mainCanvasH = 300;
+    let dpr = 1;
+    
+    // Canvas references (initialized after DOM)
+    let mainCanvas = null;
+    let mainCtx = null;
+    let genealogyCanvas = null;
+    let genealogyCtx = null;
+    let phaseCanvas = null;
+    let phaseCtx = null;
+    let kernelCanvas = null;
+    let kernelCtx = null;
+    let ensembleCanvas = null;
+    let ensembleCtx = null;
+    let qqCanvas = null;
+    let qqCtx = null;
+    
+    // ========================================
+    // UTILITY FUNCTIONS
+    // ========================================
+    
+    function clamp(val, min, max) {
+      return Math.max(min, Math.min(max, val));
+    }
+    
+    function safeRadius(r) {
+      return Math.max(0.5, r);
+    }
+    
+    function rgba(r, g, b, a) {
+      return `rgba(${clamp(Math.round(r),0,255)},${clamp(Math.round(g),0,255)},${clamp(Math.round(b),0,255)},${clamp(a,0,1)})`;
+    }
+    
+    // ========================================
+    // HAWKES PROCESS CORE
+    // ========================================
+    
+    function kernelFunction(dt, kernelType) {
+      if (dt <= 0) return 0;
+      switch (kernelType) {
+        case 'exponential': return alpha * Math.exp(-beta * dt);
+        case 'power': return alpha * Math.pow(1 + dt, -beta);
+        case 'gaussian': return alpha * Math.exp(-beta * dt * dt);
+        default: return alpha * Math.exp(-beta * dt);
+      }
+    }
+    
+    function computeIntensity(t, eventList, kernelType) {
+      let intensity = mu;
+      for (const ei of eventList) {
+        if (t > ei) {
+          intensity += kernelFunction(t - ei, kernelType);
+        }
+      }
+      return Math.max(0.001, intensity);
+    }
+    
+    function computeIntensityDecomposition(t, eventList) {
+      const base = mu;
+      let excitation = 0;
+      const contributions = [];
+      
+      for (const ei of eventList) {
+        if (t > ei) {
+          const contrib = alpha * Math.exp(-beta * (t - ei));
+          excitation += contrib;
+          contributions.push({ time: ei, contribution: contrib, dt: t - ei });
+        }
+      }
+      
+      contributions.sort((a, b) => b.contribution - a.contribution);
+      return { base, excitation, total: base + excitation, contributions };
+    }
+    
+    function simulateHawkes(T, baseMu, exciteAlpha, decayBeta) {
+      const generatedEvents = [];
+      const genealogy = [];
+      let t = 0;
+      const maxEvents = 10000;
+      
+      while (t < T && generatedEvents.length < maxEvents) {
+        const upperBound = computeIntensity(t, generatedEvents, 'exponential') + exciteAlpha;
+        const dt = -Math.log(Math.random()) / upperBound;
+        t += dt;
+        
+        if (t > T) break;
+        
+        const lambdaT = computeIntensity(t, generatedEvents, 'exponential');
+        if (Math.random() < lambdaT / upperBound) {
+          // Determine if exogenous or endogenous
+          const baseContrib = baseMu / lambdaT;
+          let isExogenous = Math.random() < baseContrib;
+          let parentIndex = -1;
+          
+          if (!isExogenous && generatedEvents.length > 0) {
+            // Find triggering event based on contribution
+            const decomp = computeIntensityDecomposition(t, generatedEvents);
+            const exciteTotal = decomp.excitation;
+            let cumSum = 0;
+            const rand = Math.random() * exciteTotal;
+            for (let i = 0; i < decomp.contributions.length; i++) {
+              cumSum += decomp.contributions[i].contribution;
+              if (cumSum >= rand) {
+                parentIndex = generatedEvents.indexOf(decomp.contributions[i].time);
+                break;
+              }
+            }
+          }
+          
+          generatedEvents.push(t);
+          genealogy.push({ time: t, parent: parentIndex, isExogenous, children: [] });
+        }
+      }
+      
+      // Build children arrays
+      for (let i = 0; i < genealogy.length; i++) {
+        if (genealogy[i].parent >= 0) {
+          genealogy[genealogy[i].parent].children.push(i);
+        }
+      }
+      
+      return { events: generatedEvents, genealogy };
+    }
+    
+    function computeMeanIntensity() {
+      const n = alpha / beta;
+      if (n >= 1) return Infinity;
+      return mu / (1 - n);
+    }
+    
+    function computeResiduals(eventList, T) {
+      if (eventList.length === 0) return [];
+      const residuals = [];
+      let compensator = 0;
+      
+      for (let i = 0; i < eventList.length; i++) {
+        const prevT = i === 0 ? 0 : eventList[i - 1];
+        const currT = eventList[i];
+        compensator += mu * (currT - prevT);
+        
+        for (let j = 0; j < i; j++) {
+          const tj = eventList[j];
+          const integral = (alpha / beta) * (Math.exp(-beta * Math.max(0, prevT - tj)) - Math.exp(-beta * (currT - tj)));
+          compensator += integral;
+        }
+        
+        residuals.push(compensator);
+      }
+      return residuals;
+    }
+    
+    // ========================================
+    // VISUALIZATION FUNCTIONS
+    // ========================================
+    
+    function drawMainCanvas() {
+      if (!mainCtx) return;
+      
+      const w = mainCanvasW;
+      const h = mainCanvasH;
+      const timeWindow = 20;
+      
+      // Clear
+      mainCtx.fillStyle = '#080c14';
+      mainCtx.fillRect(0, 0, w, h);
+      
+      // Grid
+      mainCtx.strokeStyle = rgba(36, 48, 68, 0.4);
+      mainCtx.lineWidth = 1;
+      
+      for (let i = 0; i <= timeWindow; i += 5) {
+        const x = (i / timeWindow) * w;
+        mainCtx.beginPath();
+        mainCtx.moveTo(x, 0);
+        mainCtx.lineTo(x, h);
+        mainCtx.stroke();
+      }
+      
+      for (let i = 0; i <= 4; i++) {
+        const y = (i / 4) * h;
+        mainCtx.beginPath();
+        mainCtx.moveTo(0, y);
+        mainCtx.lineTo(w, y);
+        mainCtx.stroke();
+      }
+      
+      const visibleEvents = events.filter(e => e <= currentTime);
+      const maxIntensity = Math.max(5, (isFinite(computeMeanIntensity()) ? computeMeanIntensity() * 1.5 : 10));
+      
+      // Intensity curve
+      mainCtx.beginPath();
+      mainCtx.strokeStyle = '#00e5b8';
+      mainCtx.lineWidth = 2;
+      
+      let started = false;
+      for (let px = 0; px < w; px++) {
+        const t = (px / w) * timeWindow;
+        if (t > currentTime) break;
+        
+        const intensity = computeIntensity(t, visibleEvents, selectedKernel);
+        const y = h - (intensity / maxIntensity) * h * 0.85;
+        const clampedY = clamp(y, 5, h - 5);
+        
+        if (!started) {
+          mainCtx.moveTo(px, clampedY);
+          started = true;
+        } else {
+          mainCtx.lineTo(px, clampedY);
+        }
+      }
+      mainCtx.stroke();
+      
+      // Fill
+      if (started) {
+        mainCtx.lineTo(Math.min((currentTime / timeWindow) * w, w), h);
+        mainCtx.lineTo(0, h);
+        mainCtx.closePath();
+        mainCtx.fillStyle = rgba(0, 229, 184, 0.08);
+        mainCtx.fill();
+      }
+      
+      // Base rate line
+      const baseY = h - (mu / maxIntensity) * h * 0.85;
+      mainCtx.beginPath();
+      mainCtx.strokeStyle = rgba(143, 163, 192, 0.4);
+      mainCtx.setLineDash([4, 4]);
+      mainCtx.moveTo(0, baseY);
+      mainCtx.lineTo(w, baseY);
+      mainCtx.stroke();
+      mainCtx.setLineDash([]);
+      
+      // Events
+      for (let i = 0; i < visibleEvents.length; i++) {
+        const event = visibleEvents[i];
+        const x = (event / timeWindow) * w;
+        const prevEvents = visibleEvents.slice(0, i);
+        const intensity = computeIntensity(event, prevEvents, selectedKernel);
+        const y = h - (intensity / maxIntensity) * h * 0.85;
+        const clampedY = clamp(y, 10, h - 10);
+        
+        // Glow
+        const gradient = mainCtx.createRadialGradient(x, clampedY, 0, x, clampedY, safeRadius(12));
+        gradient.addColorStop(0, rgba(0, 229, 184, 0.35));
+        gradient.addColorStop(1, rgba(0, 229, 184, 0));
+        mainCtx.fillStyle = gradient;
+        mainCtx.beginPath();
+        mainCtx.arc(x, clampedY, safeRadius(12), 0, Math.PI * 2);
+        mainCtx.fill();
+        
+        // Marker
+        const genealogyInfo = eventGenealogy[i];
+        mainCtx.fillStyle = genealogyInfo && genealogyInfo.isExogenous ? '#00e5b8' : '#f472b6';
+        mainCtx.beginPath();
+        mainCtx.arc(x, clampedY, safeRadius(4), 0, Math.PI * 2);
+        mainCtx.fill();
+        
+        // Stem
+        mainCtx.strokeStyle = rgba(0, 229, 184, 0.2);
+        mainCtx.lineWidth = 1;
+        mainCtx.beginPath();
+        mainCtx.moveTo(x, clampedY);
+        mainCtx.lineTo(x, h);
+        mainCtx.stroke();
+      }
+      
+      // Selected time indicator
+      if (selectedTime !== null && selectedTime <= timeWindow) {
+        const selX = (selectedTime / timeWindow) * w;
+        mainCtx.strokeStyle = rgba(244, 114, 182, 0.5);
+        mainCtx.lineWidth = 2;
+        mainCtx.setLineDash([4, 4]);
+        mainCtx.beginPath();
+        mainCtx.moveTo(selX, 0);
+        mainCtx.lineTo(selX, h);
+        mainCtx.stroke();
+        mainCtx.setLineDash([]);
+        
+        // Intensity point
+        const selIntensity = computeIntensity(selectedTime, visibleEvents, selectedKernel);
+        const selY = h - (selIntensity / maxIntensity) * h * 0.85;
+        mainCtx.fillStyle = '#f472b6';
+        mainCtx.beginPath();
+        mainCtx.arc(selX, clamp(selY, 10, h - 10), safeRadius(6), 0, Math.PI * 2);
+        mainCtx.fill();
+      }
+      
+      // Current time line
+      if (currentTime > 0 && currentTime <= timeWindow) {
+        const currX = (currentTime / timeWindow) * w;
+        mainCtx.strokeStyle = rgba(255, 255, 255, 0.2);
+        mainCtx.lineWidth = 1;
+        mainCtx.beginPath();
+        mainCtx.moveTo(currX, 0);
+        mainCtx.lineTo(currX, h);
+        mainCtx.stroke();
+      }
+      
+      // Labels
+      mainCtx.fillStyle = rgba(143, 163, 192, 0.6);
+      mainCtx.font = '10px "JetBrains Mono", monospace';
+      mainCtx.fillText('Time', w - 28, h - 6);
+      mainCtx.fillText('λ*(t)', 4, 12);
+    }
+    
+    function drawGenealogyCanvas() {
+      if (!genealogyCtx || events.length === 0) return;
+      
+      const w = genealogyCanvas.width / dpr;
+      const h = genealogyCanvas.height / dpr;
+      const timeWindow = 20;
+      
+      genealogyCtx.fillStyle = '#080c14';
+      genealogyCtx.fillRect(0, 0, w, h);
+      
+      // Build generation levels
+      const levels = new Array(events.length).fill(0);
+      for (let i = 0; i < eventGenealogy.length; i++) {
+        if (eventGenealogy[i].parent >= 0) {
+          levels[i] = levels[eventGenealogy[i].parent] + 1;
+        }
+      }
+      
+      const maxLevel = Math.max(...levels, 1);
+      const levelHeight = h / (maxLevel + 2);
+      
+      // Draw connections
+      genealogyCtx.strokeStyle = rgba(244, 114, 182, 0.3);
+      genealogyCtx.lineWidth = 1;
+      
+      for (let i = 0; i < eventGenealogy.length; i++) {
+        const parent = eventGenealogy[i].parent;
+        if (parent >= 0) {
+          const x1 = (events[parent] / timeWindow) * w;
+          const y1 = (levels[parent] + 1) * levelHeight;
+          const x2 = (events[i] / timeWindow) * w;
+          const y2 = (levels[i] + 1) * levelHeight;
+          
+          genealogyCtx.beginPath();
+          genealogyCtx.moveTo(x1, y1);
+          genealogyCtx.bezierCurveTo(x1 + (x2 - x1) * 0.3, y1, x1 + (x2 - x1) * 0.7, y2, x2, y2);
+          genealogyCtx.stroke();
+        }
+      }
+      
+      // Draw events
+      for (let i = 0; i < events.length; i++) {
+        const x = (events[i] / timeWindow) * w;
+        const y = (levels[i] + 1) * levelHeight;
+        
+        genealogyCtx.fillStyle = eventGenealogy[i].isExogenous ? '#00e5b8' : '#f472b6';
+        genealogyCtx.beginPath();
+        genealogyCtx.arc(x, y, safeRadius(4), 0, Math.PI * 2);
+        genealogyCtx.fill();
+      }
+    }
+    
+    function drawPhaseCanvas() {
+      if (!phaseCtx) return;
+      
+      const w = phaseCanvas.width / dpr;
+      const h = phaseCanvas.height / dpr;
+      
+      phaseCtx.fillStyle = '#080c14';
+      phaseCtx.fillRect(0, 0, w, h);
+      
+      // Draw regions
+      // Stationary region (green)
+      phaseCtx.fillStyle = rgba(0, 229, 184, 0.1);
+      phaseCtx.fillRect(0, 0, w, h);
+      
+      // Explosive region (red) - where alpha > beta
+      phaseCtx.beginPath();
+      phaseCtx.moveTo(0, 0);
+      phaseCtx.lineTo(w, 0);
+      phaseCtx.lineTo(w, h);
+      phaseCtx.lineTo(0, h);
+      phaseCtx.closePath();
+      
+      // Draw diagonal boundary
+      phaseCtx.strokeStyle = rgba(248, 113, 113, 0.5);
+      phaseCtx.lineWidth = 2;
+      phaseCtx.beginPath();
+      phaseCtx.moveTo(0, 0);
+      phaseCtx.lineTo(w, h);
+      phaseCtx.stroke();
+      
+      // Fill explosive region
+      phaseCtx.fillStyle = rgba(248, 113, 113, 0.1);
+      phaseCtx.beginPath();
+      phaseCtx.moveTo(0, 0);
+      phaseCtx.lineTo(w, 0);
+      phaseCtx.lineTo(w, h * (2 / 3));
+      phaseCtx.lineTo(0, h * (1 / 3));
+      phaseCtx.closePath();
+      phaseCtx.fill();
+      
+      // Grid
+      phaseCtx.strokeStyle = rgba(36, 48, 68, 0.3);
+      phaseCtx.lineWidth = 1;
+      for (let i = 0.5; i <= 2; i += 0.5) {
+        const y = ((2 - i) / 1.5) * h;
+        phaseCtx.beginPath();
+        phaseCtx.moveTo(0, y);
+        phaseCtx.lineTo(w, y);
+        phaseCtx.stroke();
+      }
+      for (let i = 0.5; i <= 3; i += 0.5) {
+        const x = (i / 3) * w;
+        phaseCtx.beginPath();
+        phaseCtx.moveTo(x, 0);
+        phaseCtx.lineTo(x, h);
+        phaseCtx.stroke();
+      }
+      
+      // Labels
+      phaseCtx.fillStyle = rgba(143, 163, 192, 0.6);
+      phaseCtx.font = '9px "JetBrains Mono", monospace';
+      phaseCtx.fillText('α', w - 12, h - 6);
+      phaseCtx.fillText('β', 4, 12);
+      
+      // Update phase point position
+      const pointX = clamp((alpha / 2) * w, 6, w - 6);
+      const pointY = clamp(((2 - beta) / 1.5) * h, 6, h - 6);
+      
+      const phasePoint = document.getElementById('phase-point');
+      if (phasePoint) {
+        phasePoint.style.left = pointX + 'px';
+        phasePoint.style.top = pointY + 'px';
+        phasePoint.style.background = alpha / beta < 1 ? 'var(--accent)' : 'var(--error)';
+        phasePoint.style.boxShadow = alpha / beta < 1 ? '0 0 12px var(--accent)' : '0 0 12px var(--error)';
+      }
+    }
+    
+    function drawKernelCanvas() {
+      if (!kernelCtx) return;
+      
+      const w = kernelCanvas.width / dpr;
+      const h = kernelCanvas.height / dpr;
+      const maxT = 5;
+      
+      kernelCtx.fillStyle = '#080c14';
+      kernelCtx.fillRect(0, 0, w, h);
+      
+      // Grid
+      kernelCtx.strokeStyle = rgba(36, 48, 68, 0.3);
+      kernelCtx.lineWidth = 1;
+      for (let i = 0; i <= maxT; i++) {
+        const x = (i / maxT) * w;
+        kernelCtx.beginPath();
+        kernelCtx.moveTo(x, 0);
+        kernelCtx.lineTo(x, h);
+        kernelCtx.stroke();
+      }
+      
+      // Draw all kernels with reduced opacity
+      const kernels = ['exponential', 'power', 'gaussian'];
+      const colors = ['#00e5b8', '#f472b6', '#fbbf24'];
+      
+      kernels.forEach((k, idx) => {
+        kernelCtx.beginPath();
+        kernelCtx.strokeStyle = rgba(
+          parseInt(colors[idx].slice(1,3), 16),
+          parseInt(colors[idx].slice(3,5), 16),
+          parseInt(colors[idx].slice(5,7), 16),
+          k === selectedKernel ? 1 : 0.3
+        );
+        kernelCtx.lineWidth = k === selectedKernel ? 2 : 1;
+        
+        for (let px = 0; px < w; px++) {
+          const t = (px / w) * maxT;
+          const val = kernelFunction(t, k);
+          const y = h - (val / alpha) * h * 0.9;
+          
+          if (px === 0) kernelCtx.moveTo(px, clamp(y, 5, h - 5));
+          else kernelCtx.lineTo(px, clamp(y, 5, h - 5));
+        }
+        kernelCtx.stroke();
+      });
+      
+      // Labels
+      kernelCtx.fillStyle = rgba(143, 163, 192, 0.6);
+      kernelCtx.font = '9px "JetBrains Mono", monospace';
+      kernelCtx.fillText('t', w - 10, h - 6);
+      kernelCtx.fillText('g(t)', 4, 12);
+    }
+    
+    function drawEnsembleCanvas() {
+      if (!ensembleCtx) return;
+      
+      const w = ensembleCanvas.width / dpr;
+      const h = ensembleCanvas.height / dpr;
+      const timeWindow = 20;
+      
+      ensembleCtx.fillStyle = '#080c14';
+      ensembleCtx.fillRect(0, 0, w, h);
+      
+      // Grid
+      ensembleCtx.strokeStyle = rgba(36, 48, 68, 0.3);
+      ensembleCtx.lineWidth = 1;
+      for (let i = 0; i <= timeWindow; i += 5) {
+        const x = (i / timeWindow) * w;
+        ensembleCtx.beginPath();
+        ensembleCtx.moveTo(x, 0);
+        ensembleCtx.lineTo(x, h);
+        ensembleCtx.stroke();
+      }
+      
+      if (ensembleRuns.length === 0) {
+        ensembleCtx.fillStyle = rgba(143, 163, 192, 0.4);
+        ensembleCtx.font = '11px "Space Grotesk", sans-serif';
+        ensembleCtx.textAlign = 'center';
+        ensembleCtx.fillText('Click "Run Ensemble" to generate realizations', w/2, h/2);
+        ensembleCtx.textAlign = 'left';
+        return;
+      }
+      
+      // Count events at each time point
+      const maxEvents = Math.max(...ensembleRuns.map(run => run.length), 10);
+      
+      // Draw individual realizations
+      ensembleRuns.forEach((run, idx) => {
+        ensembleCtx.beginPath();
+        ensembleCtx.strokeStyle = rgba(0, 229, 184, 0.15);
+        ensembleCtx.lineWidth = 1;
+        
+        for (let px = 0; px < w; px++) {
+          const t = (px / w) * timeWindow;
+          const count = run.filter(e => e <= t).length;
+          const y = h - (count / maxEvents) * h * 0.9;
+          
+          if (px === 0) ensembleCtx.moveTo(px, y);
+          else ensembleCtx.lineTo(px, y);
+        }
+        ensembleCtx.stroke();
+      });
+      
+      // Draw mean
+      const meanLine = [];
+      for (let px = 0; px < w; px++) {
+        const t = (px / w) * timeWindow;
+        let sum = 0;
+        ensembleRuns.forEach(run => {
+          sum += run.filter(e => e <= t).length;
+        });
+        meanLine.push(sum / ensembleRuns.length);
+      }
+      
+      ensembleCtx.beginPath();
+      ensembleCtx.strokeStyle = '#00e5b8';
+      ensembleCtx.lineWidth = 2;
+      meanLine.forEach((val, px) => {
+        const y = h - (val / maxEvents) * h * 0.9;
+        if (px === 0) ensembleCtx.moveTo(px, y);
+        else ensembleCtx.lineTo(px, y);
+      });
+      ensembleCtx.stroke();
+      
+      // Update stats
+      const finalCounts = ensembleRuns.map(run => run.length);
+      const meanCount = finalCounts.reduce((a, b) => a + b, 0) / finalCounts.length;
+      const stdCount = Math.sqrt(finalCounts.reduce((sum, c) => sum + (c - meanCount) ** 2, 0) / finalCounts.length);
+      const theoreticalN = computeMeanIntensity() * timeWindow;
+      
+      document.getElementById('ensemble-mean-events').textContent = meanCount.toFixed(1);
+      document.getElementById('ensemble-std-events').textContent = stdCount.toFixed(1);
+      document.getElementById('theoretical-n').textContent = isFinite(theoreticalN) ? theoreticalN.toFixed(1) : '∞';
+    }
+    
+    function drawQQCanvas() {
+      if (!qqCtx) return;
+      
+      const w = qqCanvas.width / dpr;
+      const h = qqCanvas.height / dpr;
+      
+      qqCtx.fillStyle = '#080c14';
+      qqCtx.fillRect(0, 0, w, h);
+      
+      // Identity line
+      qqCtx.strokeStyle = rgba(143, 163, 192, 0.3);
+      qqCtx.lineWidth = 1;
+      qqCtx.setLineDash([3, 3]);
+      qqCtx.beginPath();
+      qqCtx.moveTo(0, h);
+      qqCtx.lineTo(w, 0);
+      qqCtx.stroke();
+      qqCtx.setLineDash([]);
+      
+      if (events.length < 2) return;
+      
+      const residuals = computeResiduals(events, currentTime);
+      if (residuals.length === 0) return;
+      
+      residuals.sort((a, b) => a - b);
+      const n = residuals.length;
+      const maxRes = Math.max(...residuals, 1);
+      
+      // Points
+      qqCtx.fillStyle = '#00e5b8';
+      for (let i = 0; i < n; i++) {
+        const theoretical = -Math.log(1 - (i + 0.5) / n);
+        const x = (theoretical / maxRes) * w;
+        const y = h - (residuals[i] / maxRes) * h;
+        qqCtx.beginPath();
+        qqCtx.arc(clamp(x, 2, w-2), clamp(y, 2, h-2), safeRadius(2), 0, Math.PI * 2);
+        qqCtx.fill();
+      }
+    }
+    
+    // ========================================
+    // UI UPDATE FUNCTIONS
+    // ========================================
+    
+    function updateStats() {
+      const visibleEvents = events.filter(e => e <= currentTime);
+      const currentIntensity = computeIntensity(currentTime, visibleEvents, selectedKernel);
+      const meanInt = computeMeanIntensity();
+      
+      document.getElementById('stat-events').textContent = visibleEvents.length;
+      document.getElementById('stat-intensity').textContent = currentIntensity.toFixed(2);
+      document.getElementById('stat-mean').textContent = isFinite(meanInt) ? meanInt.toFixed(2) : '∞';
+      
+      // Sidebar quick stats
+      document.getElementById('quick-events').textContent = visibleEvents.length;
+      document.getElementById('quick-intensity').textContent = currentIntensity.toFixed(2);
+      document.getElementById('quick-mean').textContent = isFinite(meanInt) ? meanInt.toFixed(2) : '∞';
+      
+      // Exogenous ratio
+      if (visibleEvents.length > 0 && isFinite(meanInt)) {
+        const exogRatio = (mu / meanInt * 100).toFixed(0);
+        document.getElementById('stat-exogenous').textContent = exogRatio + '%';
+      } else {
+        document.getElementById('stat-exogenous').textContent = '—';
+      }
+      
+      // KS test
+      const residuals = computeResiduals(visibleEvents, currentTime);
+      if (residuals.length > 1) {
+        residuals.sort((a, b) => a - b);
+        const n = residuals.length;
+        let maxDiff = 0;
+        for (let i = 0; i < n; i++) {
+          const empirical = (i + 1) / n;
+          const theoretical = 1 - Math.exp(-residuals[i]);
+          maxDiff = Math.max(maxDiff, Math.abs(empirical - theoretical));
+        }
+        const pval = Math.max(0, Math.min(1, 1 - maxDiff * Math.sqrt(n)));
+        document.getElementById('ks-pval').textContent = pval.toFixed(2);
+      }
+    }
+    
+    function updateBranchingRatio() {
+      const n = alpha / beta;
+      document.getElementById('branching-ratio').textContent = n.toFixed(2);
+      document.getElementById('stability-sublabel').textContent = `n = ${n.toFixed(2)}`;
+      
+      const statusIndicator = document.getElementById('status-indicator');
+      const statusDot = document.getElementById('status-dot');
+      
+      if (n < 1) {
+        document.getElementById('process-type').textContent = 'Stationary';
+        document.getElementById('process-type').style.color = 'var(--accent)';
+        document.getElementById('process-desc').textContent = 'Finite expected intensity';
+        document.getElementById('stability-label').textContent = 'Stationary';
+        statusIndicator.style.borderColor = 'var(--accent)';
+        statusDot.style.background = 'var(--accent)';
+        
+        document.getElementById('val-stationarity').className = 'validation-status pass';
+        document.getElementById('val-stationarity').innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span>Stationarity</span>';
+      } else {
+        document.getElementById('process-type').textContent = 'Explosive';
+        document.getElementById('process-type').style.color = 'var(--error)';
+        document.getElementById('process-desc').textContent = 'Intensity grows unboundedly';
+        document.getElementById('stability-label').textContent = 'Explosive';
+        statusIndicator.style.borderColor = 'var(--error)';
+        statusDot.style.background = 'var(--error)';
+        
+        document.getElementById('val-stationarity').className = 'validation-status fail';
+        document.getElementById('val-stationarity').innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg><span>Stationarity</span>';
+      }
+      
+      // Update theoretical values
+      const meanInt = computeMeanIntensity();
+      document.getElementById('theoretical-mean').textContent = isFinite(meanInt) ? meanInt.toFixed(2) : '∞';
+      document.getElementById('memory-horizon').textContent = (1/beta).toFixed(2);
+      
+      const cv = n < 1 ? Math.sqrt(1 + 2*n*n/(1-n*n)) : Infinity;
+      document.getElementById('coeff-var').textContent = isFinite(cv) ? cv.toFixed(2) : '∞';
+    }
+    
+    function updateIntensityDecomposition() {
+      if (selectedTime === null || events.length === 0) {
+        document.getElementById('decomp-time').textContent = '—';
+        document.getElementById('decomp-total').textContent = '—';
+        document.getElementById('decomp-base-val').textContent = '—';
+        document.getElementById('decomp-excite-val').textContent = '—';
+        document.getElementById('decomp-base-bar').style.width = '0%';
+        document.getElementById('decomp-excite-bar').style.width = '0%';
+        document.getElementById('contribution-list').innerHTML = '<div class="text-xs text-[var(--fg-muted)] text-center py-4">Select a time point to see contributions</div>';
+        return;
+      }
+      
+      const visibleEvents = events.filter(e => e <= selectedTime);
+      const decomp = computeIntensityDecomposition(selectedTime, visibleEvents);
+      
+      document.getElementById('decomp-time').textContent = selectedTime.toFixed(2);
+      document.getElementById('decomp-total').textContent = decomp.total.toFixed(3);
+      document.getElementById('decomp-base-val').textContent = decomp.base.toFixed(3);
+      document.getElementById('decomp-excite-val').textContent = decomp.excitation.toFixed(3);
+      
+      const basePct = (decomp.base / decomp.total * 100);
+      const excitePct = (decomp.excitation / decomp.total * 100);
+      
+      document.getElementById('decomp-base-bar').style.width = basePct + '%';
+      document.getElementById('decomp-excite-bar').style.width = excitePct + '%';
+      
+      // Contribution list
+      const listHtml = decomp.contributions.slice(0, 10).map((c, i) => `
+        <div class="flex justify-between items-center py-1 px-2 ${i % 2 === 0 ? 'bg-[var(--bg-highlight)]' : ''} rounded text-xs">
+          <span class="text-[var(--fg-muted)]">t = ${c.time.toFixed(2)}</span>
+          <span class="mono text-[var(--trigger)]">+${c.contribution.toFixed(4)}</span>
+          <span class="text-[var(--fg-muted)]">(${c.dt.toFixed(2)} ago)</span>
+        </div>
+      `).join('');
+      
+      document.getElementById('contribution-list').innerHTML = listHtml || '<div class="text-xs text-[var(--fg-muted)] text-center py-4">No past events</div>';
+    }
+    
+    function updateEventGenealogy() {
+      if (eventGenealogy.length === 0) {
+        document.getElementById('exog-count').textContent = '0';
+        document.getElementById('endog-count').textContent = '0';
+        document.getElementById('avg-children').textContent = '0.00';
+        document.getElementById('event-log').innerHTML = `
+          <div class="event-row bg-[var(--bg-highlight)] text-[var(--fg-muted)]">
+            <span>#</span><span>Time</span><span>Type</span><span>Children</span>
+          </div>
+        `;
+        return;
+      }
+      
+      const exogCount = eventGenealogy.filter(e => e.isExogenous).length;
+      const endogCount = eventGenealogy.length - exogCount;
+      const totalChildren = eventGenealogy.reduce((sum, e) => sum + e.children.length, 0);
+      const avgChildren = eventGenealogy.length > 0 ? totalChildren / eventGenealogy.length : 0;
+      
+      document.getElementById('exog-count').textContent = exogCount;
+      document.getElementById('endog-count').textContent = endogCount;
+      document.getElementById('avg-children').textContent = avgChildren.toFixed(2);
+      
+      // Event log
+      const logHtml = eventGenealogy.slice(-20).map((e, i) => {
+        const idx = eventGenealogy.length - 20 + i;
+        return `
+          <div class="event-row">
+            <span class="text-[var(--fg-muted)]">${idx + 1}</span>
+            <span class="mono">${e.time.toFixed(2)}</span>
+            <span>${e.isExogenous ? '<span class="badge badge-exogenous">EXOG</span>' : '<span class="badge badge-endogenous">ENDO</span>'}</span>
+            <span class="mono">${e.children.length}</span>
+          </div>
+        `;
+      }).join('');
+      
+      document.getElementById('event-log').innerHTML = `
+        <div class="event-row bg-[var(--bg-highlight)] text-[var(--fg-muted)]">
+          <span>#</span><span>Time</span><span>Type</span><span>Children</span>
+        </div>
+        ${logHtml}
+      `;
+      
+      drawGenealogyCanvas();
+    }
+    
+    // ========================================
+    // ANIMATION LOOP
+    // ========================================
+    
+    function animate() {
+      if (!isPaused && currentTime < 20) {
+        currentTime += simulationSpeed;
+        drawMainCanvas();
+        updateStats();
+        drawQQCanvas();
+      }
+      animationId = requestAnimationFrame(animate);
+    }
+    
+    // ========================================
+    // EVENT HANDLERS
+    // ========================================
+    
+    function runSimulation() {
+      const result = simulateHawkes(20, mu, alpha, beta);
+      events = result.events;
+      eventGenealogy = result.genealogy;
+      currentTime = 0;
+      selectedTime = null;
+      isPaused = false;
+      document.getElementById('pause-btn-text').textContent = 'Pause';
+      
+      drawMainCanvas();
+      drawGenealogyCanvas();
+      drawPhaseCanvas();
+      drawQQCanvas();
+      updateStats();
+      updateBranchingRatio();
+      updateEventGenealogy();
+      updateIntensityDecomposition();
+    }
+    
+    function togglePause() {
+      isPaused = !isPaused;
+      document.getElementById('pause-btn-text').textContent = isPaused ? 'Resume' : 'Pause';
+    }
+    
+    function resetSimulation() {
+      events = [];
+      eventGenealogy = [];
+      currentTime = 0;
+      selectedTime = null;
+      isPaused = false;
+      document.getElementById('pause-btn-text').textContent = 'Pause';
+      
+      drawMainCanvas();
+      drawGenealogyCanvas();
+      drawQQCanvas();
+      updateStats();
+      updateEventGenealogy();
+      updateIntensityDecomposition();
+    }
+    
+    function runEnsemble() {
+      ensembleRuns = [];
+      for (let i = 0; i < 20; i++) {
+        const result = simulateHawkes(20, mu, alpha, beta);
+        ensembleRuns.push(result.events);
+      }
+      document.getElementById('ensemble-n').textContent = ensembleRuns.length;
+      drawEnsembleCanvas();
+    }
+    
+    function switchMainTab(btn) {
+      document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      
+      const tabName = btn.dataset.tab;
+      document.getElementById('tab-simulate').style.display = tabName === 'simulate' ? 'block' : 'none';
+      document.getElementById('tab-explore').style.display = tabName === 'explore' ? 'block' : 'none';
+      
+      if (tabName === 'explore') {
+        drawPhaseCanvas();
+        drawKernelCanvas();
+        drawGenealogyCanvas();
+        drawEnsembleCanvas();
+      }
+    }
+    
+    function switchSubTab(btn) {
+      document.querySelectorAll('.subtab-btn').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      
+      document.querySelectorAll('.subtab-content').forEach(c => c.style.display = 'none');
+      document.getElementById('subtab-' + btn.dataset.subtab).style.display = 'block';
+      
+      // Redraw relevant canvas
+      if (btn.dataset.subtab === 'genealogy') drawGenealogyCanvas();
+      if (btn.dataset.subtab === 'phase') drawPhaseCanvas();
+      if (btn.dataset.subtab === 'kernel') drawKernelCanvas();
+      if (btn.dataset.subtab === 'ensemble') drawEnsembleCanvas();
+    }
+    
+    function toggleSection(header) {
+      const content = header.nextElementSibling;
+      const icon = header.querySelector('svg');
+      content.classList.toggle('open');
+      icon.style.transform = content.classList.contains('open') ? 'rotate(180deg)' : '';
+    }
+    
+    // ========================================
+    // INITIALIZATION
+    // ========================================
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get canvas elements
+      mainCanvas = document.getElementById('main-canvas');
+      genealogyCanvas = document.getElementById('genealogy-canvas');
+      phaseCanvas = document.getElementById('phase-canvas');
+      kernelCanvas = document.getElementById('kernel-canvas');
+      ensembleCanvas = document.getElementById('ensemble-canvas');
+      qqCanvas = document.getElementById('qq-canvas');
+      
+      if (!mainCanvas) return;
+      
+      // Get contexts
+      mainCtx = mainCanvas.getContext('2d');
+      genealogyCtx = genealogyCanvas ? genealogyCanvas.getContext('2d') : null;
+      phaseCtx = phaseCanvas ? phaseCanvas.getContext('2d') : null;
+      kernelCtx = kernelCanvas ? kernelCanvas.getContext('2d') : null;
+      ensembleCtx = ensembleCanvas ? ensembleCanvas.getContext('2d') : null;
+      qqCtx = qqCanvas ? qqCanvas.getContext('2d') : null;
+      
+      dpr = window.devicePixelRatio || 1;
+      
+      // Resize function
+      function resizeCanvas(canvasEl, w, h) {
+        if (!canvasEl) return;
+        canvasEl.width = w * dpr;
+        canvasEl.height = h * dpr;
+        canvasEl.style.width = w + 'px';
+        canvasEl.style.height = h + 'px';
+        canvasEl.getContext('2d').scale(dpr, dpr);
+      }
+      
+      function resizeAll() {
+        const mainRect = mainCanvas.parentElement.getBoundingClientRect();
+        mainCanvasW = mainRect.width;
+        mainCanvasH = mainRect.height;
+        resizeCanvas(mainCanvas, mainCanvasW, mainCanvasH);
+        
+        if (genealogyCanvas) {
+          const gRect = genealogyCanvas.parentElement.getBoundingClientRect();
+          resizeCanvas(genealogyCanvas, gRect.width, gRect.height);
+        }
+        if (phaseCanvas) {
+          const pRect = phaseCanvas.parentElement.getBoundingClientRect();
+          resizeCanvas(phaseCanvas, pRect.width, pRect.height);
+        }
+        if (kernelCanvas) {
+          const kRect = kernelCanvas.parentElement.getBoundingClientRect();
+          resizeCanvas(kernelCanvas, kRect.width, kRect.height);
+        }
+        if (ensembleCanvas) {
+          const eRect = ensembleCanvas.parentElement.getBoundingClientRect();
+          resizeCanvas(ensembleCanvas, eRect.width, eRect.height);
+        }
+        if (qqCanvas) {
+          const qRect = qqCanvas.parentElement.getBoundingClientRect();
+          resizeCanvas(qqCanvas, qRect.width, qRect.height);
+        }
+        
+        drawMainCanvas();
+        drawPhaseCanvas();
+        drawKernelCanvas();
+      }
+      
+      resizeAll();
+      window.addEventListener('resize', resizeAll);
+      
+      // Parameter sliders
+      document.getElementById('mu-slider').addEventListener('input', function() {
+        mu = parseFloat(this.value);
+        document.getElementById('mu-value').textContent = mu.toFixed(2);
+        updateBranchingRatio();
+        drawPhaseCanvas();
+      });
+      
+      document.getElementById('alpha-slider').addEventListener('input', function() {
+        alpha = parseFloat(this.value);
+        document.getElementById('alpha-value').textContent = alpha.toFixed(2);
+        updateBranchingRatio();
+        drawPhaseCanvas();
+        drawKernelCanvas();
+      });
+      
+      document.getElementById('beta-slider').addEventListener('input', function() {
+        beta = parseFloat(this.value);
+        document.getElementById('beta-value').textContent = beta.toFixed(1);
+        updateBranchingRatio();
+        drawPhaseCanvas();
+        drawKernelCanvas();
+      });
+      
+      document.getElementById('speed-slider').addEventListener('input', function() {
+        simulationSpeed = parseFloat(this.value);
+      });
+      
+      // Kernel selection
+      document.querySelectorAll('input[name="kernel"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+          selectedKernel = this.value;
+          drawKernelCanvas();
+          drawMainCanvas();
+        });
+      });
+      
+      // Canvas click for intensity decomposition
+      mainCanvas.addEventListener('click', function(e) {
+        const rect = mainCanvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const timeWindow = 20;
+        selectedTime = (x / rect.width) * timeWindow;
+        updateIntensityDecomposition();
+        drawMainCanvas();
+      });
+      
+      // Canvas mousemove for tooltip
+      const tooltip = document.getElementById('intensity-tooltip');
+      
+      mainCanvas.addEventListener('mousemove', function(e) {
+        const rect = mainCanvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const timeWindow = 20;
+        const t = (x / rect.width) * timeWindow;
+        
+        const visibleEvents = events.filter(e => e <= Math.min(t, currentTime));
+        const intensity = computeIntensity(Math.min(t, currentTime), visibleEvents, selectedKernel);
+        const decomp = computeIntensityDecomposition(Math.min(t, currentTime), visibleEvents);
+        
+        document.getElementById('tooltip-time').textContent = Math.min(t, currentTime).toFixed(2);
+        document.getElementById('tooltip-intensity').textContent = intensity.toFixed(3);
+        document.getElementById('tooltip-base').textContent = decomp.base.toFixed(3);
+        document.getElementById('tooltip-excitation').textContent = decomp.excitation.toFixed(3);
+        document.getElementById('tooltip-contributors').textContent = decomp.contributions.length;
+        
+        tooltip.style.left = (e.clientX + 12) + 'px';
+        tooltip.style.top = (e.clientY + 12) + 'px';
+        tooltip.classList.add('visible');
+      });
+      
+      mainCanvas.addEventListener('mouseleave', function() {
+        tooltip.classList.remove('visible');
+      });
+      
+      // Navigation
+      const sections = document.querySelectorAll('section[id]');
+      const navLinks = document.querySelectorAll('.nav-link');
+      
+      const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            navLinks.forEach(function(link) {
+              link.classList.remove('active');
+              if (link.getAttribute('href') === '#' + entry.target.id) {
+                link.classList.add('active');
+              }
+            });
+          }
+        });
+      }, { rootMargin: '-20% 0px -80% 0px' });
+      
+      sections.forEach(function(section) { observer.observe(section); });
+      
+      // Animate on scroll
+      const animateObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+          }
+        });
+      }, { threshold: 0.1 });
+      
+      document.querySelectorAll('.animate-in').forEach(function(el) {
+        animateObserver.observe(el);
+      });
+      
+      // Initial setup
+      updateBranchingRatio();
+      runSimulation();
+      animate();
+    });
+  </script>
+</body>
+</html>

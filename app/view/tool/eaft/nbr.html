@@ -1,0 +1,2060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Number as Epistemic Artifact</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg-deep: #0a0b0d;
+      --bg: #12141a;
+      --bg-elevated: #1a1d26;
+      --bg-card: #1e222d;
+      --fg: #e8e6e3;
+      --fg-muted: #7a7d85;
+      --fg-dim: #4a4d55;
+      --accent: #d4a574;
+      --accent-bright: #e8c4a0;
+      --accent-dim: #8b6914;
+      --border: #2a2e38;
+      --border-subtle: #22262f;
+      --success: #5fb87a;
+      --warning: #d4a574;
+      --error: #c75f5f;
+      --info: #5f8dc7;
+      --granular-low: #4a6670;
+      --granular-mid: #6b8a4e;
+      --granular-high: #c49a3a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg-deep);
+      color: var(--fg);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: 
+        radial-gradient(ellipse at 20% 0%, rgba(212, 165, 116, 0.03) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(212, 165, 116, 0.02) 0%, transparent 50%),
+        var(--bg-deep);
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .grid-bg {
+      background-image: 
+        linear-gradient(rgba(42, 46, 56, 0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(42, 46, 56, 0.3) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--fg-dim);
+    }
+
+    @keyframes fadeSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    @keyframes numberMorph {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes grainFlow {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+
+    .animate-in {
+      animation: fadeSlideIn 0.5s ease-out forwards;
+    }
+
+    .animate-pulse-subtle {
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .number-morph {
+      animation: numberMorph 0.3s ease-out;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      border-color: var(--border);
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.15s;
+      cursor: pointer;
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg-deep);
+      border-color: var(--accent);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-bright);
+      border-color: var(--accent-bright);
+    }
+
+    .btn-secondary {
+      background: var(--bg-elevated);
+      color: var(--fg);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-card);
+      border-color: var(--fg-dim);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--fg-muted);
+    }
+
+    .btn-ghost:hover {
+      background: var(--bg-elevated);
+      color: var(--fg);
+    }
+
+    .type-selector {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .type-btn {
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 13px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--fg-muted);
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .type-btn:hover {
+      color: var(--fg);
+      background: var(--bg-elevated);
+    }
+
+    .type-btn.active {
+      background: var(--bg-card);
+      color: var(--accent);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .type-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+
+    .input-field {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 16px;
+      color: var(--fg);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 24px;
+      width: 100%;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
+    }
+
+    .input-field.error {
+      border-color: var(--error);
+    }
+
+    .input-field.valid {
+      border-color: var(--success);
+    }
+
+    .number-display {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 72px;
+      font-weight: 300;
+      letter-spacing: -2px;
+      line-height: 1;
+      transition: all 0.3s;
+    }
+
+    .transform-btn {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--fg-muted);
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .transform-btn:hover {
+      background: var(--bg-card);
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .transform-btn:active {
+      transform: translateY(0);
+    }
+
+    .transform-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .constraint-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--bg-elevated);
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .constraint-item.satisfied {
+      border-left: 3px solid var(--success);
+    }
+
+    .constraint-item.violated {
+      border-left: 3px solid var(--error);
+    }
+
+    .constraint-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .constraint-indicator.satisfied {
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+    }
+
+    .constraint-indicator.violated {
+      background: var(--error);
+      box-shadow: 0 0 8px var(--error);
+    }
+
+    .panel-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .panel-tab {
+      padding: 12px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--fg-muted);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      position: relative;
+      transition: color 0.2s;
+    }
+
+    .panel-tab:hover {
+      color: var(--fg);
+    }
+
+    .panel-tab.active {
+      color: var(--accent);
+    }
+
+    .panel-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    .panel-tab:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+
+    .representation-card {
+      padding: 16px;
+      background: var(--bg);
+      border-radius: 6px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .representation-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--fg-dim);
+      margin-bottom: 8px;
+    }
+
+    .representation-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      color: var(--fg);
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg);
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    .history-op {
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: var(--bg-elevated);
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 24px 0;
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-success {
+      background: rgba(95, 184, 122, 0.15);
+      color: var(--success);
+    }
+
+    .badge-warning {
+      background: rgba(212, 165, 116, 0.15);
+      color: var(--warning);
+    }
+
+    .badge-error {
+      background: rgba(199, 95, 95, 0.15);
+      color: var(--error);
+    }
+
+    .badge-info {
+      background: rgba(95, 141, 199, 0.15);
+      color: var(--info);
+    }
+
+    .number-line {
+      position: relative;
+      height: 60px;
+      background: var(--bg);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .number-line-axis {
+      position: absolute;
+      top: 50%;
+      left: 20px;
+      right: 20px;
+      height: 2px;
+      background: var(--border);
+      transform: translateY(-50%);
+    }
+
+    .number-line-tick {
+      position: absolute;
+      top: 50%;
+      width: 1px;
+      height: 8px;
+      background: var(--fg-dim);
+      transform: translate(-50%, -50%);
+    }
+
+    .number-line-marker {
+      position: absolute;
+      top: 50%;
+      width: 12px;
+      height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 12px var(--accent);
+      transition: left 0.3s ease-out;
+    }
+
+    .tooltip {
+      position: relative;
+    }
+
+    .tooltip::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      padding: 6px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 12px;
+      color: var(--fg);
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s;
+    }
+
+    .tooltip:hover::after {
+      opacity: 1;
+    }
+
+    /* Granularity Slider */
+    .granularity-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--granular-low), var(--granular-mid), var(--granular-high));
+      outline: none;
+      cursor: pointer;
+    }
+
+    .granularity-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--fg);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      transition: transform 0.15s;
+    }
+
+    .granularity-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+    }
+
+    .granularity-slider::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--fg);
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .granularity-slider:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    /* Grain visualization */
+    .grain-container {
+      position: relative;
+      height: 120px;
+      background: var(--bg);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .grain-block {
+      position: absolute;
+      background: var(--accent);
+      opacity: 0.3;
+      transition: all 0.4s ease-out;
+    }
+
+    /* Transition arrow */
+    .transition-arrow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 24px;
+      background: linear-gradient(90deg, var(--bg-elevated), var(--bg-card), var(--bg-elevated));
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .arrow-line {
+      flex: 1;
+      height: 2px;
+      background: linear-gradient(90deg, var(--fg-dim), var(--accent), var(--fg-dim));
+      position: relative;
+    }
+
+    .arrow-line::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 6px solid transparent;
+      border-left-color: var(--accent);
+    }
+
+    /* Domain selector */
+    .domain-card {
+      padding: 16px;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .domain-card:hover {
+      border-color: var(--accent);
+    }
+
+    .domain-card.active {
+      border-color: var(--accent);
+      background: rgba(212, 165, 116, 0.05);
+    }
+
+    .domain-card:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Coarse/Fine display */
+    .characterization-display {
+      padding: 24px;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .coarse-text {
+      font-size: 24px;
+      color: var(--fg-muted);
+      font-style: italic;
+    }
+
+    .fine-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 48px;
+      font-weight: 300;
+      color: var(--accent);
+    }
+
+    .unit-text {
+      font-size: 18px;
+      color: var(--fg-muted);
+      margin-left: 8px;
+    }
+
+    /* Resolution spectrum */
+    .resolution-spectrum {
+      display: flex;
+      gap: 2px;
+      height: 40px;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .resolution-bin {
+      flex: 1;
+      background: var(--border);
+      transition: background 0.2s;
+    }
+
+    .resolution-bin.active {
+      background: var(--accent);
+    }
+  </style>
+</head>
+<body class="grid-bg">
+  <div class="min-h-screen">
+    <!-- Header -->
+    <header class="border-b border-[var(--border-subtle)] bg-[var(--bg)]/80 backdrop-blur-sm sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 rounded-lg bg-[var(--bg-card)] border border-[var(--border)] flex items-center justify-center">
+            <span class="mono text-[var(--accent)] text-lg font-semibold">N</span>
+          </div>
+          <div>
+            <h1 class="text-lg font-semibold tracking-tight">Number</h1>
+            <p class="text-xs text-[var(--fg-muted)]">Epistemic Artifact Type</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="badge badge-info">Interactive Notebook</span>
+          <button id="resetBtn" class="btn btn-ghost text-sm" aria-label="Reset all">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+            </svg>
+            Reset
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-8">
+      <!-- Conceptual Layer -->
+      <section class="mb-12 animate-in" style="animation-delay: 0.1s;">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-8 h-8 rounded bg-[var(--accent)]/10 flex items-center justify-center">
+            <span class="text-[var(--accent)] text-sm font-semibold">1</span>
+          </div>
+          <h2 class="text-xl font-semibold">Conceptual Layer</h2>
+          <span class="text-[var(--fg-dim)] text-sm">Type Definition</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Type Definition -->
+          <div class="card lg:col-span-2">
+            <div class="card-header">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5"/>
+                <path d="M2 12l10 5 10-5"/>
+              </svg>
+              <span class="font-medium">Type Definition</span>
+            </div>
+            <div class="card-body space-y-4">
+              <p class="text-[var(--fg-muted)] leading-relaxed">
+                A <strong class="text-[var(--fg)]">Number</strong> is an epistemic artifact that encodes affirmations about 
+                <strong class="text-[var(--accent)]">quantity</strong>, <strong class="text-[var(--accent)]">magnitude</strong>, 
+                <strong class="text-[var(--accent)]">order</strong>, or <strong class="text-[var(--accent)]">relation</strong> 
+                in a formal symbolic system.
+              </p>
+              <div class="grid grid-cols-2 gap-4 pt-2">
+                <div class="p-4 bg-[var(--bg)] rounded-lg border border-[var(--border-subtle)]">
+                  <div class="text-xs text-[var(--fg-dim)] uppercase tracking-wide mb-2">Formal Structure</div>
+                  <p class="text-sm text-[var(--fg-muted)]">Symbolic representation with defined syntax, operations, and ordering relations</p>
+                </div>
+                <div class="p-4 bg-[var(--bg)] rounded-lg border border-[var(--border-subtle)]">
+                  <div class="text-xs text-[var(--fg-dim)] uppercase tracking-wide mb-2">Semantic Interpretation</div>
+                  <p class="text-sm text-[var(--fg-muted)]">Mapping to quantities, positions, or relations in conceptual or physical reality</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Epistemic Role -->
+          <div class="card">
+            <div class="card-header">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4"/>
+                <path d="M12 8h.01"/>
+              </svg>
+              <span class="font-medium">Epistemic Role</span>
+            </div>
+            <div class="card-body">
+              <div class="space-y-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-2 h-2 rounded-full bg-[var(--accent)]"></div>
+                  <span class="text-sm text-[var(--fg-muted)]">Encoding measurement</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="w-2 h-2 rounded-full bg-[var(--accent)]"></div>
+                  <span class="text-sm text-[var(--fg-muted)]">Representing order</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="w-2 h-2 rounded-full bg-[var(--accent)]"></div>
+                  <span class="text-sm text-[var(--fg-muted)]">Expressing relations</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="w-2 h-2 rounded-full bg-[var(--accent)]"></div>
+                  <span class="text-sm text-[var(--fg-muted)]">Enabling calculation</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Coarse → Fine Grained Transition -->
+      <section class="mb-12 animate-in" style="animation-delay: 0.15s;">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-8 h-8 rounded bg-[var(--accent)]/10 flex items-center justify-center">
+            <span class="text-[var(--accent)] text-sm font-semibold">1b</span>
+          </div>
+          <h2 class="text-xl font-semibold">Resolution Transition</h2>
+          <span class="text-[var(--fg-dim)] text-sm">Coarse-grained State → Fine-grained Quantitative Representation</span>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24"/>
+            </svg>
+            <span class="font-medium">The Epistemic Function of Numbers</span>
+          </div>
+          <div class="card-body">
+            <p class="text-[var(--fg-muted)] mb-6 leading-relaxed">
+              Numbers serve as the primary tool for transforming <strong class="text-[var(--fg)]">qualitative, coarse-grained characterizations</strong> 
+              of reality into <strong class="text-[var(--accent)]">precise, quantitative representations</strong>. 
+              This transition is the fundamental epistemic move that enables prediction, comparison, and manipulation.
+            </p>
+
+            <!-- Domain Selector -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+              <button class="domain-card active" data-domain="temperature" tabindex="0" role="button" aria-pressed="true">
+                <div class="text-2xl mb-2">🌡</div>
+                <div class="text-sm font-medium">Temperature</div>
+                <div class="text-xs text-[var(--fg-dim)]">cold → 4.2°C</div>
+              </button>
+              <button class="domain-card" data-domain="length" tabindex="0" role="button" aria-pressed="false">
+                <div class="text-2xl mb-2">📏</div>
+                <div class="text-sm font-medium">Length</div>
+                <div class="text-xs text-[var(--fg-dim)]">tall → 2.3m</div>
+              </button>
+              <button class="domain-card" data-domain="count" tabindex="0" role="button" aria-pressed="false">
+                <div class="text-2xl mb-2">📦</div>
+                <div class="text-sm font-medium">Count</div>
+                <div class="text-xs text-[var(--fg-dim)]">many → 847</div>
+              </button>
+              <button class="domain-card" data-domain="probability" tabindex="0" role="button" aria-pressed="false">
+                <div class="text-2xl mb-2">🎲</div>
+                <div class="text-sm font-medium">Probability</div>
+                <div class="text-xs text-[var(--fg-dim)]">likely → 0.73</div>
+              </button>
+            </div>
+
+            <!-- Transition Visualization -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center mb-8">
+              <!-- Coarse-grained -->
+              <div class="characterization-display">
+                <div class="text-xs text-[var(--fg-dim)] uppercase tracking-wide mb-3">Coarse-grained</div>
+                <div id="coarseDisplay" class="coarse-text">"cold"</div>
+                <div class="mt-3 text-xs text-[var(--fg-dim)]">Qualitative characterization</div>
+              </div>
+
+              <!-- Arrow -->
+              <div class="transition-arrow">
+                <span class="text-xs text-[var(--fg-dim)]">precision</span>
+                <div class="arrow-line"></div>
+                <span class="text-xs text-[var(--fg-dim)]">quantification</span>
+              </div>
+
+              <!-- Fine-grained -->
+              <div class="characterization-display" style="border-color: var(--accent);">
+                <div class="text-xs text-[var(--accent)] uppercase tracking-wide mb-3">Fine-grained</div>
+                <div class="flex items-baseline justify-center">
+                  <span id="fineDisplay" class="fine-text">4.2</span>
+                  <span id="unitDisplay" class="unit-text">°C</span>
+                </div>
+                <div class="mt-3 text-xs text-[var(--fg-dim)]">Quantitative representation</div>
+              </div>
+            </div>
+
+            <!-- Granularity Slider -->
+            <div class="mb-6">
+              <div class="flex justify-between items-center mb-3">
+                <span class="text-sm text-[var(--fg-muted)]">Resolution Level</span>
+                <span id="granularityLabel" class="text-sm font-medium text-[var(--accent)]">Fine (0.1 units)</span>
+              </div>
+              <input 
+                type="range" 
+                id="granularitySlider" 
+                class="granularity-slider" 
+                min="0" 
+                max="100" 
+                value="85"
+                aria-label="Granularity level"
+              >
+              <div class="flex justify-between text-xs text-[var(--fg-dim)] mt-2">
+                <span>Coarse categories</span>
+                <span>Continuous precision</span>
+              </div>
+            </div>
+
+            <!-- Resolution Spectrum -->
+            <div class="mb-6">
+              <div class="text-xs text-[var(--fg-dim)] uppercase tracking-wide mb-3">Information Resolution</div>
+              <div id="resolutionSpectrum" class="resolution-spectrum" role="img" aria-label="Resolution spectrum showing current precision level">
+                <!-- Generated by JS -->
+              </div>
+              <div class="flex justify-between text-xs text-[var(--fg-dim)] mt-2">
+                <span>1 bit</span>
+                <span id="bitCount">~13 bits</span>
+                <span>64 bits</span>
+              </div>
+            </div>
+
+            <!-- Grain Visualization -->
+            <div>
+              <div class="text-xs text-[var(--fg-dim)] uppercase tracking-wide mb-3">State Space Partitioning</div>
+              <div id="grainContainer" class="grain-container">
+                <!-- Generated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Instance Layer -->
+      <section class="mb-12 animate-in" style="animation-delay: 0.2s;">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-8 h-8 rounded bg-[var(--accent)]/10 flex items-center justify-center">
+            <span class="text-[var(--accent)] text-sm font-semibold">2</span>
+          </div>
+          <h2 class="text-xl font-semibold">Instance Layer</h2>
+          <span class="text-[var(--fg-dim)] text-sm">Artifact Instantiation</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- Number Type Selector -->
+          <div class="lg:col-span-8">
+            <div class="card">
+              <div class="card-header justify-between">
+                <div class="flex items-center gap-3">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                  </svg>
+                  <span class="font-medium">Number Type</span>
+                </div>
+                <span id="typeBadge" class="badge badge-success">Valid</span>
+              </div>
+              <div class="card-body">
+                <!-- Type Selector -->
+                <div class="type-selector mb-6" role="tablist" aria-label="Number type selector">
+                  <button class="type-btn active" data-type="natural" role="tab" aria-selected="true">
+                    <span class="mono font-semibold">N</span>
+                    <span class="ml-1 text-xs opacity-70">Natural</span>
+                  </button>
+                  <button class="type-btn" data-type="integer" role="tab" aria-selected="false">
+                    <span class="mono font-semibold">Z</span>
+                    <span class="ml-1 text-xs opacity-70">Integer</span>
+                  </button>
+                  <button class="type-btn" data-type="rational" role="tab" aria-selected="false">
+                    <span class="mono font-semibold">Q</span>
+                    <span class="ml-1 text-xs opacity-70">Rational</span>
+                  </button>
+                  <button class="type-btn" data-type="real" role="tab" aria-selected="false">
+                    <span class="mono font-semibold">R</span>
+                    <span class="ml-1 text-xs opacity-70">Real</span>
+                  </button>
+                  <button class="type-btn" data-type="complex" role="tab" aria-selected="false">
+                    <span class="mono font-semibold">C</span>
+                    <span class="ml-1 text-xs opacity-70">Complex</span>
+                  </button>
+                </div>
+
+                <!-- Number Input -->
+                <div class="mb-6">
+                  <label for="numberInput" class="block text-xs text-[var(--fg-dim)] uppercase tracking-wide mb-3">
+                    Instance Value
+                  </label>
+                  <div class="relative">
+                    <input 
+                      type="text" 
+                      id="numberInput" 
+                      class="input-field" 
+                      value="42"
+                      autocomplete="off"
+                      spellcheck="false"
+                      aria-describedby="inputHelp"
+                    >
+                    <div id="inputFeedback" class="absolute right-4 top-1/2 -translate-y-1/2 text-sm"></div>
+                  </div>
+                  <p id="inputHelp" class="mt-2 text-xs text-[var(--fg-dim)]">
+                    Enter a value valid for the selected number type
+                  </p>
+                </div>
+
+                <!-- Number Display -->
+                <div class="flex items-center justify-center py-8 bg-[var(--bg)] rounded-lg border border-[var(--border-subtle)]">
+                  <div id="numberDisplay" class="number-display text-[var(--accent)]">42</div>
+                </div>
+
+                <!-- Number Line Visualization -->
+                <div id="numberLineContainer" class="mt-6">
+                  <div class="text-xs text-[var(--fg-dim)] uppercase tracking-wide mb-3">Position on Number Line</div>
+                  <div class="number-line" role="img" aria-label="Number line visualization">
+                    <div class="number-line-axis"></div>
+                    <div id="numberLineMarker" class="number-line-marker" style="left: 70%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Representations Panel -->
+          <div class="lg:col-span-4">
+            <div class="card h-full">
+              <div class="panel-tabs">
+                <button class="panel-tab active" data-panel="repr" role="tab">Representations</button>
+                <button class="panel-tab" data-panel="props" role="tab">Properties</button>
+              </div>
+              <div class="card-body">
+                <div id="reprPanel" class="space-y-4">
+                  <div class="representation-card">
+                    <div class="representation-label">Decimal</div>
+                    <div id="reprDecimal" class="representation-value">42</div>
+                  </div>
+                  <div class="representation-card">
+                    <div class="representation-label">Binary</div>
+                    <div id="reprBinary" class="representation-value">101010</div>
+                  </div>
+                  <div class="representation-card">
+                    <div class="representation-label">Hexadecimal</div>
+                    <div id="reprHex" class="representation-value">0x2A</div>
+                  </div>
+                  <div class="representation-card">
+                    <div class="representation-label">Scientific</div>
+                    <div id="reprScientific" class="representation-value">4.2 × 10¹</div>
+                  </div>
+                  <div class="representation-card">
+                    <div class="representation-label">English</div>
+                    <div id="reprEnglish" class="representation-value">forty-two</div>
+                  </div>
+                </div>
+                <div id="propsPanel" class="hidden space-y-3">
+                  <div class="flex justify-between items-center py-2 border-b border-[var(--border-subtle)]">
+                    <span class="text-sm text-[var(--fg-muted)]">Even</span>
+                    <span id="propEven" class="badge badge-success">Yes</span>
+                  </div>
+                  <div class="flex justify-between items-center py-2 border-b border-[var(--border-subtle)]">
+                    <span class="text-sm text-[var(--fg-muted)]">Prime</span>
+                    <span id="propPrime" class="badge badge-error">No</span>
+                  </div>
+                  <div class="flex justify-between items-center py-2 border-b border-[var(--border-subtle)]">
+                    <span class="text-sm text-[var(--fg-muted)]">Positive</span>
+                    <span id="propPositive" class="badge badge-success">Yes</span>
+                  </div>
+                  <div class="flex justify-between items-center py-2 border-b border-[var(--border-subtle)]">
+                    <span class="text-sm text-[var(--fg-muted)]">Integer</span>
+                    <span id="propInteger" class="badge badge-success">Yes</span>
+                  </div>
+                  <div class="flex justify-between items-center py-2">
+                    <span class="text-sm text-[var(--fg-muted)]">Rational</span>
+                    <span id="propRational" class="badge badge-success">Yes</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Transformation Layer -->
+      <section class="mb-12 animate-in" style="animation-delay: 0.3s;">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-8 h-8 rounded bg-[var(--accent)]/10 flex items-center justify-center">
+            <span class="text-[var(--accent)] text-sm font-semibold">3</span>
+          </div>
+          <h2 class="text-xl font-semibold">Transformation Layer</h2>
+          <span class="text-[var(--fg-dim)] text-sm">Admissible Operations</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Operations -->
+          <div class="card">
+            <div class="card-header">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14"/>
+                <path d="M5 12h14"/>
+              </svg>
+              <span class="font-medium">Arithmetic Transformations</span>
+            </div>
+            <div class="card-body">
+              <div class="grid grid-cols-4 gap-3 mb-6">
+                <button class="transform-btn tooltip" data-op="add" data-tooltip="Add 1" aria-label="Add 1">+</button>
+                <button class="transform-btn tooltip" data-op="subtract" data-tooltip="Subtract 1" aria-label="Subtract 1">−</button>
+                <button class="transform-btn tooltip" data-op="multiply" data-tooltip="Multiply by 2" aria-label="Multiply by 2">×</button>
+                <button class="transform-btn tooltip" data-op="divide" data-tooltip="Divide by 2" aria-label="Divide by 2">÷</button>
+              </div>
+              <div class="grid grid-cols-4 gap-3 mb-6">
+                <button class="transform-btn tooltip" data-op="square" data-tooltip="Square" aria-label="Square">x²</button>
+                <button class="transform-btn tooltip" data-op="sqrt" data-tooltip="Square root" aria-label="Square root">√</button>
+                <button class="transform-btn tooltip" data-op="negate" data-tooltip="Negate" aria-label="Negate">±</button>
+                <button class="transform-btn tooltip" data-op="reciprocal" data-tooltip="Reciprocal" aria-label="Reciprocal">1/x</button>
+              </div>
+
+              <!-- Custom Operation -->
+              <div class="pt-4 border-t border-[var(--border-subtle)]">
+                <label class="block text-xs text-[var(--fg-dim)] uppercase tracking-wide mb-3">Custom Operation</label>
+                <div class="flex gap-3">
+                  <select id="customOpSelect" class="flex-1 bg-[var(--bg)] border border-[var(--border)] rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-[var(--accent)]">
+                    <option value="add">Add</option>
+                    <option value="subtract">Subtract</option>
+                    <option value="multiply">Multiply by</option>
+                    <option value="divide">Divide by</option>
+                    <option value="power">Raise to power</option>
+                  </select>
+                  <input 
+                    type="text" 
+                    id="customOpValue" 
+                    class="w-24 bg-[var(--bg)] border border-[var(--border)] rounded-lg px-4 py-3 mono text-center focus:outline-none focus:border-[var(--accent)]"
+                    value="1"
+                  >
+                  <button id="applyCustomOp" class="btn btn-primary">Apply</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Transformation History -->
+          <div class="card">
+            <div class="card-header justify-between">
+              <div class="flex items-center gap-3">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 8v4l3 3"/>
+                  <circle cx="12" cy="12" r="10"/>
+                </svg>
+                <span class="font-medium">Transformation Trace</span>
+              </div>
+              <button id="clearHistory" class="btn btn-ghost text-xs">Clear</button>
+            </div>
+            <div class="card-body">
+              <div id="historyContainer" class="space-y-2 max-h-64 overflow-y-auto">
+                <div class="text-sm text-[var(--fg-dim)] text-center py-8">
+                  No transformations yet
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Constraint Layer -->
+      <section class="mb-12 animate-in" style="animation-delay: 0.4s;">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-8 h-8 rounded bg-[var(--accent)]/10 flex items-center justify-center">
+            <span class="text-[var(--accent)] text-sm font-semibold">4</span>
+          </div>
+          <h2 class="text-xl font-semibold">Constraint Layer</h2>
+          <span class="text-[var(--fg-dim)] text-sm">Validation & Invariants</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Constraint System -->
+          <div class="lg:col-span-2 card">
+            <div class="card-header">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              <span class="font-medium">Constraint Satisfaction</span>
+            </div>
+            <div class="card-body">
+              <div id="constraintsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <!-- Constraints will be rendered here -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Type Inclusion Diagram -->
+          <div class="card">
+            <div class="card-header">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="6"/>
+                <circle cx="12" cy="12" r="2"/>
+              </svg>
+              <span class="font-medium">Type Inclusion</span>
+            </div>
+            <div class="card-body">
+              <div class="relative w-full aspect-square">
+                <svg viewBox="0 0 200 200" class="w-full h-full">
+                  <!-- Complex (outermost) -->
+                  <circle cx="100" cy="100" r="90" fill="rgba(212, 165, 116, 0.05)" stroke="rgba(212, 165, 116, 0.2)" stroke-width="1"/>
+                  <text x="100" y="20" text-anchor="middle" fill="var(--fg-dim)" font-size="10">C</text>
+                  
+                  <!-- Real -->
+                  <circle cx="100" cy="100" r="72" fill="rgba(212, 165, 116, 0.08)" stroke="rgba(212, 165, 116, 0.3)" stroke-width="1"/>
+                  <text x="100" y="38" text-anchor="middle" fill="var(--fg-dim)" font-size="10">R</text>
+                  
+                  <!-- Rational -->
+                  <circle cx="100" cy="100" r="54" fill="rgba(212, 165, 116, 0.12)" stroke="rgba(212, 165, 116, 0.4)" stroke-width="1"/>
+                  <text x="100" y="56" text-anchor="middle" fill="var(--fg-dim)" font-size="10">Q</text>
+                  
+                  <!-- Integer -->
+                  <circle cx="100" cy="100" r="36" fill="rgba(212, 165, 116, 0.18)" stroke="rgba(212, 165, 116, 0.5)" stroke-width="1"/>
+                  <text x="100" y="74" text-anchor="middle" fill="var(--fg-dim)" font-size="10">Z</text>
+                  
+                  <!-- Natural (innermost) -->
+                  <circle id="naturalCircle" cx="100" cy="100" r="18" fill="rgba(212, 165, 116, 0.3)" stroke="var(--accent)" stroke-width="2"/>
+                  <text x="100" y="104" text-anchor="middle" fill="var(--accent)" font-size="10" font-weight="600">N</text>
+                  
+                  <!-- Instance marker -->
+                  <circle id="instanceMarker" cx="100" cy="100" r="4" fill="var(--accent)">
+                    <animate attributeName="r" values="4;6;4" dur="2s" repeatCount="indefinite"/>
+                  </circle>
+                </svg>
+              </div>
+              <p class="text-xs text-[var(--fg-dim)] text-center mt-4">
+                Instance resides in: <span id="instanceTypeLabel" class="text-[var(--accent)] font-medium">N ∩ Z ∩ Q ∩ R ∩ C</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Edge Cases -->
+      <section class="animate-in" style="animation-delay: 0.5s;">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-8 h-8 rounded bg-[var(--accent)]/10 flex items-center justify-center">
+            <span class="text-[var(--accent)] text-sm font-semibold">5</span>
+          </div>
+          <h2 class="text-xl font-semibold">Boundary Exploration</h2>
+          <span class="text-[var(--fg-dim)] text-sm">Edge Cases & Limits</span>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <span class="font-medium">Edge Case Probes</span>
+          </div>
+          <div class="card-body">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              <button class="edge-case-btn btn btn-secondary w-full" data-value="0">Zero (0)</button>
+              <button class="edge-case-btn btn btn-secondary w-full" data-value="1">Unit (1)</button>
+              <button class="edge-case-btn btn btn-secondary w-full" data-value="-1">Negative Unit (-1)</button>
+              <button class="edge-case-btn btn btn-secondary w-full" data-value="Infinity">Infinity (∞)</button>
+              <button class="edge-case-btn btn btn-secondary w-full" data-value="-Infinity">Neg. Infinity (-∞)</button>
+              <button class="edge-case-btn btn btn-secondary w-full" data-value="NaN">Not a Number</button>
+              <button class="edge-case-btn btn btn-secondary w-full" data-value="1e308">Max Approx</button>
+              <button class="edge-case-btn btn btn-secondary w-full" data-value="1e-323">Min Approx</button>
+              <button class="edge-case-btn btn btn-secondary w-full" data-value="3.14159265359">π (pi)</button>
+              <button class="edge-case-btn btn btn-secondary w-full" data-value="2.718281828">e (Euler's)</button>
+              <button class="edge-case-btn btn btn-secondary w-full" data-value="1/3">Repeating (1/3)</button>
+              <button class="edge-case-btn btn btn-secondary w-full" data-value="i">Imaginary (i)</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-[var(--border-subtle)] mt-16 py-8 text-center text-sm text-[var(--fg-dim)]">
+      <p>Epistemic Artifact Type: Number — Interactive Notebook</p>
+      <p class="mt-2 text-xs">Understanding numbers as structured objects encoding affirmations about reality</p>
+    </footer>
+  </div>
+
+  <script>
+    // ============================================
+    // Domain Data for Coarse → Fine Transition
+    // ============================================
+    const domainData = {
+      temperature: {
+        name: 'Temperature',
+        unit: '°C',
+        coarseLevels: [
+          { label: 'freezing', range: [-50, -10] },
+          { label: 'cold', range: [-10, 10] },
+          { label: 'cool', range: [10, 18] },
+          { label: 'mild', range: [18, 24] },
+          { label: 'warm', range: [24, 30] },
+          { label: 'hot', range: [30, 40] },
+          { label: 'scorching', range: [40, 60] }
+        ],
+        baseValue: 4.2,
+        precision: 1
+      },
+      length: {
+        name: 'Length',
+        unit: 'm',
+        coarseLevels: [
+          { label: 'tiny', range: [0, 0.01] },
+          { label: 'small', range: [0.01, 0.3] },
+          { label: 'moderate', range: [0.3, 1.5] },
+          { label: 'tall', range: [1.5, 3] },
+          { label: 'large', range: [3, 10] },
+          { label: 'huge', range: [10, 100] },
+          { label: 'massive', range: [100, 1000] }
+        ],
+        baseValue: 2.3,
+        precision: 2
+      },
+      count: {
+        name: 'Count',
+        unit: '',
+        coarseLevels: [
+          { label: 'none', range: [0, 0] },
+          { label: 'few', range: [1, 5] },
+          { label: 'several', range: [5, 15] },
+          { label: 'many', range: [15, 100] },
+          { label: 'numerous', range: [100, 1000] },
+          { label: 'countless', range: [1000, 1000000] },
+          { label: 'innumerable', range: [1000000, Infinity] }
+        ],
+        baseValue: 847,
+        precision: 0
+      },
+      probability: {
+        name: 'Probability',
+        unit: '',
+        coarseLevels: [
+          { label: 'impossible', range: [0, 0.001] },
+          { label: 'unlikely', range: [0.001, 0.25] },
+          { label: 'possible', range: [0.25, 0.5] },
+          { label: 'likely', range: [0.5, 0.75] },
+          { label: 'probable', range: [0.75, 0.95] },
+          { label: 'certain', range: [0.95, 0.999] },
+          { label: 'definite', range: [0.999, 1] }
+        ],
+        baseValue: 0.73,
+        precision: 3
+      }
+    };
+
+    // ============================================
+    // State Management
+    // ============================================
+    const state = {
+      currentValue: 42,
+      currentType: 'natural',
+      currentDomain: 'temperature',
+      granularity: 85,
+      history: [],
+      maxHistory: 50
+    };
+
+    // ============================================
+    // Number Type Definitions
+    // ============================================
+    const numberTypes = {
+      natural: {
+        symbol: 'N',
+        name: 'Natural',
+        description: 'Non-negative integers: {0, 1, 2, 3, ...}',
+        constraints: [
+          { id: 'integer', name: 'Integer', desc: 'No fractional part' },
+          { id: 'non-negative', name: 'Non-negative', desc: '≥ 0' },
+          { id: 'finite', name: 'Finite', desc: 'Not Infinity or NaN' }
+        ],
+        validate: (n) => Number.isInteger(n) && n >= 0 && Number.isFinite(n),
+        defaultValue: 42
+      },
+      integer: {
+        symbol: 'Z',
+        name: 'Integer',
+        description: 'Whole numbers: {..., -2, -1, 0, 1, 2, ...}',
+        constraints: [
+          { id: 'integer', name: 'Integer', desc: 'No fractional part' },
+          { id: 'finite', name: 'Finite', desc: 'Not Infinity or NaN' }
+        ],
+        validate: (n) => Number.isInteger(n) && Number.isFinite(n),
+        defaultValue: 42
+      },
+      rational: {
+        symbol: 'Q',
+        name: 'Rational',
+        description: 'Fractions of integers: a/b where b ≠ 0',
+        constraints: [
+          { id: 'finite', name: 'Finite', desc: 'Not Infinity or NaN' },
+          { id: 'rational', name: 'Rational', desc: 'Can be expressed as a/b' }
+        ],
+        validate: (n) => Number.isFinite(n),
+        defaultValue: 42.5
+      },
+      real: {
+        symbol: 'R',
+        name: 'Real',
+        description: 'All rational and irrational numbers',
+        constraints: [
+          { id: 'finite', name: 'Finite', desc: 'Not Infinity or NaN' },
+          { id: 'real', name: 'Real', desc: 'No imaginary component' }
+        ],
+        validate: (n) => Number.isFinite(n),
+        defaultValue: 42.71828
+      },
+      complex: {
+        symbol: 'C',
+        name: 'Complex',
+        description: 'Numbers of the form a + bi',
+        constraints: [
+          { id: 'defined', name: 'Defined', desc: 'Not NaN' }
+        ],
+        validate: (n) => !Number.isNaN(n.real !== undefined ? n.real : n),
+        defaultValue: { real: 3, imag: 4 },
+        isComplex: true
+      }
+    };
+
+    // ============================================
+    // DOM Elements
+    // ============================================
+    let elements = {};
+
+    // ============================================
+    // Utility Functions
+    // ============================================
+    function parseInput(value) {
+      const trimmed = value.trim();
+      
+      if (trimmed === 'Infinity' || trimmed === '∞') return Infinity;
+      if (trimmed === '-Infinity' || trimmed === '-∞') return -Infinity;
+      if (trimmed === 'NaN') return NaN;
+      if (trimmed === 'i') return { real: 0, imag: 1 };
+      if (trimmed === '-i') return { real: 0, imag: -1 };
+      
+      const complexMatch = trimmed.match(/^([+-]?\d*\.?\d*)\s*([+-])\s*(\d*\.?\d*)i$/);
+      if (complexMatch) {
+        return {
+          real: parseFloat(complexMatch[1] || '0'),
+          imag: parseFloat((complexMatch[2] === '-' ? '-' : '+') + complexMatch[3])
+        };
+      }
+      
+      if (trimmed.includes('/')) {
+        const [num, denom] = trimmed.split('/');
+        return parseFloat(num) / parseFloat(denom);
+      }
+      
+      return parseFloat(trimmed);
+    }
+
+    function formatNumber(n, type) {
+      if (typeof n === 'object' && n.real !== undefined) {
+        const realStr = n.real.toFixed(4).replace(/\.?0+$/, '');
+        const imagStr = Math.abs(n.imag).toFixed(4).replace(/\.?0+$/, '');
+        const sign = n.imag >= 0 ? '+' : '-';
+        return `${realStr} ${sign} ${imagStr}i`;
+      }
+      
+      if (Number.isNaN(n)) return 'NaN';
+      if (n === Infinity) return '∞';
+      if (n === -Infinity) return '-∞';
+      
+      if (Number.isInteger(n)) return n.toString();
+      return n.toFixed(6).replace(/\.?0+$/, '');
+    }
+
+    function toBinary(n) {
+      if (typeof n === 'object' || !Number.isInteger(n) || n < 0) return '—';
+      if (n === 0) return '0';
+      return n.toString(2);
+    }
+
+    function toHex(n) {
+      if (typeof n === 'object' || !Number.isInteger(n) || n < 0) return '—';
+      return '0x' + n.toString(16).toUpperCase();
+    }
+
+    function toScientific(n) {
+      if (typeof n === 'object') return '—';
+      if (!Number.isFinite(n)) return formatNumber(n);
+      if (n === 0) return '0';
+      const exp = Math.floor(Math.log10(Math.abs(n)));
+      const mantissa = n / Math.pow(10, exp);
+      const sup = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+      const expStr = Math.abs(exp).toString().split('').map(d => sup[parseInt(d)]).join('');
+      const expSign = exp < 0 ? '⁻' : '';
+      return `${mantissa.toFixed(2)} × 10${expSign}${expStr}`;
+    }
+
+    function toEnglish(n) {
+      if (typeof n === 'object') return 'complex number';
+      if (!Number.isFinite(n)) return formatNumber(n);
+      
+      const ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+      const teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+      const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+      
+      if (n === 0) return 'zero';
+      if (!Number.isInteger(n) || n < 0 || n > 999) return formatNumber(n);
+      
+      if (n < 10) return ones[n];
+      if (n < 20) return teens[n - 10];
+      if (n < 100) {
+        const t = Math.floor(n / 10);
+        const o = n % 10;
+        return tens[t] + (o ? '-' + ones[o] : '');
+      }
+      const h = Math.floor(n / 100);
+      const rest = n % 100;
+      return ones[h] + ' hundred' + (rest ? ' ' + toEnglish(rest) : '');
+    }
+
+    // ============================================
+    // Coarse → Fine Functions
+    // ============================================
+    function getCoarseLabel(value, domain) {
+      const data = domainData[domain];
+      for (const level of data.coarseLevels) {
+        if (value >= level.range[0] && value <= level.range[1]) {
+          return level.label;
+        }
+      }
+      return 'undefined';
+    }
+
+    function getQuantizedValue(value, granularity) {
+      // Granularity 0 = coarsest (category), 100 = finest (full precision)
+      const domain = domainData[state.currentDomain];
+      const levels = domain.coarseLevels.length;
+      
+      if (granularity < 10) {
+        // Return midpoint of category
+        const level = domain.coarseLevels.find(l => 
+          value >= l.range[0] && value <= l.range[1]
+        );
+        if (level) {
+          return ((level.range[0] + level.range[1]) / 2).toFixed(1);
+        }
+      }
+      
+      // Calculate decimal places based on granularity
+      const maxDecimals = domain.precision;
+      const decimals = Math.max(0, Math.floor((granularity / 100) * maxDecimals + 1));
+      
+      return value.toFixed(decimals);
+    }
+
+    function updateGranularityDisplay() {
+      const domain = domainData[state.currentDomain];
+      const granularity = state.granularity;
+      
+      // Update coarse display
+      const coarse = getCoarseLabel(domain.baseValue, state.currentDomain);
+      elements.coarseDisplay.textContent = `"${coarse}"`;
+      
+      // Update fine display
+      const fine = getQuantizedValue(domain.baseValue, granularity);
+      elements.fineDisplay.textContent = fine;
+      elements.unitDisplay.textContent = domain.unit;
+      
+      // Update granularity label
+      let label = 'Fine';
+      const decPlaces = Math.floor((granularity / 100) * domain.precision + 1);
+      if (granularity < 20) label = 'Coarse categories';
+      else if (granularity < 40) label = 'Rounded';
+      else if (granularity < 60) label = 'Moderate';
+      else if (granularity < 80) label = 'Detailed';
+      else label = `Fine (${Math.pow(10, -decPlaces).toFixed(decPlaces)} units)`;
+      
+      elements.granularityLabel.textContent = label;
+      
+      // Update bit count
+      const bits = Math.max(1, Math.floor(granularity * 0.64));
+      elements.bitCount.textContent = `~${bits} bits`;
+      
+      // Update resolution spectrum
+      updateResolutionSpectrum(granularity);
+      
+      // Update grain visualization
+      updateGrainVisualization(granularity);
+    }
+
+    function updateResolutionSpectrum(granularity) {
+      const container = elements.resolutionSpectrum;
+      const totalBins = 64;
+      const activeBins = Math.max(1, Math.floor((granularity / 100) * totalBins));
+      
+      let html = '';
+      for (let i = 0; i < totalBins; i++) {
+        const isActive = i < activeBins;
+        const opacity = isActive ? 0.3 + (i / totalBins) * 0.7 : 0.1;
+        html += `<div class="resolution-bin ${isActive ? 'active' : ''}" style="opacity: ${isActive ? opacity : 0.1}"></div>`;
+      }
+      container.innerHTML = html;
+    }
+
+    function updateGrainVisualization(granularity) {
+      const container = elements.grainContainer;
+      const numBlocks = Math.max(4, Math.floor((granularity / 100) * 64 + 4));
+      
+      // Clear existing
+      container.innerHTML = '';
+      
+      const containerWidth = container.offsetWidth || 600;
+      const containerHeight = container.offsetHeight || 120;
+      
+      for (let i = 0; i < numBlocks; i++) {
+        const block = document.createElement('div');
+        block.className = 'grain-block';
+        
+        const cols = Math.ceil(Math.sqrt(numBlocks * (containerWidth / containerHeight)));
+        const rows = Math.ceil(numBlocks / cols);
+        const cellWidth = containerWidth / cols;
+        const cellHeight = containerHeight / rows;
+        
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        
+        // Add small gaps
+        const gap = 2;
+        block.style.width = `${cellWidth - gap}px`;
+        block.style.height = `${cellHeight - gap}px`;
+        block.style.left = `${col * cellWidth + gap/2}px`;
+        block.style.top = `${row * cellHeight + gap/2}px`;
+        
+        // Vary opacity based on position
+        block.style.opacity = 0.2 + (Math.sin(i * 0.5) * 0.15 + 0.15);
+        
+        container.appendChild(block);
+      }
+    }
+
+    // ============================================
+    // UI Update Functions
+    // ============================================
+    function updateDisplay() {
+      const type = numberTypes[state.currentType];
+      const value = state.currentValue;
+      
+      elements.numberDisplay.textContent = formatNumber(value, state.currentType);
+      elements.numberDisplay.classList.add('number-morph');
+      setTimeout(() => elements.numberDisplay.classList.remove('number-morph'), 300);
+      
+      const numericValue = typeof value === 'object' ? value.real : value;
+      elements.reprDecimal.textContent = formatNumber(value, state.currentType);
+      elements.reprBinary.textContent = toBinary(numericValue);
+      elements.reprHex.textContent = toHex(numericValue);
+      elements.reprScientific.textContent = toScientific(numericValue);
+      elements.reprEnglish.textContent = toEnglish(Math.round(numericValue));
+      
+      updateProperties(numericValue);
+      updateConstraints(value);
+      updateNumberLine(numericValue);
+      updateTypeBadge(value);
+      updateInstanceTypeLabel(value);
+    }
+
+    function updateProperties(n) {
+      const isEven = Number.isInteger(n) && n % 2 === 0;
+      const isPrime = isPrimeNumber(n);
+      
+      elements.propEven.textContent = Number.isInteger(n) ? (isEven ? 'Yes' : 'No') : 'N/A';
+      elements.propEven.className = 'badge ' + (Number.isInteger(n) ? (isEven ? 'badge-success' : 'badge-error') : 'badge-warning');
+      
+      elements.propPrime.textContent = Number.isInteger(n) && n > 1 ? (isPrime ? 'Yes' : 'No') : 'N/A';
+      elements.propPrime.className = 'badge ' + (Number.isInteger(n) && n > 1 ? (isPrime ? 'badge-success' : 'badge-error') : 'badge-warning');
+      
+      elements.propPositive.textContent = n > 0 ? 'Yes' : (n === 0 ? 'Zero' : 'No');
+      elements.propPositive.className = 'badge ' + (n > 0 ? 'badge-success' : (n === 0 ? 'badge-warning' : 'badge-error'));
+      
+      elements.propInteger.textContent = Number.isInteger(n) ? 'Yes' : 'No';
+      elements.propInteger.className = 'badge ' + (Number.isInteger(n) ? 'badge-success' : 'badge-error');
+      
+      elements.propRational.textContent = Number.isFinite(n) ? 'Yes' : 'No';
+      elements.propRational.className = 'badge ' + (Number.isFinite(n) ? 'badge-success' : 'badge-error');
+    }
+
+    function isPrimeNumber(n) {
+      if (!Number.isInteger(n) || n < 2) return false;
+      if (n === 2) return true;
+      if (n % 2 === 0) return false;
+      for (let i = 3; i <= Math.sqrt(n); i += 2) {
+        if (n % i === 0) return false;
+      }
+      return true;
+    }
+
+    function updateConstraints(value) {
+      const type = numberTypes[state.currentType];
+      const numericValue = typeof value === 'object' ? value.real : value;
+      
+      const allConstraints = [
+        { id: 'defined', name: 'Defined', desc: 'Not NaN', check: () => !Number.isNaN(numericValue) },
+        { id: 'finite', name: 'Finite', desc: 'Not Infinity', check: () => Number.isFinite(numericValue) },
+        { id: 'real', name: 'Real', desc: 'No imaginary component', check: () => typeof value !== 'object' },
+        { id: 'integer', name: 'Integer', desc: 'No fractional part', check: () => Number.isInteger(numericValue) },
+        { id: 'non-negative', name: 'Non-negative', desc: '≥ 0', check: () => numericValue >= 0 },
+        { id: 'rational', name: 'Rational', desc: 'Expressible as a/b', check: () => Number.isFinite(numericValue) }
+      ];
+      
+      const container = elements.constraintsContainer;
+      container.innerHTML = '';
+      
+      type.constraints.forEach(constraint => {
+        const fullConstraint = allConstraints.find(c => c.id === constraint.id);
+        const isSatisfied = fullConstraint ? fullConstraint.check() : false;
+        
+        const item = document.createElement('div');
+        item.className = `constraint-item ${isSatisfied ? 'satisfied' : 'violated'}`;
+        item.innerHTML = `
+          <div class="constraint-indicator ${isSatisfied ? 'satisfied' : 'violated'}"></div>
+          <div class="flex-1">
+            <div class="text-sm font-medium">${constraint.name}</div>
+            <div class="text-xs text-[var(--fg-dim)]">${constraint.desc}</div>
+          </div>
+          <span class="text-xs ${isSatisfied ? 'text-[var(--success)]' : 'text-[var(--error)]'}">${isSatisfied ? 'Satisfied' : 'Violated'}</span>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function updateNumberLine(n) {
+      const marker = elements.numberLineMarker;
+      const container = elements.numberLineContainer;
+      
+      if (typeof state.currentValue === 'object') {
+        container.style.display = 'none';
+        return;
+      }
+      container.style.display = 'block';
+      
+      let position;
+      if (!Number.isFinite(n)) {
+        position = n > 0 ? 95 : 5;
+      } else {
+        const mapped = Math.atan(n / 10) / Math.PI + 0.5;
+        position = Math.max(5, Math.min(95, mapped * 100));
+      }
+      
+      marker.style.left = `${position}%`;
+    }
+
+    function updateTypeBadge(value) {
+      const type = numberTypes[state.currentType];
+      const isValid = type.validate(value);
+      
+      elements.typeBadge.textContent = isValid ? 'Valid' : 'Invalid';
+      elements.typeBadge.className = `badge ${isValid ? 'badge-success' : 'badge-error'}`;
+      
+      elements.numberInput.classList.remove('valid', 'error');
+      elements.numberInput.classList.add(isValid ? 'valid' : 'error');
+    }
+
+    function updateInstanceTypeLabel(value) {
+      const numericValue = typeof value === 'object' ? value.real : value;
+      const types = [];
+      
+      if (!Number.isNaN(numericValue)) types.push('C');
+      if (Number.isFinite(numericValue) && typeof value !== 'object') {
+        types.push('R');
+        types.push('Q');
+        if (Number.isInteger(numericValue)) {
+          types.push('Z');
+          if (numericValue >= 0) types.push('N');
+        }
+      }
+      
+      elements.instanceTypeLabel.textContent = types.length > 0 ? types.join(' ∩ ') : 'None';
+    }
+
+    function addToHistory(operation, from, to) {
+      state.history.unshift({
+        operation,
+        from: formatNumber(from, state.currentType),
+        to: formatNumber(to, state.currentType),
+        timestamp: Date.now()
+      });
+      
+      if (state.history.length > state.maxHistory) {
+        state.history.pop();
+      }
+      
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const container = elements.historyContainer;
+      
+      if (state.history.length === 0) {
+        container.innerHTML = '<div class="text-sm text-[var(--fg-dim)] text-center py-8">No transformations yet</div>';
+        return;
+      }
+      
+      container.innerHTML = state.history.map((item, i) => `
+        <div class="history-item" style="animation: fadeSlideIn 0.3s ease-out ${i * 0.05}s forwards; opacity: 0;">
+          <span class="history-op">${item.operation}</span>
+          <span class="text-[var(--fg-dim)]">${item.from}</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--fg-dim)" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+          <span class="text-[var(--accent)]">${item.to}</span>
+        </div>
+      `).join('');
+    }
+
+    // ============================================
+    // Transformation Functions
+    // ============================================
+    const transformations = {
+      add: (n) => n + 1,
+      subtract: (n) => n - 1,
+      multiply: (n) => n * 2,
+      divide: (n) => n / 2,
+      square: (n) => n * n,
+      sqrt: (n) => Math.sqrt(n),
+      negate: (n) => -n,
+      reciprocal: (n) => n === 0 ? NaN : 1 / n
+    };
+
+    function applyTransformation(opName) {
+      const oldValue = state.currentValue;
+      const transform = transformations[opName];
+      
+      if (!transform) return;
+      
+      if (typeof oldValue === 'object') {
+        switch(opName) {
+          case 'add':
+            state.currentValue = { real: oldValue.real + 1, imag: oldValue.imag };
+            break;
+          case 'subtract':
+            state.currentValue = { real: oldValue.real - 1, imag: oldValue.imag };
+            break;
+          case 'negate':
+            state.currentValue = { real: -oldValue.real, imag: -oldValue.imag };
+            break;
+          default:
+            return;
+        }
+      } else {
+        state.currentValue = transform(oldValue);
+      }
+      
+      elements.numberInput.value = formatNumber(state.currentValue, state.currentType);
+      addToHistory(opName, oldValue, state.currentValue);
+      updateDisplay();
+    }
+
+    function applyCustomTransformation() {
+      const op = elements.customOpSelect.value;
+      const val = parseFloat(elements.customOpValue.value);
+      
+      if (isNaN(val)) return;
+      
+      const oldValue = state.currentValue;
+      
+      if (typeof oldValue === 'object') {
+        return;
+      }
+      
+      switch(op) {
+        case 'add': state.currentValue = oldValue + val; break;
+        case 'subtract': state.currentValue = oldValue - val; break;
+        case 'multiply': state.currentValue = oldValue * val; break;
+        case 'divide': state.currentValue = val !== 0 ? oldValue / val : NaN; break;
+        case 'power': state.currentValue = Math.pow(oldValue, val); break;
+      }
+      
+      elements.numberInput.value = formatNumber(state.currentValue, state.currentType);
+      addToHistory(`${op} ${val}`, oldValue, state.currentValue);
+      updateDisplay();
+    }
+
+    // ============================================
+    // Event Handlers
+    // ============================================
+    function handleTypeChange(e) {
+      const btn = e.target.closest('.type-btn');
+      if (!btn) return;
+      
+      const type = btn.dataset.type;
+      if (type === state.currentType) return;
+      
+      document.querySelectorAll('.type-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      
+      state.currentType = type;
+      
+      const typeDef = numberTypes[type];
+      state.currentValue = typeDef.defaultValue;
+      elements.numberInput.value = formatNumber(state.currentValue, type);
+      
+      updateDisplay();
+    }
+
+    function handleInputChange(e) {
+      const value = parseInput(e.target.value);
+      
+      if (typeof value === 'object' || !Number.isNaN(value)) {
+        state.currentValue = value;
+        updateDisplay();
+      }
+    }
+
+    function handlePanelTab(e) {
+      const tab = e.target.closest('.panel-tab');
+      if (!tab) return;
+      
+      const panel = tab.dataset.panel;
+      
+      tab.parentElement.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      
+      elements.reprPanel.classList.toggle('hidden', panel !== 'repr');
+      elements.propsPanel.classList.toggle('hidden', panel !== 'props');
+    }
+
+    function handleEdgeCase(e) {
+      const btn = e.target.closest('.edge-case-btn');
+      if (!btn) return;
+      
+      const value = parseInput(btn.dataset.value);
+      
+      if (typeof value === 'object' || !Number.isNaN(value)) {
+        const oldValue = state.currentValue;
+        state.currentValue = value;
+        elements.numberInput.value = btn.dataset.value;
+        addToHistory('edge case', oldValue, value);
+        updateDisplay();
+      }
+    }
+
+    function handleDomainChange(e) {
+      const card = e.target.closest('.domain-card');
+      if (!card) return;
+      
+      const domain = card.dataset.domain;
+      if (domain === state.currentDomain) return;
+      
+      document.querySelectorAll('.domain-card').forEach(c => {
+        c.classList.remove('active');
+        c.setAttribute('aria-pressed', 'false');
+      });
+      card.classList.add('active');
+      card.setAttribute('aria-pressed', 'true');
+      
+      state.currentDomain = domain;
+      updateGranularityDisplay();
+    }
+
+    function handleGranularityChange(e) {
+      state.granularity = parseInt(e.target.value);
+      updateGranularityDisplay();
+    }
+
+    function reset() {
+      state.currentValue = 42;
+      state.currentType = 'natural';
+      state.currentDomain = 'temperature';
+      state.granularity = 85;
+      state.history = [];
+      
+      document.querySelectorAll('.type-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      document.querySelector('[data-type="natural"]').classList.add('active');
+      document.querySelector('[data-type="natural"]').setAttribute('aria-selected', 'true');
+      
+      document.querySelectorAll('.domain-card').forEach(c => {
+        c.classList.remove('active');
+        c.setAttribute('aria-pressed', 'false');
+      });
+      document.querySelector('[data-domain="temperature"]').classList.add('active');
+      document.querySelector('[data-domain="temperature"]').setAttribute('aria-pressed', 'true');
+      
+      elements.numberInput.value = '42';
+      elements.granularitySlider.value = 85;
+      
+      renderHistory();
+      updateDisplay();
+      updateGranularityDisplay();
+    }
+
+    // ============================================
+    // Initialization
+    // ============================================
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize DOM elements
+      elements = {
+        numberDisplay: document.getElementById('numberDisplay'),
+        numberInput: document.getElementById('numberInput'),
+        typeBadge: document.getElementById('typeBadge'),
+        constraintsContainer: document.getElementById('constraintsContainer'),
+        historyContainer: document.getElementById('historyContainer'),
+        numberLineMarker: document.getElementById('numberLineMarker'),
+        numberLineContainer: document.getElementById('numberLineContainer'),
+        instanceTypeLabel: document.getElementById('instanceTypeLabel'),
+        reprPanel: document.getElementById('reprPanel'),
+        propsPanel: document.getElementById('propsPanel'),
+        reprDecimal: document.getElementById('reprDecimal'),
+        reprBinary: document.getElementById('reprBinary'),
+        reprHex: document.getElementById('reprHex'),
+        reprScientific: document.getElementById('reprScientific'),
+        reprEnglish: document.getElementById('reprEnglish'),
+        propEven: document.getElementById('propEven'),
+        propPrime: document.getElementById('propPrime'),
+        propPositive: document.getElementById('propPositive'),
+        propInteger: document.getElementById('propInteger'),
+        propRational: document.getElementById('propRational'),
+        customOpSelect: document.getElementById('customOpSelect'),
+        customOpValue: document.getElementById('customOpValue'),
+        coarseDisplay: document.getElementById('coarseDisplay'),
+        fineDisplay: document.getElementById('fineDisplay'),
+        unitDisplay: document.getElementById('unitDisplay'),
+        granularityLabel: document.getElementById('granularityLabel'),
+        granularitySlider: document.getElementById('granularitySlider'),
+        bitCount: document.getElementById('bitCount'),
+        resolutionSpectrum: document.getElementById('resolutionSpectrum'),
+        grainContainer: document.getElementById('grainContainer')
+      };
+      
+      // Event listeners
+      document.querySelector('.type-selector').addEventListener('click', handleTypeChange);
+      elements.numberInput.addEventListener('input', handleInputChange);
+      document.querySelector('.panel-tabs').addEventListener('click', handlePanelTab);
+      document.getElementById('clearHistory').addEventListener('click', () => {
+        state.history = [];
+        renderHistory();
+      });
+      document.getElementById('resetBtn').addEventListener('click', reset);
+      document.getElementById('applyCustomOp').addEventListener('click', applyCustomTransformation);
+      
+      // Domain cards
+      document.querySelectorAll('.domain-card').forEach(card => {
+        card.addEventListener('click', handleDomainChange);
+        card.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleDomainChange(e);
+          }
+        });
+      });
+      
+      // Granularity slider
+      elements.granularitySlider.addEventListener('input', handleGranularityChange);
+      
+      // Transformation buttons
+      document.querySelectorAll('.transform-btn[data-op]').forEach(btn => {
+        btn.addEventListener('click', () => applyTransformation(btn.dataset.op));
+      });
+      
+      // Edge case buttons
+      document.querySelectorAll('.edge-case-btn').forEach(btn => {
+        btn.addEventListener('click', handleEdgeCase);
+      });
+      
+      // Keyboard support for number input
+      elements.numberInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.target.blur();
+        }
+      });
+      
+      // Initial render
+      updateDisplay();
+      renderHistory();
+      updateGranularityDisplay();
+      
+      // Staggered reveal animation
+      document.querySelectorAll('.animate-in').forEach((el, i) => {
+        el.style.opacity = '0';
+        setTimeout(() => {
+          el.style.opacity = '1';
+        }, 100 + i * 100);
+      });
+      
+      // Initialize grain visualization after container has dimensions
+      setTimeout(() => {
+        updateGrainVisualization(state.granularity);
+      }, 100);
+    });
+  </script>
+</body>
+</html>

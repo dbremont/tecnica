@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Epistemic Map</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+:root {
+  --bg-deep: #030306;
+  --bg-primary: #07070d;
+  --bg-secondary: #0c0c16;
+  --bg-tertiary: #111120;
+  --bg-card: #0e0e1a;
+  --border: rgba(255,255,255,0.05);
+  --border-light: rgba(255,255,255,0.1);
+  --text-primary: #e4e4f0;
+  --text-secondary: #7878a0;
+  --text-dim: #4a4a6a;
+  --accent: #00ffc8;
+  --accent-dim: rgba(0,255,200,0.12);
+  --orange: #ff6b35;
+  --pink: #ff3d71;
+  --gold: #ffd60a;
+  --cyan: #00c9db;
+  --coral: #ef476f;
+  --mint: #7dffaf;
+  --emerald: #06d6a0;
+  --sky: #4cc9f0;
+  --teal: #1b9aaa;
+  --sidebar-w: 250px;
+  --sidebar-collapsed: 62px;
+  --topbar-h: 52px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; background:var(--bg-deep); color:var(--text-primary); font-family:'Space Grotesk',sans-serif; }
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.08); border-radius:3px; }
+
+/* Layout */
+#app { display:flex; height:100vh; }
+#sidebar {
+  width:var(--sidebar-w); min-width:var(--sidebar-w); height:100vh;
+  background:var(--bg-primary); border-right:1px solid var(--border);
+  display:flex; flex-direction:column; transition:all .3s ease;
+  z-index:20; position:relative; overflow:hidden;
+}
+#sidebar.collapsed { width:var(--sidebar-collapsed); min-width:var(--sidebar-collapsed); }
+#sidebar.collapsed .nav-label, #sidebar.collapsed .sidebar-title span,
+#sidebar.collapsed .nav-section-title, #sidebar.collapsed .sidebar-subtitle { display:none; }
+#sidebar.collapsed .nav-item { justify-content:center; padding:0 0; }
+#sidebar.collapsed .nav-icon { margin-right:0; }
+
+.sidebar-header {
+  padding:20px 18px 12px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.sidebar-title {
+  font-size:15px; font-weight:700; letter-spacing:1.5px; color:var(--accent);
+  display:flex; align-items:center; gap:8px; white-space:nowrap;
+}
+.sidebar-title i { font-size:14px; }
+.collapse-btn {
+  background:none; border:none; color:var(--text-dim); cursor:pointer;
+  font-size:13px; padding:4px; transition:color .2s;
+}
+.collapse-btn:hover { color:var(--text-primary); }
+.sidebar-subtitle { font-size:10px; color:var(--text-dim); letter-spacing:1px; margin-top:4px; text-transform:uppercase; }
+
+.sidebar-nav { flex:1; overflow-y:auto; padding:8px 0; }
+.nav-section-title {
+  font-size:9px; font-weight:600; letter-spacing:2px; color:var(--text-dim);
+  padding:16px 18px 6px; text-transform:uppercase;
+}
+.nav-item {
+  display:flex; align-items:center; padding:9px 18px; cursor:pointer;
+  color:var(--text-secondary); transition:all .2s; font-size:13px;
+  border-left:2px solid transparent; gap:0;
+}
+.nav-item:hover { color:var(--text-primary); background:rgba(255,255,255,0.02); }
+.nav-item.active {
+  color:var(--accent); background:var(--accent-dim);
+  border-left-color:var(--accent);
+}
+.nav-icon { width:20px; text-align:center; margin-right:10px; font-size:13px; flex-shrink:0; }
+.nav-label { white-space:nowrap; }
+
+/* Main */
+#main { flex:1; display:flex; flex-direction:column; overflow:hidden; background:var(--bg-deep); }
+#topbar {
+  height:var(--topbar-h); min-height:var(--topbar-h);
+  background:var(--bg-primary); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 24px; z-index:10;
+}
+.view-title { font-size:14px; font-weight:600; color:var(--text-primary); letter-spacing:.5px; }
+.view-controls { display:flex; align-items:center; gap:12px; }
+.view-controls select, .view-controls button {
+  background:var(--bg-tertiary); border:1px solid var(--border-light);
+  color:var(--text-primary); font-family:inherit; font-size:12px;
+  padding:5px 12px; border-radius:6px; cursor:pointer; transition:all .2s;
+}
+.view-controls button:hover { border-color:var(--accent); color:var(--accent); }
+.view-controls select:focus, .view-controls button:focus { outline:none; border-color:var(--accent); }
+
+#view-container { flex:1; position:relative; overflow:hidden; }
+.view-panel { position:absolute; inset:0; display:none; }
+.view-panel.active { display:flex; flex-direction:column; }
+
+/* Canvas */
+.view-canvas { width:100%; height:100%; display:block; }
+
+/* Tooltip */
+#tooltip {
+  position:fixed; pointer-events:none; z-index:100;
+  background:rgba(8,8,16,0.96); border:1px solid var(--border-light);
+  border-radius:12px; padding:0; width:360px;
+  backdrop-filter:blur(16px) saturate(1.4); opacity:0;
+  transition:opacity .2s ease-out, transform .2s ease-out;
+  font-size:12px; line-height:1.5; box-shadow:0 12px 48px rgba(0,0,0,0.6);
+  transform:translateY(6px); overflow:hidden;
+}
+#tooltip.visible { opacity:1; transform:translateY(0); }
+
+.tt-header { padding:14px 16px 10px; border-bottom:1px solid var(--border); }
+.tt-name { font-size:15px; font-weight:700; margin-bottom:6px; letter-spacing:0.2px; }
+.tt-badges { display:flex; gap:6px; flex-wrap:wrap; }
+.tt-badge { font-size:9px; padding:2px 8px; border-radius:4px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; }
+
+.tt-body { padding:12px 16px; }
+.tt-desc { color:var(--text-secondary); margin-bottom:12px; font-size:11px; line-height:1.6; }
+
+.tt-section { margin-bottom:12px; }
+.tt-section:last-child { margin-bottom:0; }
+.tt-section-title { font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px; font-weight:600; }
+
+/* Metrics */
+.tt-meters { display:flex; flex-direction:column; gap:8px; }
+.tt-meter-label { display:flex; justify-content:space-between; font-size:10px; color:var(--text-secondary); margin-bottom:3px; }
+.tt-meter-label span:last-child { font-family:'JetBrains Mono', monospace; font-size:9px; color:var(--text-dim); }
+.tt-meter-track { height:3px; background:rgba(255,255,255,0.05); border-radius:2px; overflow:hidden; }
+.tt-meter-fill { height:100%; border-radius:2px; transition:width 0.3s ease-out; }
+
+/* Properties */
+.tt-props { display:grid; grid-template-columns:auto 1fr; gap:4px 12px; font-size:10px; }
+.tt-prop-key { color:var(--text-dim); text-transform:capitalize; white-space:nowrap; }
+.tt-prop-val { color:var(--text-secondary); font-family:'JetBrains Mono', monospace; font-size:9px; word-break:break-all; text-align:right; }
+
+/* Connections */
+.tt-edges-list { display:flex; flex-direction:column; gap:8px; }
+.tt-edge-group {}
+.tt-edge-type { font-size:9px; font-weight:700; letter-spacing:0.8px; margin-bottom:3px; text-transform:uppercase; }
+.tt-edge-items { padding-left:10px; border-left:2px solid rgba(255,255,255,0.05); }
+.tt-edge-item { font-size:10px; color:var(--text-secondary); padding:2px 0; display:flex; align-items:center; gap:6px; }
+.tt-edge-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
+.tt-edge-more { font-size:9px; color:var(--text-dim); font-style:italic; padding-left:11px; }
+
+/* Overview */
+.overview-scroll { overflow-y:auto; height:100%; padding:32px; }
+.overview-hero { text-align:center; padding:40px 0 32px; }
+.overview-hero h1 {
+  font-size:48px; font-weight:800; letter-spacing:-1px;
+  background:linear-gradient(135deg, var(--accent), var(--sky));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text; margin-bottom:8px;
+}
+.overview-hero p { color:var(--text-secondary); font-size:15px; max-width:600px; margin:0 auto; line-height:1.7; }
+.stats-grid {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:14px; margin:28px 0;
+}
+.stat-card {
+  background:var(--bg-card); border:1px solid var(--border); border-radius:10px;
+  padding:18px; text-align:left; transition:border-color .3s;
+}
+.stat-card:hover { border-color:var(--border-light); }
+.stat-card .stat-val { font-size:28px; font-weight:800; line-height:1; }
+.stat-card .stat-label { font-size:10px; color:var(--text-dim); letter-spacing:1.5px; text-transform:uppercase; margin-top:6px; }
+.type-legend { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:8px; margin-top:20px; }
+.type-legend-item { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text-secondary); }
+.type-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+
+/* Modal */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200;
+  display:none; align-items:center; justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.open { display:flex; }
+.modal-content {
+  background:var(--bg-secondary); border:1px solid var(--border-light);
+  border-radius:14px; padding:28px; max-width:90vw; max-height:85vh;
+  overflow:auto; position:relative; min-width:600px;
+}
+.modal-close {
+  position:absolute; top:14px; right:14px; background:none; border:none;
+  color:var(--text-dim); font-size:18px; cursor:pointer;
+}
+.modal-close:hover { color:var(--text-primary); }
+.modal-title { font-size:18px; font-weight:700; margin-bottom:16px; }
+
+/* About */
+.about-content { max-width:720px; margin:0 auto; padding:40px 32px; overflow-y:auto; height:100%; }
+.about-content h2 { font-size:24px; font-weight:700; margin-bottom:12px; color:var(--accent); }
+.about-content h3 { font-size:16px; font-weight:600; margin:20px 0 8px; }
+.about-content p { color:var(--text-secondary); line-height:1.8; font-size:13px; margin-bottom:12px; }
+.about-content table { width:100%; border-collapse:collapse; margin:16px 0; font-size:12px; }
+.about-content th { text-align:left; padding:8px 10px; background:var(--bg-tertiary); color:var(--text-secondary); font-weight:600; font-size:10px; letter-spacing:1px; text-transform:uppercase; border-bottom:1px solid var(--border-light); }
+.about-content td { padding:8px 10px; border-bottom:1px solid var(--border); color:var(--text-secondary); }
+
+/* Animations */
+@keyframes pulse { 0%,100%{opacity:.6;transform:scale(1)} 50%{opacity:1;transform:scale(1.05)} }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.fade-in { animation:fadeIn .4s ease; }
+
+@media(prefers-reduced-motion:reduce){
+  *, *::before, *::after { animation-duration:.01ms!important; transition-duration:.01ms!important; }
+}
+@media(max-width:768px){
+  #sidebar { width:var(--sidebar-collapsed); min-width:var(--sidebar-collapsed); }
+  .nav-label, .sidebar-title span, .nav-section-title, .sidebar-subtitle { display:none; }
+  .nav-item { justify-content:center; padding:0; }
+  .nav-icon { margin-right:0; }
+  .overview-hero h1 { font-size:32px; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <div class="sidebar-header">
+      <div>
+        <div class="sidebar-title"><i class="fa-solid fa-share-nodes"></i> <span>Epistemic Map</span></div>
+        <div class="sidebar-subtitle">A multi-layer epistemic hypergraph of artifacts, tools, agents, and processes</div>
+      </div>
+      <button class="collapse-btn" id="collapseBtn" aria-label="Toggle sidebar"><i class="fa-solid fa-angles-left"></i></button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Overview</div>
+      <div class="nav-item active" data-view="overview"><span class="nav-icon"><i class="fa-solid fa-compass"></i></span><span class="nav-label">Overview</span></div>
+
+      <div class="nav-section-title">Exploration</div>
+      <div class="nav-item" data-view="hypergraph"><span class="nav-icon"><i class="fa-solid fa-diagram-project"></i></span><span class="nav-label">Hypergraph View</span></div>
+      <div class="nav-item" data-view="pipeline"><span class="nav-icon"><i class="fa-solid fa-code-branch"></i></span><span class="nav-label">Process Pipeline</span></div>
+      <div class="nav-item" data-view="centrality"><span class="nav-icon"><i class="fa-solid fa-bullseye"></i></span><span class="nav-label">Centrality Map</span></div>
+      <div class="nav-item" data-view="cluster"><span class="nav-icon"><i class="fa-solid fa-object-group"></i></span><span class="nav-label">Domain Cluster</span></div>
+
+      <div class="nav-section-title">Analysis</div>
+      <div class="nav-item" data-view="heatmap"><span class="nav-icon"><i class="fa-solid fa-table-cells"></i></span><span class="nav-label">Adjacency Heatmap</span></div>
+      <div class="nav-item" data-view="representation"><span class="nav-icon"><i class="fa-solid fa-layer-group"></i></span><span class="nav-label">Representation Coverage</span></div>
+      <div class="nav-item" data-view="evaluation"><span class="nav-icon"><i class="fa-solid fa-clipboard-check"></i></span><span class="nav-label">Evaluation Coverage</span></div>
+      <div class="nav-item" data-view="degree"><span class="nav-icon"><i class="fa-solid fa-chart-column"></i></span><span class="nav-label">Degree Distribution</span></div>
+      <div class="nav-item" data-view="embedding"><span class="nav-icon"><i class="fa-solid fa-braille"></i></span><span class="nav-label">Hypergraph Embedding</span></div>
+
+      <div class="nav-section-title">Info</div>
+      <div class="nav-item" data-view="about"><span class="nav-icon"><i class="fa-solid fa-circle-info"></i></span><span class="nav-label">About</span></div>
+    </nav>
+  </aside>
+
+  <main id="main">
+    <header id="topbar">
+      <div class="view-title" id="viewTitle">Overview</div>
+      <div class="view-controls" id="viewControls"></div>
+    </header>
+    <div id="view-container">
+      <div class="view-panel active" id="panel-overview"><div class="overview-scroll" id="overviewContent"></div></div>
+      <div class="view-panel" id="panel-hypergraph"><canvas class="view-canvas" id="canvasHypergraph"></canvas></div>
+      <div class="view-panel" id="panel-pipeline"><canvas class="view-canvas" id="canvasPipeline"></canvas></div>
+      <div class="view-panel" id="panel-centrality"><canvas class="view-canvas" id="canvasCentrality"></canvas></div>
+      <div class="view-panel" id="panel-cluster"><canvas class="view-canvas" id="canvasCluster"></canvas></div>
+      <div class="view-panel" id="panel-heatmap"><canvas class="view-canvas" id="canvasHeatmap"></canvas></div>
+      <div class="view-panel" id="panel-representation"><canvas class="view-canvas" id="canvasRepresentation"></canvas></div>
+      <div class="view-panel" id="panel-degree"><canvas class="view-canvas" id="canvasDegree"></canvas></div>
+      <div class="view-panel" id="panel-embedding"><canvas class="view-canvas" id="canvasEmbedding"></canvas></div>
+      <div class="view-panel" id="panel-about"><div class="about-content" id="aboutContent"></div></div>
+    </div>
+  </main>
+</div>
+
+<div id="tooltip"></div>
+<div class="modal-overlay" id="evalModal">
+  <div class="modal-content" id="evalModalContent">
+    <button class="modal-close" id="evalModalClose"><i class="fa-solid fa-xmark"></i></button>
+    <div class="modal-title">Evaluation Coverage Matrix</div>
+    <canvas id="canvasEvalModal" width="800" height="500"></canvas>
+  </div>
+</div>
+
+<script>
+/* ===========================
+   DATA
+   =========================== */
+const RAW_DATA = {"nodes":[{"id":"art_prop_001","name":"Proposition: F=ma","type":"EpistemicArtifact","subtype":"Proposition","description":"Newton's second law of motion as a propositional claim about force, mass, and acceleration.","roles":["input","output","target"],"specific":{},"edges":[{"type":"REPRESENTS","node":"rep_symbolic_001","meta":{}},{"type":"EVALUATES","node":"std_logical_001","meta":{}},{"type":"TARGETS","node":"dom_physical_001","meta":{}},{"type":"CONSTRAINS","node":"con_noise_001","meta":{"note":"Measurement noise affects verification"}}],"meta":{"tags":["physics","law"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"art_num_001","name":"Number: \u03c0","type":"EpistemicArtifact","subtype":"Mathematical Constant","description":"The ratio of a circle's circumference to its diameter, a fundamental mathematical constant.","roles":["input","output"],"specific":{},"edges":[{"type":"REPRESENTS","node":"rep_symbolic_001","meta":{}},{"type":"TARGETS","node":"dom_physical_001","meta":{}}],"meta":{"tags":["mathematics","constant"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"art_dataset_001","name":"Dataset: MNIST","type":"EpistemicArtifact","subtype":"Image Dataset","description":"Handwritten digit images for training machine learning models.","roles":["input","training"],"specific":{},"edges":[{"type":"REPRESENTS","node":"rep_matrices_001","meta":{}},{"type":"REPRESENTS","node":"rep_datastruct_001","meta":{}},{"type":"EVALUATES","node":"std_robust_001","meta":{}},{"type":"TARGETS","node":"dom_comp_001","meta":{}},{"type":"CONSTRAINS","node":"con_limdata_001","meta":{}},{"type":"SUPPORTED_BY","node":"inf_db_001","meta":{}}],"meta":{"tags":["vision","benchmark"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"art_de_001","name":"Differential Equation: Heat Equation","type":"EpistemicArtifact","subtype":"Partial Differential Equation","description":"Describes the distribution of heat in a given region over time.","roles":["model","output"],"specific":{},"edges":[{"type":"REPRESENTS","node":"rep_symbolic_001","meta":{}},{"type":"TARGETS","node":"dom_physical_001","meta":{}},{"type":"OPTIMIZES_FOR","node":"obj_pred_001","meta":{}}],"meta":{"tags":["physics","PDE"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"art_pm_001","name":"Probabilistic Model: Gaussian Mixture","type":"EpistemicArtifact","subtype":"Generative Model","description":"Models data as a mixture of Gaussian distributions, used for clustering and density estimation.","roles":["model","output"],"specific":{},"edges":[{"type":"REPRESENTS","node":"rep_tensors_001","meta":{}},{"type":"EVALUATES","node":"std_robust_001","meta":{}},{"type":"TARGETS","node":"dom_bio_001","meta":{}},{"type":"CONSTRAINS","node":"con_id_001","meta":{}}],"meta":{"tags":["statistics","unsupervised"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"art_hypergraph_001","name":"Hypergraph: Epistemic Map","type":"EpistemicArtifact","subtype":"Structural Artifact","description":"Full directed, typed network of epistemic instances including all nodes and edges defined here.","roles":["meta","representation"],"specific":{},"edges":[{"type":"REPRESENTS","node":"rep_hypergraph_001","meta":{}},{"type":"EVALUATES","node":"std_consistency_001","meta":{}},{"type":"SUPPORTED_BY","node":"inf_soft_001","meta":{}}],"meta":{"tags":["meta","structure"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"art_statresult_001","name":"Statistical Result: p-value","type":"EpistemicArtifact","subtype":"Inference Output","description":"Probability of observing data given null hypothesis, used for significance testing.","roles":["output","evidence"],"specific":{},"edges":[{"type":"EVALUATES","node":"std_signif_001","meta":{}},{"type":"TARGETS","node":"dom_bio_001","meta":{}}],"meta":{"tags":["statistics","inference"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"art_optmodel_001","name":"Optimized Neural Network Weights","type":"EpistemicArtifact","subtype":"Model Parameters","description":"Learned weights of a neural network after optimization.","roles":["output","model"],"specific":{},"edges":[{"type":"OPTIMIZES_FOR","node":"obj_ctrl_001","meta":{}},{"type":"TARGETS","node":"dom_comp_001","meta":{}}],"meta":{"tags":["deep learning","weights"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"tool_alg_001","name":"Algebraic Manipulation","type":"EpistemicTool","subtype":"Symbolic Solver","description":"Transform symbolic expressions using algebraic rules.","roles":["transformer"],"specific":{"input_types":["Proposition","Number"],"output_types":["Proposition","Number"],"algorithmic_class":"Symbolic","deterministic":true},"edges":[{"type":"OPERATES_ON","node":"art_prop_001","meta":{}},{"type":"OPERATES_ON","node":"art_num_001","meta":{}},{"type":"PRODUCES","node":"art_prop_001","meta":{"derivation":"simplified"}}],"meta":{"tags":["algebra","symbolic"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"tool_statinf_001","name":"Statistical Inference","type":"EpistemicTool","subtype":"Frequentist/Bayesian","description":"Draw conclusions about populations from sample data.","roles":["analyzer"],"specific":{"input_types":["Dataset"],"output_types":["StatisticalResult"],"algorithmic_class":"Probabilistic","deterministic":false},"edges":[{"type":"OPERATES_ON","node":"art_dataset_001","meta":{}},{"type":"PRODUCES","node":"art_statresult_001","meta":{}},{"type":"OPTIMIZES_FOR","node":"obj_pred_001","meta":{}}],"meta":{"tags":["statistics","inference"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"tool_opt_001","name":"Gradient Descent","type":"EpistemicTool","subtype":"Optimization Algorithm","description":"Iteratively minimizes a loss function by following the negative gradient.","roles":["optimizer"],"specific":{"input_types":["ProbabilisticModel","Dataset"],"output_types":["Model Parameters"],"algorithmic_class":"Numerical Optimization","deterministic":false},"edges":[{"type":"OPERATES_ON","node":"art_pm_001","meta":{}},{"type":"PRODUCES","node":"art_optmodel_001","meta":{}},{"type":"OPTIMIZES_FOR","node":"obj_ctrl_001","meta":{}}],"meta":{"tags":["optimization","gradient"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"tool_sim_001","name":"Monte Carlo Simulation","type":"EpistemicTool","subtype":"Simulation Method","description":"Approximate complex systems using repeated random sampling.","roles":["simulator"],"specific":{"input_types":["DifferentialEquation","ProbabilisticModel"],"output_types":["Number","StatisticalResult"],"algorithmic_class":"Stochastic","deterministic":false},"edges":[{"type":"OPERATES_ON","node":"art_de_001","meta":{}},{"type":"OPERATES_ON","node":"art_pm_001","meta":{}},{"type":"OPTIMIZES_FOR","node":"obj_pred_001","meta":{}}],"meta":{"tags":["simulation","stochastic"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"tool_meas_001","name":"LIGO Measurement Procedure","type":"EpistemicTool","subtype":"Physical Measurement","description":"Procedure to detect gravitational waves using laser interferometry.","roles":["sensor"],"specific":{"input_types":["PhysicalSystems"],"output_types":["Dataset"],"algorithmic_class":"Physical Sensing","deterministic":true},"edges":[{"type":"PRODUCES","node":"art_dataset_001","meta":{}},{"type":"TARGETS","node":"dom_physical_001","meta":{}},{"type":"SUPPORTED_BY","node":"inf_lab_001","meta":{}}],"meta":{"tags":["physics","measurement"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"agent_sci_001","name":"Scientist","type":"EpistemicAgent","subtype":"Human Researcher","description":"Individual who formulates hypotheses, designs experiments, and interprets results.","roles":["executor","creator"],"specific":{"capabilities":["hypothesis formation","experimental design","data analysis","theoretical reasoning"],"cognitive_type":"human"},"edges":[{"type":"USES","node":"tool_alg_001","meta":{}},{"type":"USES","node":"tool_statinf_001","meta":{}},{"type":"USES","node":"tool_opt_001","meta":{}},{"type":"USES","node":"tool_sim_001","meta":{}},{"type":"USES","node":"tool_meas_001","meta":{}},{"type":"PART_OF","node":"proc_sci_method_001","meta":{}}],"meta":{"tags":["human","researcher"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"agent_analyst_001","name":"Data Analyst","type":"EpistemicAgent","subtype":"Human Analyst","description":"Professional who cleans, models, and interprets data to support decisions.","roles":["executor"],"specific":{"capabilities":["data wrangling","statistical modeling","visualization"],"cognitive_type":"human"},"edges":[{"type":"USES","node":"tool_statinf_001","meta":{}},{"type":"USES","node":"tool_opt_001","meta":{}}],"meta":{"tags":["analyst","data"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"agent_ml_001","name":"Machine Learning System","type":"EpistemicAgent","subtype":"Neural Network Trainer","description":"Automated system that learns from data using gradient-based optimization.","roles":["automated executor"],"specific":{"capabilities":["backpropagation","batch processing","hyperparameter tuning"],"cognitive_type":"machine"},"edges":[{"type":"USES","node":"tool_opt_001","meta":{}},{"type":"USES","node":"tool_statinf_001","meta":{}},{"type":"PART_OF","node":"proc_train_001","meta":{}}],"meta":{"tags":["ML","automation"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"proc_sci_method_001","name":"Scientific Method","type":"EpistemicProcess","subtype":"Methodology","description":"Iterative cycle of hypothesis, experiment, analysis, and conclusion.","roles":["workflow"],"specific":{"steps":["proc_hypothesis_001","proc_datacollection_001","proc_dataanalysis_001","proc_interpretation_001"],"composition_type":"iterative"},"edges":[{"type":"USES","node":"tool_alg_001","meta":{}},{"type":"USES","node":"tool_statinf_001","meta":{}},{"type":"USES","node":"tool_meas_001","meta":{}},{"type":"PRODUCES","node":"art_prop_001","meta":{}},{"type":"TARGETS","node":"dom_physical_001","meta":{}},{"type":"OPTIMIZES_FOR","node":"obj_expl_001","meta":{}},{"type":"EVALUATES","node":"std_falsify_001","meta":{}}],"meta":{"tags":["science","cycle"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"proc_hypothesis_001","name":"Hypothesis Formulation","type":"EpistemicProcess","subtype":"Creative Step","description":"Proposing a testable explanation based on prior knowledge.","roles":["subprocess"],"specific":{"steps":[],"composition_type":"sequential"},"edges":[{"type":"PART_OF","node":"proc_sci_method_001","meta":{}},{"type":"PRODUCES","node":"art_prop_001","meta":{}}],"meta":{"tags":["hypothesis"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"proc_datacollection_001","name":"Data Collection","type":"EpistemicProcess","subtype":"Experimental Step","description":"Gathering measurements or observations.","roles":["subprocess"],"specific":{"steps":[],"composition_type":"sequential"},"edges":[{"type":"PART_OF","node":"proc_sci_method_001","meta":{}},{"type":"USES","node":"tool_meas_001","meta":{}},{"type":"PRODUCES","node":"art_dataset_001","meta":{}}],"meta":{"tags":["experiment"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"proc_dataanalysis_001","name":"Data Analysis","type":"EpistemicProcess","subtype":"Analytical Step","description":"Applying statistical and computational tools to extract insights.","roles":["subprocess"],"specific":{"steps":[],"composition_type":"sequential"},"edges":[{"type":"PART_OF","node":"proc_sci_method_001","meta":{}},{"type":"USES","node":"tool_statinf_001","meta":{}},{"type":"USES","node":"tool_opt_001","meta":{}},{"type":"PRODUCES","node":"art_statresult_001","meta":{}}],"meta":{"tags":["analysis"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"proc_interpretation_001","name":"Interpretation","type":"EpistemicProcess","subtype":"Synthesis Step","description":"Drawing conclusions and relating results to theory.","roles":["subprocess"],"specific":{"steps":[],"composition_type":"sequential"},"edges":[{"type":"PART_OF","node":"proc_sci_method_001","meta":{}},{"type":"PRODUCES","node":"art_prop_001","meta":{}}],"meta":{"tags":["interpretation"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"proc_bayes_001","name":"Bayesian Updating Loop","type":"EpistemicProcess","subtype":"Iterative Inference","description":"Update prior beliefs with new evidence to form posterior.","roles":["workflow"],"specific":{"steps":["proc_prior_001","proc_likelihood_001","proc_posterior_001"],"composition_type":"iterative"},"edges":[{"type":"USES","node":"tool_statinf_001","meta":{}},{"type":"PRODUCES","node":"art_pm_001","meta":{}},{"type":"OPTIMIZES_FOR","node":"obj_pred_001","meta":{}}],"meta":{"tags":["bayesian","inference"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"proc_train_001","name":"Training Pipeline","type":"EpistemicProcess","subtype":"Machine Learning Pipeline","description":"Sequence of data loading, model training, and evaluation.","roles":["workflow"],"specific":{"steps":["proc_dataload_001","proc_modeltrain_001","proc_eval_001"],"composition_type":"sequential"},"edges":[{"type":"USES","node":"tool_opt_001","meta":{}},{"type":"USES","node":"tool_statinf_001","meta":{}},{"type":"PRODUCES","node":"art_optmodel_001","meta":{}},{"type":"TARGETS","node":"dom_comp_001","meta":{}},{"type":"OPTIMIZES_FOR","node":"obj_ctrl_001","meta":{}}],"meta":{"tags":["ML","pipeline"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"std_logical_001","name":"Logical Consistency","type":"EpistemicStandard","subtype":"Formal Criterion","description":"Absence of contradictions within a set of propositions.","roles":["quality metric"],"specific":{"criterion":"No contradictory statements","threshold":null,"evaluation_method":"Formal logic verification"},"edges":[{"type":"EVALUATES","node":"art_prop_001","meta":{}}],"meta":{"tags":["logic","consistency"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"std_signif_001","name":"Statistical Significance (p < 0.05)","type":"EpistemicStandard","subtype":"Inference Criterion","description":"Threshold for rejecting null hypothesis based on p-value.","roles":["decision rule"],"specific":{"criterion":"p-value < alpha","threshold":0.05,"evaluation_method":"Hypothesis test"},"edges":[{"type":"EVALUATES","node":"art_statresult_001","meta":{}}],"meta":{"tags":["statistics","significance"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"std_robust_001","name":"Robustness","type":"EpistemicStandard","subtype":"Stability Criterion","description":"Insensitivity of results to small perturbations in assumptions or data.","roles":["quality metric"],"specific":{"criterion":"Stable under minor changes","threshold":null,"evaluation_method":"Sensitivity analysis"},"edges":[{"type":"EVALUATES","node":"art_pm_001","meta":{}},{"type":"EVALUATES","node":"art_dataset_001","meta":{}}],"meta":{"tags":["stability","robustness"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"std_falsify_001","name":"Falsifiability","type":"EpistemicStandard","subtype":"Philosophical Criterion","description":"A theory must be testable and capable of being proven false.","roles":["demarcation"],"specific":{"criterion":"Empirical testability with potential counterexamples","threshold":null,"evaluation_method":"Logical analysis of theory structure"},"edges":[{"type":"EVALUATES","node":"art_prop_001","meta":{}}],"meta":{"tags":["philosophy","popper"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"std_consistency_001","name":"Consistency","type":"EpistemicStandard","subtype":"Structural Criterion","description":"Internal consistency of the epistemic map structure.","roles":["quality metric"],"specific":{"criterion":"No orphan nodes or broken references","threshold":null,"evaluation_method":"Graph validation"},"edges":[],"meta":{"tags":["consistency","validation"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"rep_symbolic_001","name":"Symbolic Notation","type":"EpistemicRepresentation","subtype":"Mathematical Language","description":"Formal symbols and operators (e.g., F=ma, \u222b) for expressing artifacts.","roles":["encoding"],"specific":{"format":"symbolic","constraints":["Well-formed formula","Operator precedence"]},"edges":[],"meta":{"tags":["notation","math"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"rep_matrices_001","name":"Matrices","type":"EpistemicRepresentation","subtype":"Linear Algebra","description":"Two-dimensional arrays for representing linear transformations or data tables.","roles":["encoding"],"specific":{"format":"numeric","constraints":["Rectangular shape","Element type consistency"]},"edges":[],"meta":{"tags":["linear algebra","data"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"rep_tensors_001","name":"Tensors","type":"EpistemicRepresentation","subtype":"Multidimensional Arrays","description":"Generalization of matrices to higher dimensions, used in ML and physics.","roles":["encoding"],"specific":{"format":"numeric","constraints":["Dimension consistency","Contravariant/covariant rules"]},"edges":[],"meta":{"tags":["tensor","ML"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"rep_hypergraph_001","name":"Hypergraph Representation","type":"EpistemicRepresentation","subtype":"Graph-based","description":"Nodes and hyperedges capturing multi-way relationships among epistemic instances.","roles":["encoding"],"specific":{"format":"computational","constraints":["Directed/typed edges","Hyperedge cardinality"]},"edges":[],"meta":{"tags":["hypergraph","structure"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"rep_datastruct_001","name":"Data Structures","type":"EpistemicRepresentation","subtype":"Computational","description":"In-memory formats like arrays, lists, trees, or hash maps.","roles":["encoding"],"specific":{"format":"computational","constraints":["Memory layout","Access complexity"]},"edges":[],"meta":{"tags":["CS","data"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"dom_physical_001","name":"Physical Systems","type":"EpistemicDomain","subtype":"Natural World","description":"Realm of matter, energy, and fundamental forces (e.g., particles, planets).","roles":["target"],"specific":{"ontology":"Physics","scale":"macro to quantum"},"edges":[],"meta":{"tags":["physics","reality"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"dom_bio_001","name":"Biological Systems","type":"EpistemicDomain","subtype":"Life Sciences","description":"Organisms, cells, ecosystems, and genetic networks.","roles":["target"],"specific":{"ontology":"Biology","scale":"molecular to ecological"},"edges":[],"meta":{"tags":["biology","life"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"dom_comp_001","name":"Computational Systems","type":"EpistemicDomain","subtype":"Information Processing","description":"Algorithms, software, hardware, and data flow.","roles":["target"],"specific":{"ontology":"Computer Science","scale":"bit to distributed system"},"edges":[],"meta":{"tags":["computing","information"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"obj_pred_001","name":"Prediction","type":"EpistemicObjective","subtype":"Forecasting","description":"Accurately forecasting future or unobserved states.","roles":["goal"],"specific":{"goal_type":"prediction","metric":"Mean squared error / accuracy"},"edges":[],"meta":{"tags":["forecast","ML"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"obj_expl_001","name":"Explanation","type":"EpistemicObjective","subtype":"Causal Understanding","description":"Providing interpretable mechanisms behind phenomena.","roles":["goal"],"specific":{"goal_type":"explanation","metric":"Causal coherence / counterfactual consistency"},"edges":[],"meta":{"tags":["causality","science"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"obj_ctrl_001","name":"Control","type":"EpistemicObjective","subtype":"Intervention","description":"Manipulating a system to achieve desired outcomes.","roles":["goal"],"specific":{"goal_type":"control","metric":"Tracking error / settling time"},"edges":[],"meta":{"tags":["engineering","robotics"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"con_noise_001","name":"Measurement Noise","type":"EpistemicConstraint","subtype":"Data Imperfection","description":"Random errors corrupting observations.","roles":["limitation"],"specific":{"constraint_type":"data","severity":"medium"},"edges":[{"type":"CONSTRAINS","node":"art_dataset_001","meta":{}},{"type":"CONSTRAINS","node":"proc_datacollection_001","meta":{}}],"meta":{"tags":["noise","error"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"con_limdata_001","name":"Limited Data","type":"EpistemicConstraint","subtype":"Sample Size","description":"Insufficient observations for reliable inference.","roles":["limitation"],"specific":{"constraint_type":"data","severity":"high"},"edges":[{"type":"CONSTRAINS","node":"art_dataset_001","meta":{}},{"type":"CONSTRAINS","node":"tool_statinf_001","meta":{}}],"meta":{"tags":["sparsity","sample"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"con_comp_001","name":"Computational Complexity","type":"EpistemicConstraint","subtype":"Resource Limit","description":"Exponential time or memory requirements for exact inference.","roles":["limitation"],"specific":{"constraint_type":"computational","severity":"high"},"edges":[{"type":"CONSTRAINS","node":"tool_opt_001","meta":{}},{"type":"CONSTRAINS","node":"proc_train_001","meta":{}}],"meta":{"tags":["complexity","NP-hard"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"con_id_001","name":"Identifiability Issues","type":"EpistemicConstraint","subtype":"Model Ambiguity","description":"Different parameter sets yield identical predictions.","roles":["limitation"],"specific":{"constraint_type":"theoretical","severity":"medium"},"edges":[{"type":"CONSTRAINS","node":"art_pm_001","meta":{}}],"meta":{"tags":["identifiability","statistics"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"inf_db_001","name":"Relational Database","type":"EpistemicInfrastructure","subtype":"Storage System","description":"Structured data storage with SQL querying.","roles":["support"],"specific":{"resource_type":"software","capacity":"Terabyte scale"},"edges":[{"type":"SUPPORTED_BY","node":"art_dataset_001","meta":{}}],"meta":{"tags":["database","storage"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"inf_lab_001","name":"Physics Laboratory","type":"EpistemicInfrastructure","subtype":"Facility","description":"Controlled environment with precision instruments.","roles":["support"],"specific":{"resource_type":"institutional","capacity":"Vibration-isolated, temperature-controlled"},"edges":[{"type":"SUPPORTED_BY","node":"tool_meas_001","meta":{}}],"meta":{"tags":["lab","experiment"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"inf_soft_001","name":"Graph Analysis Software (NetworkX)","type":"EpistemicInfrastructure","subtype":"Library","description":"Software for creating, manipulating, and analyzing graphs.","roles":["support"],"specific":{"resource_type":"software","capacity":"100k nodes, 1M edges"},"edges":[{"type":"SUPPORTED_BY","node":"art_hypergraph_001","meta":{}}],"meta":{"tags":["graph","software"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"proc_prior_001","name":"Prior Definition","type":"EpistemicProcess","subtype":"Bayesian Step","description":"Specifying prior distribution over parameters.","roles":["subprocess"],"specific":{"steps":[],"composition_type":"sequential"},"edges":[{"type":"PART_OF","node":"proc_bayes_001","meta":{}},{"type":"PRODUCES","node":"art_pm_001","meta":{}}],"meta":{"tags":["prior","bayesian"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"proc_likelihood_001","name":"Likelihood Computation","type":"EpistemicProcess","subtype":"Bayesian Step","description":"Calculating probability of data given parameters.","roles":["subprocess"],"specific":{"steps":[],"composition_type":"sequential"},"edges":[{"type":"PART_OF","node":"proc_bayes_001","meta":{}},{"type":"USES","node":"tool_statinf_001","meta":{}}],"meta":{"tags":["likelihood","bayesian"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"proc_posterior_001","name":"Posterior Update","type":"EpistemicProcess","subtype":"Bayesian Step","description":"Combine prior and likelihood to obtain posterior.","roles":["subprocess"],"specific":{"steps":[],"composition_type":"sequential"},"edges":[{"type":"PART_OF","node":"proc_bayes_001","meta":{}},{"type":"PRODUCES","node":"art_pm_001","meta":{}}],"meta":{"tags":["posterior","bayesian"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"proc_dataload_001","name":"Data Loading","type":"EpistemicProcess","subtype":"Pipeline Step","description":"Reading and preprocessing raw data.","roles":["subprocess"],"specific":{"steps":[],"composition_type":"sequential"},"edges":[{"type":"PART_OF","node":"proc_train_001","meta":{}},{"type":"PRODUCES","node":"art_dataset_001","meta":{}}],"meta":{"tags":["data","pipeline"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"proc_modeltrain_001","name":"Model Training","type":"EpistemicProcess","subtype":"Pipeline Step","description":"Optimizing model parameters using gradient descent.","roles":["subprocess"],"specific":{"steps":[],"composition_type":"sequential"},"edges":[{"type":"PART_OF","node":"proc_train_001","meta":{}},{"type":"USES","node":"tool_opt_001","meta":{}},{"type":"PRODUCES","node":"art_optmodel_001","meta":{}}],"meta":{"tags":["training","optimization"],"confidence":1.0,"source":"Epistemic Map Generator"}},{"id":"proc_eval_001","name":"Evaluation","type":"EpistemicProcess","subtype":"Pipeline Step","description":"Assessing model performance on held-out data.","roles":["subprocess"],"specific":{"steps":[],"composition_type":"sequential"},"edges":[{"type":"PART_OF","node":"proc_train_001","meta":{}},{"type":"EVALUATES","node":"std_robust_001","meta":{}},{"type":"PRODUCES","node":"art_statresult_001","meta":{}}],"meta":{"tags":["evaluation","testing"],"confidence":1.0,"source":"Epistemic Map Generator"}}]};
+
+/* ===========================
+   TYPE COLORS & CONSTANTS
+   =========================== */
+const TYPE_COLORS = {
+  EpistemicArtifact:      '#00ffc8',
+  EpistemicTool:          '#ff6b35',
+  EpistemicAgent:         '#ff3d71',
+  EpistemicProcess:       '#ffd60a',
+  EpistemicStandard:      '#00c9db',
+  EpistemicRepresentation:'#7dffaf',
+  EpistemicDomain:        '#1b9aaa',
+  EpistemicObjective:     '#06d6a0',
+  EpistemicConstraint:    '#ef476f',
+  EpistemicInfrastructure:'#4cc9f0'
+};
+const EDGE_COLORS = {
+  USES:'#00c9db', OPERATES_ON:'#ff6b35', PRODUCES:'#06d6a0',
+  EVALUATES:'#ffd60a', REPRESENTS:'#7dffaf', TARGETS:'#1b9aaa',
+  OPTIMIZES_FOR:'#06d6a0', CONSTRAINS:'#ef476f', SUPPORTED_BY:'#4cc9f0', PART_OF:'#ff3d71'
+};
+const NODE_TYPES = Object.keys(TYPE_COLORS);
+const NODE_RADIUS = 8;
+const EPS = 0.001;
+
+/* ===========================
+   DATA PROCESSING
+   =========================== */
+class EpistemicData {
+  constructor(raw) {
+    this.nodeMap = {};
+    this.nodes = [];
+    this.links = [];
+    this.adjacency = {};
+    this.degrees = {};
+    this.processData(raw);
+  }
+  processData(raw) {
+    // Build nodes
+    raw.nodes.forEach(n => {
+      const node = { ...n, x: 0, y: 0, vx: 0, vy: 0, degree: 0, inDegree: 0, outDegree: 0 };
+      this.nodes.push(node);
+      this.nodeMap[n.id] = node;
+    });
+    // Build links (deduplicate bidirectional)
+    const seen = new Set();
+    raw.nodes.forEach(n => {
+      (n.edges || []).forEach(e => {
+        const key = [n.id, e.node, e.type].sort().join('|');
+        const revKey = [e.node, n.id, e.type].sort().join('|');
+        if (!seen.has(key) && !seen.has(revKey)) {
+          seen.add(key);
+          if (this.nodeMap[e.node]) {
+            this.links.push({ source: n.id, target: e.node, type: e.type, meta: e.meta || {} });
+          }
+        }
+      });
+    });
+    // Compute degrees
+    this.nodes.forEach(n => { this.degrees[n.id] = { total:0, in:0, out:0 }; });
+    this.links.forEach(l => {
+      if (this.degrees[l.source]) { this.degrees[l.source].out++; this.degrees[l.source].total++; }
+      if (this.degrees[l.target]) { this.degrees[l.target].in++; this.degrees[l.target].total++; }
+    });
+    this.nodes.forEach(n => { n.degree = this.degrees[n.id].total; n.inDegree = this.degrees[n.id].in; n.outDegree = this.degrees[n.id].out; });
+    // Adjacency
+    this.nodes.forEach(n => { this.adjacency[n.id] = new Set(); });
+    this.links.forEach(l => {
+      if (this.adjacency[l.source]) this.adjacency[l.source].add(l.target);
+      if (this.adjacency[l.target]) this.adjacency[l.target].add(l.source);
+    });
+  }
+  getNeighbors(nodeId, k = 1) {
+    let frontier = new Set([nodeId]);
+    let visited = new Set([nodeId]);
+    for (let i = 0; i < k; i++) {
+      const next = new Set();
+      frontier.forEach(id => {
+        (this.adjacency[id] || []).forEach(nid => {
+          if (!visited.has(nid)) { next.add(nid); visited.add(nid); }
+        });
+      });
+      frontier = next;
+    }
+    return visited;
+  }
+  getNodesByType(type) { return this.nodes.filter(n => n.type === type); }
+  getTypeCounts() {
+    const counts = {};
+    NODE_TYPES.forEach(t => counts[t] = 0);
+    this.nodes.forEach(n => { if (counts[n.type] !== undefined) counts[n.type]++; });
+    return counts;
+  }
+  getDegreeDistribution() {
+    const dist = {};
+    this.nodes.forEach(n => { dist[n.degree] = (dist[n.degree] || 0) + 1; });
+    return dist;
+  }
+  getAdjacencyByType() {
+    const matrix = {};
+    NODE_TYPES.forEach(r => { matrix[r] = {}; NODE_TYPES.forEach(c => matrix[r][c] = 0); });
+    this.links.forEach(l => {
+      const sType = this.nodeMap[l.source]?.type;
+      const tType = this.nodeMap[l.target]?.type;
+      if (sType && tType) { matrix[sType][tType]++; if (sType !== tType) matrix[tType][sType]++; }
+    });
+    return matrix;
+  }
+  getCentrality() {
+    // Degree centrality normalized
+    const maxDeg = Math.max(1, ...this.nodes.map(n => n.degree));
+    const cent = {};
+    this.nodes.forEach(n => cent[n.id] = n.degree / maxDeg);
+    return cent;
+  }
+  getRepresentationCoverage() {
+    const artifacts = this.getNodesByType('EpistemicArtifact');
+    const reps = this.getNodesByType('EpistemicRepresentation');
+    const matrix = {};
+    artifacts.forEach(a => {
+      matrix[a.id] = {};
+      reps.forEach(r => matrix[a.id][r.id] = 0);
+    });
+    this.links.forEach(l => {
+      if (l.type === 'REPRESENTS') {
+        const sNode = this.nodeMap[l.source];
+        const tNode = this.nodeMap[l.target];
+        if (sNode?.type === 'EpistemicArtifact' && tNode?.type === 'EpistemicRepresentation') matrix[l.source][l.target] = 1;
+        if (tNode?.type === 'EpistemicArtifact' && sNode?.type === 'EpistemicRepresentation') matrix[l.target][l.source] = 1;
+      }
+    });
+    return { artifacts, reps, matrix };
+  }
+  getEvaluationCoverage() {
+    const artifacts = this.getNodesByType('EpistemicArtifact');
+    const standards = this.getNodesByType('EpistemicStandard');
+    const matrix = {};
+    artifacts.forEach(a => { matrix[a.id] = {}; standards.forEach(s => matrix[a.id][s.id] = 0); });
+    this.links.forEach(l => {
+      if (l.type === 'EVALUATES') {
+        const sNode = this.nodeMap[l.source];
+        const tNode = this.nodeMap[l.target];
+        if (sNode?.type === 'EpistemicArtifact' && tNode?.type === 'EpistemicStandard') matrix[l.source][l.target] = 1;
+        if (tNode?.type === 'EpistemicArtifact' && sNode?.type === 'EpistemicStandard') matrix[l.target][l.source] = 1;
+      }
+    });
+    return { artifacts, standards, matrix };
+  }
+}
+
+const data = new EpistemicData(RAW_DATA);
+
+/* ===========================
+   APP STATE
+   =========================== */
+const state = {
+  currentView: 'overview',
+  selectedNode: null,
+  hoveredNode: null,
+  hopK: 1,
+  filterTypes: new Set(NODE_TYPES),
+  transform: { x: 0, y: 0, k: 1 },
+  simulation: null,
+  simNodes: null,
+  simLinks: null,
+  isDragging: false,
+  dragNode: null,
+  isPanning: false,
+  panStart: { x: 0, y: 0 },
+  needsRender: true,
+  pulsePhase: 0
+};
+
+/* ===========================
+   UTILITY
+   =========================== */
+function hexToRgba(hex, a) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+function lighten(hex, amt=60) {
+  let r = Math.min(255, parseInt(hex.slice(1,3),16)+amt);
+  let g = Math.min(255, parseInt(hex.slice(3,5),16)+amt);
+  let b = Math.min(255, parseInt(hex.slice(5,7),16)+amt);
+  return `rgb(${r},${g},${b})`;
+}
+function screenToGraph(sx, sy, transform) {
+  return { x: (sx - transform.x) / transform.k, y: (sy - transform.y) / transform.k };
+}
+function truncStr(s, n=28) { return s.length > n ? s.slice(0, n) + '...' : s; }
+function setupCanvas(canvas) {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = rect.height + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w: rect.width, h: rect.height };
+}
+
+/* ===========================
+   SIDEBAR
+   =========================== */
+const sidebar = document.getElementById('sidebar');
+const collapseBtn = document.getElementById('collapseBtn');
+collapseBtn.addEventListener('click', () => {
+  sidebar.classList.toggle('collapsed');
+  collapseBtn.querySelector('i').classList.toggle('fa-angles-left');
+  collapseBtn.querySelector('i').classList.toggle('fa-angles-right');
+});
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const view = item.dataset.view;
+    switchView(view);
+  });
+});
+
+function switchView(view) {
+  state.currentView = view;
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.toggle('active', i.dataset.view === view));
+  document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('panel-' + view);
+  if (panel) panel.classList.add('active');
+
+  const titles = {
+    overview:'Overview', hypergraph:'Hypergraph View', pipeline:'Process Pipeline',
+    centrality:'Centrality Map', cluster:'Domain Cluster', heatmap:'Adjacency Heatmap',
+    representation:'Representation Coverage', evaluation:'Evaluation Coverage',
+    degree:'Degree Distribution', embedding:'Hypergraph Embedding', about:'About'
+  };
+  document.getElementById('viewTitle').textContent = titles[view] || view;
+
+  // View-specific controls
+  const controls = document.getElementById('viewControls');
+  controls.innerHTML = '';
+
+  if (view === 'hypergraph' || view === 'centrality' || view === 'cluster') {
+    // K-hop control
+    const lbl = document.createElement('span');
+    lbl.style.cssText = 'font-size:11px;color:var(--text-dim);';
+    lbl.textContent = 'K-hop:';
+    const sel = document.createElement('select');
+    sel.innerHTML = '<option value="0">Full</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option>';
+    sel.value = state.hopK || '1';
+    sel.addEventListener('change', e => { state.hopK = parseInt(e.target.value); state.needsRender = true; });
+    controls.appendChild(lbl);
+    controls.appendChild(sel);
+
+    // Reset button
+    const btn = document.createElement('button');
+    btn.textContent = 'Reset View';
+    btn.addEventListener('click', () => {
+      state.selectedNode = null; state.hopK = 1;
+      sel.value = '1';
+      state.transform = { x: 0, y: 0, k: 1 };
+      state.needsRender = true;
+    });
+    controls.appendChild(btn);
+  }
+
+  if (view === 'evaluation') {
+    const btn = document.createElement('button');
+    btn.textContent = 'Open Full Matrix';
+    btn.addEventListener('click', () => { openEvalModal(); });
+    controls.appendChild(btn);
+  }
+
+  // Initialize view
+  state.needsRender = true;
+  setTimeout(() => initView(view), 50);
+}
+
+/* ===========================
+   TOOLTIP
+   =========================== */
+const tooltip = document.getElementById('tooltip');
+function showTooltip(x, y, node) {
+  const color = TYPE_COLORS[node.type] || '#888';
+  const deg = node.degree || 0;
+  const cent = data.getCentrality()[node.id] || 0;
+  const conf = node.meta?.confidence || 0;
+
+  // Group edges by type for structured display
+  const edgeGroups = {};
+  (node.edges || []).forEach(e => {
+    if (!edgeGroups[e.type]) edgeGroups[e.type] = [];
+    const target = data.nodeMap[e.node];
+    if (target) edgeGroups[e.type].push(target);
+  });
+  let edgesHtml = '';
+  const edgeTypes = Object.keys(edgeGroups);
+  edgeTypes.slice(0, 4).forEach(type => {
+    const targets = edgeGroups[type];
+    const eColor = EDGE_COLORS[type] || '#888';
+    edgesHtml += `
+      <div class="tt-edge-group">
+        <div class="tt-edge-type" style="color:${eColor}">${type.replace(/_/g, ' ')}</div>
+        <div class="tt-edge-items" style="border-left-color:${hexToRgba(eColor, 0.2)}">
+          ${targets.slice(0, 3).map(t => `
+            <div class="tt-edge-item">
+              <div class="tt-edge-dot" style="background:${TYPE_COLORS[t.type] || eColor}"></div>
+              <span>${truncStr(t.name, 24)}</span>
+            </div>
+          `).join('')}
+          ${targets.length > 3 ? `<div class="tt-edge-more">+${targets.length - 3} more</div>` : ''}
+        </div>
+      </div>
+    `;
+  });
+  if (edgeTypes.length > 4) {
+    edgesHtml += `<div class="tt-edge-more">+${edgeTypes.length - 4} more relationship types</div>`;
+  }
+
+  // Build specific properties HTML dynamically
+  let specificHtml = '';
+  if (node.specific && Object.keys(node.specific).length > 0) {
+    const props = Object.entries(node.specific)
+      .filter(([k, v]) => Array.isArray(v) ? v.length > 0 : v !== null && v !== undefined)
+      .slice(0, 4);
+    if (props.length > 0) {
+      specificHtml = `
+        <div class="tt-section">
+          <div class="tt-section-title">Properties</div>
+          <div class="tt-props">
+            ${props.map(([k, v]) => {
+              let valStr = Array.isArray(v) ? v.join(', ') : String(v);
+              return `<div class="tt-prop-key">${k.replace(/_/g, ' ')}</div><div class="tt-prop-val">${truncStr(valStr, 28)}</div>`;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  // Badges
+  let badgesHtml = `<span class="tt-badge" style="background:${hexToRgba(color, 0.15)}; color:${color}">${node.subtype || node.type.replace('Epistemic ', '')}</span>`;
+  if (conf > 0) badgesHtml += `<span class="tt-badge" style="background:rgba(255,255,255,0.05); color:var(--text-dim)">Conf: ${(conf*100).toFixed(0)}%</span>`;
+
+  tooltip.innerHTML = `
+    <div class="tt-header" style="border-left: 3px solid ${color}; background: linear-gradient(90deg, ${hexToRgba(color, 0.08)} 0%, transparent 100%);">
+      <div class="tt-name" style="color:${color}">${node.name}</div>
+      <div class="tt-badges">${badgesHtml}</div>
+    </div>
+    <div class="tt-body">
+      <div class="tt-desc">${node.description}</div>
+
+      <div class="tt-section">
+        <div class="tt-section-title">Network Metrics</div>
+        <div class="tt-meters">
+          <div>
+            <div class="tt-meter-label"><span>Connectivity</span> <span>${deg} edges</span></div>
+            <div class="tt-meter-track"><div class="tt-meter-fill" style="width:${Math.min(100, deg * 8)}%; background:${color}"></div></div>
+          </div>
+          <div>
+            <div class="tt-meter-label"><span>Centrality</span> <span>${cent.toFixed(3)}</span></div>
+            <div class="tt-meter-track"><div class="tt-meter-fill" style="width:${cent * 100}%; background:${color}"></div></div>
+          </div>
+        </div>
+      </div>
+
+      ${specificHtml}
+
+      ${edgeTypes.length > 0 ? `
+      <div class="tt-section">
+        <div class="tt-section-title">Relationships</div>
+        <div class="tt-edges-list">${edgesHtml}</div>
+      </div>
+      ` : ''}
+    </div>
+  `;
+
+  tooltip.classList.add('visible');
+
+  // Positioning logic with boundary detection
+  const ttRect = tooltip.getBoundingClientRect();
+  const ttW = ttRect.width, ttH = ttRect.height;
+  let tx = x + 16, ty = y - 10;
+  if (tx + ttW > window.innerWidth - 20) tx = x - ttW - 16;
+  if (ty + ttH > window.innerHeight - 20) ty = window.innerHeight - ttH - 20;
+  if (ty < 10) ty = 10;
+  tooltip.style.left = tx + 'px';
+  tooltip.style.top = ty + 'px';
+}
+function hideTooltip() { tooltip.classList.remove('visible'); }
+
+/* ===========================
+   FORCE SIMULATION
+   =========================== */
+function initSimulation(w, h) {
+  state.simNodes = data.nodes.map(n => ({ ...n }));
+  state.simLinks = data.links.map(l => ({ ...l }));
+
+  const sim = d3.forceSimulation(state.simNodes)
+    .force('link', d3.forceLink(state.simLinks).id(d => d.id).distance(90).strength(0.4))
+    .force('charge', d3.forceManyBody().strength(-350))
+    .force('center', d3.forceCenter(w / 2, h / 2))
+    .force('collision', d3.forceCollide().radius(28))
+    .force('x', d3.forceX(w / 2).strength(0.03))
+    .force('y', d3.forceY(h / 2).strength(0.03))
+    .alphaDecay(0.02)
+    .on('tick', () => { state.needsRender = true; });
+
+  state.simulation = sim;
+  return sim;
+}
+
+function getNodePositions() {
+  const pos = {};
+  if (state.simNodes) state.simNodes.forEach(n => pos[n.id] = n);
+  return pos;
+}
+
+/* ===========================
+   GRAPH RENDERING
+   =========================== */
+function drawBackground(ctx, w, h) {
+  // Deep gradient background
+  const grad = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.max(w, h) * 0.7);
+  grad.addColorStop(0, '#0a0a18');
+  grad.addColorStop(1, '#030306');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, w, h);
+
+  // Subtle grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.015)';
+  ctx.lineWidth = 0.5;
+  const gridSize = 40;
+  for (let x = 0; x < w; x += gridSize) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+  for (let y = 0; y < h; y += gridSize) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+}
+
+function drawGraphEdges(ctx, pos, links, transform, selectedNode, hoveredNode, hopSet) {
+  links.forEach(l => {
+    const s = pos[l.source.id || l.source];
+    const t = pos[l.target.id || l.target];
+    if (!s || !t) return;
+
+    let alpha = 0.12;
+    let width = 0.8;
+    const edgeColor = EDGE_COLORS[l.type] || '#555';
+
+    // If a node is selected, dim non-neighbor edges
+    if (selectedNode && hopSet) {
+      const sId = s.id || l.source.id || l.source;
+      const tId = t.id || l.target.id || l.target;
+      if (hopSet.has(sId) && hopSet.has(tId)) {
+        alpha = 0.5;
+        width = 1.2;
+      } else {
+        alpha = 0.03;
+      }
+    }
+
+    // Hover highlight
+    if (hoveredNode) {
+      const sId = s.id || l.source.id || l.source;
+      const tId = t.id || l.target.id || l.target;
+      if (sId === hoveredNode.id || tId === hoveredNode.id) {
+        alpha = Math.max(alpha, 0.6);
+        width = Math.max(width, 1.8);
+      }
+    }
+
+    const sx = s.x * transform.k + transform.x;
+    const sy = s.y * transform.k + transform.y;
+    const tx = t.x * transform.k + transform.x;
+    const ty = t.y * transform.k + transform.y;
+
+    ctx.beginPath();
+    ctx.moveTo(sx, sy);
+    ctx.lineTo(tx, ty);
+    ctx.strokeStyle = hexToRgba(edgeColor, alpha);
+    ctx.lineWidth = width;
+    ctx.stroke();
+  });
+}
+
+function drawGraphNodes(ctx, pos, nodes, transform, selectedNode, hoveredNode, hopSet, pulsePhase, sizeFn) {
+  const sizeF = sizeFn || (n => NODE_RADIUS);
+  nodes.forEach(n => {
+    const p = pos[n.id];
+    if (!p) return;
+    const x = p.x * transform.k + transform.x;
+    const y = p.y * transform.k + transform.y;
+    const r = sizeF(n) * transform.k;
+    const color = TYPE_COLORS[n.type] || '#888';
+
+    let alpha = 0.85;
+    let glowSize = 12;
+    let showLabel = transform.k > 0.6;
+
+    // Selection dimming
+    if (selectedNode && hopSet) {
+      if (!hopSet.has(n.id)) { alpha = 0.1; glowSize = 0; showLabel = false; }
+      else { alpha = 1; glowSize = 18; }
+    }
+
+    // Hover highlight
+    if (hoveredNode && n.id === hoveredNode.id) { alpha = 1; glowSize = 22; showLabel = true; }
+
+    // Selected node pulse
+    if (selectedNode && n.id === selectedNode.id) {
+      const pulse = 0.5 + 0.5 * Math.sin(pulsePhase);
+      ctx.beginPath();
+      ctx.arc(x, y, r + 8 * pulse + 6, 0, Math.PI * 2);
+      ctx.strokeStyle = hexToRgba(color, 0.15 * pulse);
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    // Glow
+    if (glowSize > 0) {
+      ctx.shadowColor = color;
+      ctx.shadowBlur = glowSize * transform.k;
+    }
+    // Fill
+    ctx.beginPath();
+    ctx.arc(x, y, Math.max(EPS, r), 0, Math.PI * 2);
+    ctx.fillStyle = hexToRgba(color, alpha);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Inner bright core
+    ctx.beginPath();
+    ctx.arc(x, y, Math.max(EPS, r * 0.5), 0, Math.PI * 2);
+    ctx.fillStyle = hexToRgba(lighten(color, 80), alpha * 0.7);
+    ctx.fill();
+
+    // Border ring
+    if (hoveredNode && n.id === hoveredNode.id) {
+      ctx.beginPath();
+      ctx.arc(x, y, Math.max(EPS, r + 3), 0, Math.PI * 2);
+      ctx.strokeStyle = hexToRgba(color, 0.8);
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    // Label
+    if (showLabel) {
+      ctx.font = `${Math.max(9, 10 * transform.k)}px 'Space Grotesk', sans-serif`;
+      ctx.fillStyle = hexToRgba('#e4e4f0', alpha * 0.8);
+      ctx.textAlign = 'center';
+      ctx.fillText(truncStr(n.name, 24), x, y + r + 14 * transform.k);
+    }
+  });
+}
+
+/* ===========================
+   VIEW INIT FUNCTIONS
+   =========================== */
+const viewInited = {};
+
+function initView(view) {
+  if (view === 'overview') initOverview();
+  else if (view === 'hypergraph') initHypergraph();
+  else if (view === 'pipeline') initPipeline();
+  else if (view === 'centrality') initCentrality();
+  else if (view === 'cluster') initCluster();
+  else if (view === 'heatmap') initHeatmap();
+  else if (view === 'representation') initRepresentation();
+  else if (view === 'evaluation') initEvaluation();
+  else if (view === 'degree') initDegree();
+  else if (view === 'embedding') initEmbedding();
+  else if (view === 'about') initAbout();
+}
+
+/* ===========================
+   OVERVIEW
+   =========================== */
+function initOverview() {
+  const el = document.getElementById('overviewContent');
+  const counts = data.getTypeCounts();
+  const totalNodes = data.nodes.length;
+  const totalEdges = data.links.length;
+
+  let statsHtml = '';
+  NODE_TYPES.forEach(t => {
+    statsHtml += `<div class="stat-card">
+      <div class="stat-val" style="color:${TYPE_COLORS[t]}">${counts[t]}</div>
+      <div class="stat-label">${t.replace('Epistemic','')}</div>
+    </div>`;
+  });
+
+  let legendHtml = '';
+  NODE_TYPES.forEach(t => {
+    legendHtml += `<div class="type-legend-item"><div class="type-dot" style="background:${TYPE_COLORS[t]}"></div>${t}</div>`;
+  });
+
+  el.innerHTML = `
+    <div class="overview-hero fade-in">
+      <h1>Epistemic Map</h1>
+      <p>A structured cartography of knowledge systems mapping the interplay between artifacts, tools, agents, processes, standards, representations, domains, objectives, constraints, and infrastructure.</p>
+    </div>
+    <div class="stats-grid fade-in">
+      <div class="stat-card"><div class="stat-val" style="color:var(--accent)">${totalNodes}</div><div class="stat-label">Total Nodes</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:var(--orange)">${totalEdges}</div><div class="stat-label">Total Edges</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:var(--gold)">${NODE_TYPES.length}</div><div class="stat-label">Node Types</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:var(--cyan)">${Object.keys(EDGE_COLORS).length}</div><div class="stat-label">Edge Types</div></div>
+    </div>
+    <div class="stats-grid fade-in">${statsHtml}</div>
+    <div style="margin-top:24px" class="fade-in">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text-secondary);letter-spacing:1px;text-transform:uppercase;">Type Legend</h3>
+      <div class="type-legend">${legendHtml}</div>
+    </div>
+  `;
+}
+
+/* ===========================
+   HYPERGRAPH VIEW
+   =========================== */
+let hypergraphCanvas, hypergraphCtx, hypergraphW, hypergraphH;
+
+function initHypergraph() {
+  hypergraphCanvas = document.getElementById('canvasHypergraph');
+  const setup = setupCanvas(hypergraphCanvas);
+  hypergraphCtx = setup.ctx; hypergraphW = setup.w; hypergraphH = setup.h;
+
+  if (!viewInited.hypergraph) {
+    initSimulation(hypergraphW, hypergraphH);
+    viewInited.hypergraph = true;
+
+    // Mouse events
+    hypergraphCanvas.addEventListener('mousemove', onHypergraphMouseMove);
+    hypergraphCanvas.addEventListener('mousedown', onHypergraphMouseDown);
+    hypergraphCanvas.addEventListener('mouseup', onHypergraphMouseUp);
+    hypergraphCanvas.addEventListener('mouseleave', () => { state.isDragging = false; state.isPanning = false; state.dragNode = null; state.hoveredNode = null; hideTooltip(); state.needsRender = true; });
+    hypergraphCanvas.addEventListener('wheel', onHypergraphWheel, { passive: false });
+    hypergraphCanvas.addEventListener('dblclick', onHypergraphDblClick);
+  }
+  state.needsRender = true;
+  renderHypergraph();
+}
+
+function findNodeAt(mx, my) {
+  if (!state.simNodes) return null;
+  const pos = getNodePositions();
+  const { x, y } = screenToGraph(mx, my, state.transform);
+  let closest = null, closestDist = Infinity;
+  state.simNodes.forEach(n => {
+    const dx = x - n.x, dy = y - n.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < NODE_RADIUS + 8 && dist < closestDist) { closest = n; closestDist = dist; }
+  });
+  return closest;
+}
+
+function onHypergraphMouseMove(e) {
+  const rect = hypergraphCanvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+
+  if (state.isDragging && state.dragNode) {
+    const pos = screenToGraph(mx, my, state.transform);
+    state.dragNode.fx = pos.x;
+    state.dragNode.fy = pos.y;
+    state.simulation.alpha(0.15).restart();
+    return;
+  }
+  if (state.isPanning) {
+    state.transform.x = e.clientX - state.panStart.x;
+    state.transform.y = e.clientY - state.panStart.y;
+    state.needsRender = true;
+    return;
+  }
+
+  const node = findNodeAt(mx, my);
+  if (node !== state.hoveredNode) {
+    state.hoveredNode = node;
+    state.needsRender = true;
+    if (node) showTooltip(e.clientX, e.clientY, node);
+    else hideTooltip();
+  } else if (node) {
+    tooltip.style.left = (e.clientX + 16) + 'px';
+    tooltip.style.top = (e.clientY - 10) + 'px';
+  }
+}
+
+function onHypergraphMouseDown(e) {
+  const rect = hypergraphCanvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const node = findNodeAt(mx, my);
+  if (node) {
+    state.isDragging = true;
+    state.dragNode = node;
+    node.fx = node.x;
+    node.fy = node.y;
+    state.simulation.alphaTarget(0.3).restart();
+  } else {
+    state.isPanning = true;
+    state.panStart = { x: e.clientX - state.transform.x, y: e.clientY - state.transform.y };
+  }
+}
+
+function onHypergraphMouseUp(e) {
+  if (state.isDragging && state.dragNode) {
+    state.simulation.alphaTarget(0);
+    state.dragNode.fx = null;
+    state.dragNode.fy = null;
+    // If barely moved, treat as click (select)
+    state.dragNode = null;
+    state.isDragging = false;
+  }
+  if (state.isPanning) {
+    state.isPanning = false;
+  }
+}
+
+function onHypergraphDblClick(e) {
+  const rect = hypergraphCanvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const node = findNodeAt(mx, my);
+  if (node) {
+    state.selectedNode = (state.selectedNode?.id === node.id) ? null : node;
+    state.needsRender = true;
+  }
+}
+
+function onHypergraphWheel(e) {
+  e.preventDefault();
+  const rect = hypergraphCanvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const scale = e.deltaY > 0 ? 0.92 : 1.08;
+  const newK = Math.max(0.15, Math.min(6, state.transform.k * scale));
+  const ratio = newK / state.transform.k;
+  state.transform.x = mx - (mx - state.transform.x) * ratio;
+  state.transform.y = my - (my - state.transform.y) * ratio;
+  state.transform.k = newK;
+  state.needsRender = true;
+}
+
+function renderHypergraph() {
+  if (state.currentView !== 'hypergraph') return;
+  const ctx = hypergraphCtx, w = hypergraphW, h = hypergraphH;
+  if (!ctx) return;
+
+  drawBackground(ctx, w, h);
+
+  const pos = getNodePositions();
+  let hopSet = null;
+  if (state.selectedNode && state.hopK > 0) {
+    hopSet = data.getNeighbors(state.selectedNode.id, state.hopK);
+  }
+
+  drawGraphEdges(ctx, pos, state.simLinks, state.transform, state.selectedNode, state.hoveredNode, hopSet);
+  state.pulsePhase += 0.06;
+  drawGraphNodes(ctx, pos, state.simNodes, state.transform, state.selectedNode, state.hoveredNode, hopSet, state.pulsePhase);
+
+  // Info overlay when node selected
+  if (state.selectedNode) {
+    ctx.font = '12px "Space Grotesk", sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.textAlign = 'left';
+    ctx.fillText(`Selected: ${state.selectedNode.name} | K-hop: ${state.hopK}`, 16, h - 16);
+  }
+
+  requestAnimationFrame(renderHypergraph);
+}
+
+/* ===========================
+   PROCESS PIPELINE
+   =========================== */
+function initPipeline() {
+  const canvas = document.getElementById('canvasPipeline');
+  const { ctx, w, h } = setupCanvas(canvas);
+
+  drawBackground(ctx, w, h);
+
+  // Extract process nodes and their relationships
+  const processes = data.getNodesByType('EpistemicProcess');
+  const tools = data.getNodesByType('EpistemicTool');
+  const artifacts = data.getNodesByType('EpistemicArtifact');
+
+  // Layout: processes in center column, tools on left, artifacts on right
+  const centerX = w / 2;
+  const colSpacing = 200;
+
+  // Find top-level processes (not subprocesses)
+  const subProcessIds = new Set();
+  data.links.forEach(l => {
+    if (l.type === 'PART_OF') {
+      const targetId = l.target.id || l.target;
+      subProcessIds.add(l.source.id || l.source);
+    }
+  });
+  const topProcesses = processes.filter(p => !subProcessIds.has(p.id));
+
+  // Assign positions
+  const pos = {};
+  const startY = 80;
+  const procGap = 90;
+
+  // Top processes
+  topProcesses.forEach((p, i) => {
+    pos[p.id] = { x: centerX, y: startY + i * procGap };
+  });
+
+  // Sub-processes
+  data.links.forEach(l => {
+    if (l.type === 'PART_OF') {
+      const parentId = l.target.id || l.target;
+      const childId = l.source.id || l.source;
+      if (pos[parentId]) {
+        const parent = data.nodeMap[childId];
+        const siblings = data.links.filter(ll => ll.type === 'PART_OF' && (ll.target.id || ll.target) === parentId);
+        const idx = siblings.findIndex(s => (s.source.id || s.source) === childId);
+        pos[childId] = { x: pos[parentId].x - 160, y: pos[parentId].y + (idx - siblings.length/2) * 40 };
+      }
+    }
+  });
+
+  // Tools on left
+  tools.forEach((t, i) => {
+    if (!pos[t.id]) pos[t.id] = { x: 120, y: startY + i * 60 };
+  });
+
+  // Artifacts on right
+  artifacts.forEach((a, i) => {
+    if (!pos[a.id]) pos[a.id] = { x: w - 180, y: startY + i * 55 };
+  });
+
+  // Draw edges
+  const allNodes = [...processes, ...tools, ...artifacts];
+  data.links.forEach(l => {
+    const sId = l.source.id || l.source;
+    const tId = l.target.id || l.target;
+    const s = pos[sId], t = pos[tId];
+    if (!s || !t) return;
+    const edgeColor = EDGE_COLORS[l.type] || '#555';
+    ctx.beginPath();
+    ctx.moveTo(s.x, s.y);
+    // Curved edge
+    const mx = (s.x + t.x) / 2, my = (s.y + t.y) / 2 - 10;
+    ctx.quadraticCurveTo(mx, my, t.x, t.y);
+    ctx.strokeStyle = hexToRgba(edgeColor, 0.25);
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  // Draw nodes
+  allNodes.forEach(n => {
+    const p = pos[n.id];
+    if (!p) return;
+    const color = TYPE_COLORS[n.type];
+    const r = 6;
+
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = hexToRgba(color, 0.9);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.font = '10px "Space Grotesk", sans-serif';
+    ctx.fillStyle = 'rgba(228,228,240,0.7)';
+    ctx.textAlign = 'left';
+    ctx.fillText(truncStr(n.name, 28), p.x + 12, p.y + 4);
+  });
+
+  // Column labels
+  ctx.font = '10px "Space Grotesk", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  ctx.textAlign = 'center';
+  ctx.letterSpacing = '2px';
+  ctx.fillText('TOOLS', 120, 40);
+  ctx.fillText('PROCESSES', centerX, 40);
+  ctx.fillText('ARTIFACTS', w - 180, 40);
+}
+
+/* ===========================
+   CENTRALITY MAP
+   =========================== */
+function initCentrality() {
+  const canvas = document.getElementById('canvasCentrality');
+  const { ctx, w, h } = setupCanvas(canvas);
+  const centrality = data.getCentrality();
+
+  drawBackground(ctx, w, h);
+
+  // Use simulation positions if available
+  const pos = getNodePositions();
+  const hasPos = Object.keys(pos).length > 0 && pos[Object.keys(pos)[0]]?.x !== 0;
+
+  // If no positions, run a quick simulation
+  if (!hasPos) {
+    const simNodes = data.nodes.map(n => ({ ...n }));
+    const simLinks = data.links.map(l => ({ ...l }));
+    const sim = d3.forceSimulation(simNodes)
+      .force('link', d3.forceLink(simLinks).id(d => d.id).distance(80))
+      .force('charge', d3.forceManyBody().strength(-300))
+      .force('center', d3.forceCenter(w/2, h/2))
+      .stop();
+    for (let i = 0; i < 200; i++) sim.tick();
+    simNodes.forEach(n => pos[n.id] = n);
+  }
+
+  const maxCent = Math.max(EPS, ...Object.values(centrality));
+
+  // Draw edges
+  data.links.forEach(l => {
+    const sId = l.source.id || l.source;
+    const tId = l.target.id || l.target;
+    const s = pos[sId], t = pos[tId];
+    if (!s || !t) return;
+    ctx.beginPath();
+    ctx.moveTo(s.x, s.y);
+    ctx.lineTo(t.x, t.y);
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  });
+
+  // Draw nodes sized by centrality
+  data.nodes.forEach(n => {
+    const p = pos[n.id];
+    if (!p) return;
+    const c = centrality[n.id] || 0;
+    const r = 4 + c * 16;
+    const color = TYPE_COLORS[n.type];
+
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 8 + c * 12;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, Math.max(EPS, r), 0, Math.PI * 2);
+    ctx.fillStyle = hexToRgba(color, 0.7 + c * 0.3);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    if (c > 0.4) {
+      ctx.font = '9px "Space Grotesk", sans-serif';
+      ctx.fillStyle = 'rgba(228,228,240,0.6)';
+      ctx.textAlign = 'center';
+      ctx.fillText(truncStr(n.name, 20), p.x, p.y + r + 12);
+    }
+  });
+
+  // Legend
+  ctx.font = '10px "Space Grotesk", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.textAlign = 'left';
+  ctx.fillText('Node size indicates degree centrality', 20, h - 20);
+}
+
+/* ===========================
+   DOMAIN CLUSTER VIEW
+   =========================== */
+function initCluster() {
+  const canvas = document.getElementById('canvasCluster');
+  const { ctx, w, h } = setupCanvas(canvas);
+  drawBackground(ctx, w, h);
+
+  const domains = data.getNodesByType('EpistemicDomain');
+  const clusterPos = {};
+  const nodeToCluster = {};
+  
+  // Position domains in a large circle
+  const radius = Math.min(w, h) * 0.3;
+  domains.forEach((d, i) => {
+    const angle = (i / domains.length) * Math.PI * 2 - Math.PI / 2;
+    clusterPos[d.id] = { x: w/2 + Math.cos(angle) * radius, y: h/2 + Math.sin(angle) * radius };
+  });
+
+  // Map nodes to domains via TARGETS links
+  data.links.forEach(l => {
+    if (l.type === 'TARGETS') {
+      const tId = l.target.id || l.target;
+      const sId = l.source.id || l.source;
+      if (clusterPos[tId]) nodeToCluster[sId] = tId;
+    }
+  });
+
+  const pos = {};
+  // Place domain nodes
+  domains.forEach(d => pos[d.id] = clusterPos[d.id]);
+
+  // Scatter other nodes around their targeted domain
+  const clusterNodes = {};
+  domains.forEach(d => clusterNodes[d.id] = []);
+  
+  data.nodes.forEach(n => {
+    if (n.type === 'EpistemicDomain') return;
+    const domId = nodeToCluster[n.id];
+    if (domId) {
+      clusterNodes[domId].push(n);
+    } else {
+      // Unaffiliated nodes go to center
+      if (!clusterNodes['center']) clusterNodes['center'] = [];
+      clusterNodes['center'].push(n);
+    }
+  });
+
+  const centerPos = { x: w/2, y: h/2 };
+
+  Object.keys(clusterNodes).forEach(domId => {
+    const center = clusterPos[domId] || centerPos;
+    clusterNodes[domId].forEach((n, i) => {
+      const angle = (i / clusterNodes[domId].length) * Math.PI * 2;
+      const dist = 40 + Math.random() * 60;
+      pos[n.id] = { x: center.x + Math.cos(angle) * dist, y: center.y + Math.sin(angle) * dist };
+    });
+  });
+
+  // Draw edges
+  data.links.forEach(l => {
+    const sId = l.source.id || l.source;
+    const tId = l.target.id || l.target;
+    const s = pos[sId], t = pos[tId];
+    if (!s || !t) return;
+    ctx.beginPath();
+    ctx.moveTo(s.x, s.y);
+    ctx.lineTo(t.x, t.y);
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  });
+
+  // Draw domain boundaries (subtle circles)
+  domains.forEach(d => {
+    const p = clusterPos[d.id];
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 110, 0, Math.PI * 2);
+    ctx.strokeStyle = hexToRgba(TYPE_COLORS.EpistemicDomain, 0.15);
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // Draw nodes
+  data.nodes.forEach(n => {
+    const p = pos[n.id];
+    if (!p) return;
+    const color = TYPE_COLORS[n.type];
+    const r = n.type === 'EpistemicDomain' ? 10 : 5;
+
+    ctx.shadowColor = color;
+    ctx.shadowBlur = n.type === 'EpistemicDomain' ? 15 : 8;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = hexToRgba(color, 0.9);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    if (n.type === 'EpistemicDomain') {
+      ctx.font = 'bold 12px "Space Grotesk", sans-serif';
+      ctx.fillStyle = hexToRgba(color, 0.9);
+      ctx.textAlign = 'center';
+      ctx.fillText(n.name, p.x, p.y + 24);
+    }
+  });
+}
+
+/* ===========================
+   MATRIX HELPER
+   =========================== */
+function drawMatrix(ctx, w, h, rowNodes, colNodes, matrix, accentColor, title) {
+  drawBackground(ctx, w, h);
+  const cellW = Math.max(10, Math.min(40, (w - 220) / colNodes.length));
+  const cellH = Math.max(10, Math.min(40, (h - 160) / rowNodes.length));
+  const startX = 180;
+  const startY = 100;
+
+  // Title
+  ctx.font = 'bold 16px "Space Grotesk", sans-serif';
+  ctx.fillStyle = 'rgba(228,228,240,0.8)';
+  ctx.textAlign = 'left';
+  ctx.fillText(title, 20, 40);
+
+  // Column labels (rotated)
+  ctx.font = '9px "Space Grotesk", sans-serif';
+  ctx.fillStyle = 'rgba(228,228,240,0.6)';
+  colNodes.forEach((c, i) => {
+    ctx.save();
+    ctx.translate(startX + i * cellW + cellW / 2, startY - 10);
+    ctx.rotate(-Math.PI / 3);
+    ctx.textAlign = 'left';
+    ctx.fillText(truncStr(c.name.replace(/^(Representation:|Standard:)\s*/, ''), 16), 0, 0);
+    ctx.restore();
+  });
+
+  // Row labels and cells
+  rowNodes.forEach((r, ri) => {
+    const y = startY + ri * cellH;
+    // Label
+    ctx.font = '9px "Space Grotesk", sans-serif';
+    ctx.fillStyle = TYPE_COLORS[r.type] || 'rgba(228,228,240,0.6)';
+    ctx.textAlign = 'right';
+    ctx.fillText(truncStr(r.name.replace(/^(Artifact:)\s*/, ''), 20), startX - 10, y + cellH / 2 + 3);
+
+    // Cells
+    colNodes.forEach((c, ci) => {
+      const x = startX + ci * cellW;
+      const val = matrix[r.id]?.[c.id] || 0;
+      
+      ctx.fillStyle = val > 0 ? hexToRgba(accentColor, 0.6 + val * 0.4) : 'rgba(255,255,255,0.02)';
+      ctx.fillRect(x + 1, y + 1, cellW - 2, cellH - 2);
+      
+      if (val > 0) {
+        ctx.shadowColor = accentColor;
+        ctx.shadowBlur = 4;
+        ctx.fillRect(x + 1, y + 1, cellW - 2, cellH - 2);
+        ctx.shadowBlur = 0;
+      }
+    });
+  });
+}
+
+/* ===========================
+   ADJACENCY HEATMAP
+   =========================== */
+function initHeatmap() {
+  const canvas = document.getElementById('canvasHeatmap');
+  const { ctx, w, h } = setupCanvas(canvas);
+  const matrix = data.getAdjacencyByType();
+  const types = NODE_TYPES;
+  
+  drawBackground(ctx, w, h);
+  const cellSize = Math.min(50, (Math.min(w, h) - 200) / types.length);
+  const startX = (w - types.length * cellSize) / 2 + 40;
+  const startY = 100;
+
+  ctx.font = 'bold 16px "Space Grotesk", sans-serif';
+  ctx.fillStyle = 'rgba(228,228,240,0.8)';
+  ctx.textAlign = 'left';
+  ctx.fillText('Type Adjacency Heatmap', 20, 40);
+
+  let maxVal = 1;
+  types.forEach(r => types.forEach(c => { if (matrix[r][c] > maxVal) maxVal = matrix[r][c]; }));
+
+  types.forEach((r, ri) => {
+    // Row label
+    ctx.font = '10px "Space Grotesk", sans-serif';
+    ctx.fillStyle = TYPE_COLORS[r];
+    ctx.textAlign = 'right';
+    ctx.fillText(r.replace('Epistemic', ''), startX - 10, startY + ri * cellSize + cellSize / 2 + 4);
+
+    types.forEach((c, ci) => {
+      const val = matrix[r][c];
+      const alpha = val / maxVal;
+      
+      ctx.fillStyle = hexToRgba(TYPE_COLORS[r], Math.max(0.03, alpha * 0.8));
+      ctx.fillRect(startX + ci * cellSize + 1, startY + ri * cellSize + 1, cellSize - 2, cellSize - 2);
+
+      if (val > 0) {
+        ctx.font = '9px "JetBrains Mono", monospace';
+        ctx.fillStyle = `rgba(228,228,240,${alpha > 0.5 ? 0.9 : 0.5})`;
+        ctx.textAlign = 'center';
+        ctx.fillText(val, startX + ci * cellSize + cellSize / 2, startY + ri * cellSize + cellSize / 2 + 3);
+      }
+    });
+  });
+
+  // Col labels
+  ctx.font = '10px "Space Grotesk", sans-serif';
+  types.forEach((c, ci) => {
+    ctx.save();
+    ctx.translate(startX + ci * cellSize + cellSize / 2, startY - 10);
+    ctx.rotate(-Math.PI / 3);
+    ctx.fillStyle = TYPE_COLORS[c];
+    ctx.textAlign = 'left';
+    ctx.fillText(c.replace('Epistemic', ''), 0, 0);
+    ctx.restore();
+  });
+}
+
+/* ===========================
+   REPRESENTATION COVERAGE
+   =========================== */
+function initRepresentation() {
+  const canvas = document.getElementById('canvasRepresentation');
+  const { ctx, w, h } = setupCanvas(canvas);
+  const { artifacts, reps, matrix } = data.getRepresentationCoverage();
+  drawMatrix(ctx, w, h, artifacts, reps, matrix, TYPE_COLORS.EpistemicRepresentation, 'Representation Coverage Matrix');
+}
+
+/* ===========================
+   EVALUATION COVERAGE
+   =========================== */
+function initEvaluation() {
+  const canvas = document.getElementById('canvasEvaluation');
+  const { ctx, w, h } = setupCanvas(canvas);
+  const { artifacts, standards, matrix } = data.getEvaluationCoverage();
+  drawMatrix(ctx, w, h, artifacts, standards, matrix, TYPE_COLORS.EpistemicStandard, 'Evaluation Coverage Matrix');
+}
+
+/* ===========================
+   EVAL MODAL
+   =========================== */
+function openEvalModal() {
+  document.getElementById('evalModal').classList.add('open');
+  const canvas = document.getElementById('canvasEvalModal');
+  // Set fixed canvas size for modal
+  canvas.width = 800; canvas.height = 500;
+  canvas.style.width = '800px'; canvas.style.height = '500px';
+  const ctx = canvas.getContext('2d');
+  const { artifacts, standards, matrix } = data.getEvaluationCoverage();
+  drawMatrix(ctx, 800, 500, artifacts, standards, matrix, TYPE_COLORS.EpistemicStandard, 'Detailed Evaluation Coverage');
+}
+
+document.getElementById('evalModalClose').addEventListener('click', () => {
+  document.getElementById('evalModal').classList.remove('open');
+});
+document.getElementById('evalModal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('evalModal')) {
+    document.getElementById('evalModal').classList.remove('open');
+  }
+});
+
+/* ===========================
+   DEGREE DISTRIBUTION
+   =========================== */
+function initDegree() {
+  const canvas = document.getElementById('canvasDegree');
+  const { ctx, w, h } = setupCanvas(canvas);
+  drawBackground(ctx, w, h);
+
+  const dist = data.getDegreeDistribution();
+  const sortedDegs = Object.keys(dist).map(Number).sort((a, b) => a - b);
+  const maxCount = Math.max(1, ...Object.values(dist));
+  
+  const chartH = h - 180;
+  const chartW = w - 160;
+  const startX = 100;
+  const startY = h - 80;
+  const barW = Math.min(40, (chartW) / sortedDegs.length - 8);
+
+  // Title
+  ctx.font = 'bold 16px "Space Grotesk", sans-serif';
+  ctx.fillStyle = 'rgba(228,228,240,0.8)';
+  ctx.textAlign = 'left';
+  ctx.fillText('Degree Distribution', 20, 40);
+
+  // Axes
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(startX, startY);
+  ctx.lineTo(startX + chartW, startY);
+  ctx.moveTo(startX, startY);
+  ctx.lineTo(startX, startY - chartH);
+  ctx.stroke();
+
+  // Y-axis labels
+  ctx.font = '9px "JetBrains Mono", monospace';
+  ctx.fillStyle = 'rgba(228,228,240,0.4)';
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= 4; i++) {
+    const yVal = (maxCount / 4) * i;
+    const yPos = startY - (yVal / maxCount) * chartH;
+    ctx.fillText(Math.round(yVal), startX - 10, yPos + 3);
+    ctx.beginPath();
+    ctx.moveTo(startX, yPos);
+    ctx.lineTo(startX + chartW, yPos);
+    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+    ctx.stroke();
+  }
+
+  // Bars
+  sortedDegs.forEach((deg, i) => {
+    const count = dist[deg];
+    const barH = (count / maxCount) * chartH;
+    const x = startX + (i * (chartW / sortedDegs.length)) + ((chartW / sortedDegs.length) - barW) / 2;
+    
+    // Gradient bar
+    const grad = ctx.createLinearGradient(0, startY, 0, startY - barH);
+    grad.addColorStop(0, hexToRgba('#00ffc8', 0.2));
+    grad.addColorStop(1, hexToRgba('#00ffc8', 0.8));
+    
+    ctx.fillStyle = grad;
+    ctx.fillRect(x, startY - barH, barW, barH);
+    
+    // Glow cap
+    ctx.shadowColor = '#00ffc8';
+    ctx.shadowBlur = 6;
+    ctx.fillRect(x, startY - barH, barW, 2);
+    ctx.shadowBlur = 0;
+
+    // X-axis label
+    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.fillStyle = 'rgba(228,228,240,0.5)';
+    ctx.textAlign = 'center';
+    ctx.fillText(deg, x + barW / 2, startY + 16);
+  });
+
+  // Axis Titles
+  ctx.font = '10px "Space Grotesk", sans-serif';
+  ctx.fillStyle = 'rgba(228,228,240,0.5)';
+  ctx.textAlign = 'center';
+  ctx.fillText('Degree (k)', startX + chartW / 2, startY + 40);
+  
+  ctx.save();
+  ctx.translate(30, startY - chartH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('Frequency P(k)', 0, 0);
+  ctx.restore();
+}
+
+/* ===========================
+   HYPERGRAPH EMBEDDING
+   =========================== */
+function initEmbedding() {
+  const canvas = document.getElementById('canvasEmbedding');
+  const { ctx, w, h } = setupCanvas(canvas);
+  drawBackground(ctx, w, h);
+
+  ctx.font = 'bold 16px "Space Grotesk", sans-serif';
+  ctx.fillStyle = 'rgba(228,228,240,0.8)';
+  ctx.textAlign = 'left';
+  ctx.fillText('Structural Embedding (Force Projection)', 20, 40);
+
+  const pos = getNodePositions();
+  const hasPos = Object.keys(pos).length > 0 && pos[Object.keys(pos)[0]]?.x !== 0;
+
+  if (!hasPos) {
+    ctx.font = '12px "Space Grotesk", sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillText('Initializing layout... please visit Hypergraph View first to warm up simulation.', 20, 80);
+    return;
+  }
+
+  // Normalize positions to fit canvas
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  data.nodes.forEach(n => {
+    const p = pos[n.id];
+    if (!p) return;
+    if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
+    if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
+  });
+
+  const rangeX = Math.max(1, maxX - minX);
+  const rangeY = Math.max(1, maxY - minY);
+  const padding = 80;
+  const scale = Math.min((w - padding * 2) / rangeX, (h - padding * 2 - 40) / rangeY);
+
+  const normPos = {};
+  data.nodes.forEach(n => {
+    const p = pos[n.id];
+    if (!p) return;
+    normPos[n.id] = {
+      x: ((p.x - minX) * scale) + padding + (((w - padding*2) - rangeX * scale) / 2),
+      y: ((p.y - minY) * scale) + padding + 40 + (((h - padding*2 - 40) - rangeY * scale) / 2)
+    };
+  });
+
+  // Draw subtle edges
+  data.links.forEach(l => {
+    const sId = l.source.id || l.source;
+    const tId = l.target.id || l.target;
+    const s = normPos[sId], t = normPos[tId];
+    if (!s || !t) return;
+    ctx.beginPath();
+    ctx.moveTo(s.x, s.y);
+    ctx.lineTo(t.x, t.y);
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  });
+
+  // Draw nodes as pure scatter
+  data.nodes.forEach(n => {
+    const p = normPos[n.id];
+    if (!p) return;
+    const color = TYPE_COLORS[n.type];
+    
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = hexToRgba(color, 0.7);
+    ctx.fill();
+  });
+
+  // Legend
+  let ly = h - 40;
+  let lx = 20;
+  ctx.font = '9px "Space Grotesk", sans-serif';
+  NODE_TYPES.forEach(t => {
+    ctx.fillStyle = TYPE_COLORS[t];
+    ctx.beginPath();
+    ctx.arc(lx + 4, ly, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(228,228,240,0.5)';
+    ctx.textAlign = 'left';
+    ctx.fillText(t.replace('Epistemic', ''), lx + 12, ly + 3);
+    lx += ctx.measureText(t.replace('Epistemic', '')).width + 28;
+    if (lx > w - 100) { lx = 20; ly -= 20; }
+  });
+}
+
+/* ===========================
+   ABOUT
+   =========================== */
+function initAbout() {
+  const el = document.getElementById('aboutContent');
+  el.innerHTML = `
+    <h2>About the Epistemic Map</h2>
+    <p>The Epistemic Map is a structured cartography of knowledge systems. It models the intricate interplay between the artifacts, tools, agents, processes, standards, representations, domains, objectives, constraints, and infrastructure that compose epistemic practice.</p>
+    
+    <h3>Ontology</h3>
+    <p>The map is built upon 10 foundational epistemic categories:</p>
+    <table>
+      <thead>
+        <tr><th>Concept</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="color:${TYPE_COLORS.EpistemicArtifact}">Epistemic Artifact</td><td>Structured object that encodes claims, constraints, or distributions over reality; the primary carrier of semantic content.</td></tr>
+        <tr><td style="color:${TYPE_COLORS.EpistemicTool}">Epistemic Tool</td><td>Formal or procedural mechanism used to construct, transform, or validate epistemic artifacts.</td></tr>
+        <tr><td style="color:${TYPE_COLORS.EpistemicAgent}">Epistemic Agent</td><td>Entity that performs epistemic operations by applying tools to artifacts.</td></tr>
+        <tr><td style="color:${TYPE_COLORS.EpistemicProcess}">Epistemic Process</td><td>Ordered sequence of tool applications over time; defines the dynamics of knowledge construction.</td></tr>
+        <tr><td style="color:${TYPE_COLORS.EpistemicStandard}">Epistemic Standard</td><td>Normative criteria used to evaluate validity, correctness, or acceptability of artifacts and processes.</td></tr>
+        <tr><td style="color:${TYPE_COLORS.EpistemicRepresentation}">Epistemic Representation</td><td>Encoding format or substrate in which artifacts are expressed; constrains manipulation and interpretation.</td></tr>
+        <tr><td style="color:${TYPE_COLORS.EpistemicDomain}">Epistemic Domain</td><td>Segment of reality that the epistemic practice targets or models.</td></tr>
+        <tr><td style="color:${TYPE_COLORS.EpistemicObjective}">Epistemic Objective</td><td>Goal or optimization criterion guiding the construction and use of artifacts.</td></tr>
+        <tr><td style="color:${TYPE_COLORS.EpistemicConstraint}">Epistemic Constraint</td><td>Limitation that bounds what can be known or inferred within the system.</td></tr>
+        <tr><td style="color:${TYPE_COLORS.EpistemicInfrastructure}">Epistemic Infrastructure</td><td>Supporting environment that enables storage, computation, measurement, and communication of artifacts.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Hypergraph Structure</h3>
+    <p>The map is implemented as a directed, typed hypergraph where nodes represent instances of the ontological categories and edges represent semantic relationships (e.g., USES, PRODUCES, CONSTRAINS).</p>
+
+    <h3>Exploration Guide</h3>
+    <ul style="list-style:disc; padding-left:20px; color:var(--text-secondary); font-size:13px; line-height:1.8;">
+      <li><strong>Hypergraph View:</strong> Interactive force-directed graph. Double-click nodes to select and explore k-hop neighborhoods. Scroll to zoom, drag to pan.</li>
+      <li><strong>Process Pipeline:</strong> View the flow of epistemic processes and their tool/artifact relationships.</li>
+      <li><strong>Centrality Map:</strong> Visualize node importance based on degree centrality.</li>
+      <li><strong>Domain Cluster:</strong> See how nodes group around their target epistemic domains.</li>
+      <li><strong>Adjacency Heatmap:</strong> Inspect connection density between different epistemic types.</li>
+      <li><strong>Coverage Matrices:</strong> Analyze which representations and evaluation standards apply to which artifacts.</li>
+      <li><strong>Degree Distribution:</strong> View the statistical distribution of node connectivity.</li>
+    </ul>
+  `;
+}
+
+/* ===========================
+   RESIZE HANDLER
+   =========================== */
+window.addEventListener('resize', () => {
+  if (state.currentView && state.currentView !== 'overview' && state.currentView !== 'about') {
+    initView(state.currentView);
+  }
+});
+
+/* ===========================
+   INIT APP
+   =========================== */
+switchView('overview');
+
+</script>
+</body>
+</html>

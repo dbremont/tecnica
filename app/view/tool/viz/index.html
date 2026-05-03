@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Epistemic Toolbox - Visualization</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-deep: #060a10;
+            --bg-primary: #0a1019;
+            --bg-elevated: #0f1621;
+            --bg-card: rgba(15, 22, 33, 0.7);
+            --fg-primary: #e8eef5;
+            --fg-secondary: #8a96a8;
+            --fg-muted: #4a5567;
+            --accent-primary: #d4a056;
+            --accent-secondary: #7dd3c0;
+            --accent-glow: rgba(212, 160, 86, 0.25);
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-elevated: rgba(255, 255, 255, 0.1);
+            --border-accent: rgba(212, 160, 86, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-deep);
+            color: var(--fg-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--fg-muted);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-primary);
+        }
+
+        .font-display {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Background & Atmosphere */
+        .bg-atmosphere {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(212, 160, 86, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 60%, rgba(125, 211, 192, 0.05) 0%, transparent 50%),
+                linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-primary) 100%);
+        }
+
+        .bg-pattern {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            opacity: 0.4;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 100% 70% at 50% 30%, black, transparent);
+        }
+
+        /* ------------------------------------------
+           NAVIGATION AESTHETICS
+           ------------------------------------------ */
+        .nav-blur {
+            background: rgba(6, 10, 16, 0.92);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            position: relative;
+        }
+
+        /* Subtle glowing underline for nav */
+        .nav-blur::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, var(--accent-primary) 50%, transparent 100%);
+            opacity: 0.3;
+        }
+
+        .nav-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+            background: transparent;
+            color: var(--fg-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0, 0.2, 1);
+            text-decoration: none;
+        }
+
+        .nav-back-btn:hover {
+            background: rgba(212, 160, 86, 0.1);
+            border-color: var(--border-accent);
+            color: var(--accent-primary);
+            box-shadow: 0 0 15px rgba(212, 160, 86, 0.1);
+        }
+
+        .nav-back-btn svg {
+            transition: transform 0.2s;
+        }
+
+        .nav-back-btn:hover svg {
+            transform: translateX(-3px);
+        }
+
+        /* Context Title Styling */
+        .nav-context {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+        }
+
+        .nav-context span {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Cards */
+        .tool-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            position: relative;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.2, 0, 0.2, 1);
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .tool-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(212, 160, 86, 0.06), transparent 40%);
+            opacity: 0;
+            transition: opacity 0.4s;
+            pointer-events: none;
+        }
+
+        .tool-card:hover {
+            background: rgba(15, 22, 33, 0.9);
+            border-color: var(--border-elevated);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5), 0 0 60px -20px var(--accent-glow);
+        }
+
+        .tool-card:hover::before,
+        .tool-card:hover::after {
+            opacity: 1;
+        }
+
+        .icon-wrapper {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, rgba(212, 160, 86, 0.1) 0%, rgba(125, 211, 192, 0.05) 100%);
+            border: 1px solid rgba(212, 160, 86, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+            transition: all 0.4s;
+        }
+
+        .tool-card:hover .icon-wrapper {
+            background: linear-gradient(135deg, rgba(212, 160, 86, 0.15) 0%, rgba(125, 211, 192, 0.08) 100%);
+            border-color: rgba(212, 160, 86, 0.4);
+            transform: scale(1.05);
+        }
+
+        .icon-wrapper svg {
+            width: 26px;
+            height: 26px;
+            stroke: var(--accent-primary);
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        /* Tags */
+        .tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0.3rem 0.65rem;
+            border-radius: 4px;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .tag-primary {
+            background: rgba(212, 160, 86, 0.12);
+            border: 1px solid rgba(212, 160, 86, 0.3);
+            color: var(--accent-primary);
+        }
+
+        .tag-secondary {
+            background: rgba(125, 211, 192, 0.08);
+            border: 1px solid rgba(125, 211, 192, 0.2);
+            color: var(--accent-secondary);
+        }
+
+        /* Animations */
+        .animate-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.7s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+
+        .accent-line {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .accent-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 200%; }
+        }
+
+        /* Hero Specific */
+        .hero-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: rgba(212, 160, 86, 0.08);
+            border: 1px solid rgba(212, 160, 86, 0.2);
+            border-radius: 100px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-primary);
+        }
+
+        .hero-label-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Search Input & Dropdown */
+        .search-container {
+            position: relative;
+            z-index: 10;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            background: rgba(15, 22, 33, 0.8);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            color: var(--fg-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            transition: all 0.3s;
+        }
+
+        .search-input::placeholder { color: var(--fg-muted); }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--border-accent);
+            background: rgba(15, 22, 33, 0.95);
+            box-shadow: 0 0 0 3px rgba(212, 160, 86, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--fg-muted);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .search-dropdown {
+            margin-top: 8px;
+            background: rgba(15, 22, 33, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-elevated);
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            display: none;
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        .search-dropdown.active { display: block; }
+
+        .search-result-item {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-subtle);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .search-result-item:last-child { border-bottom: none; }
+        .search-result-item:hover { background: rgba(212, 160, 86, 0.05); }
+
+        .search-result-title {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--fg-primary);
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-result-desc {
+            font-size: 0.8rem;
+            color: var(--fg-secondary);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .search-result-stats {
+            display: flex;
+            gap: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--fg-muted);
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+
+        /* Filter Buttons & Navigation */
+        .filter-nav-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            gap: 8px;
+            margin-top: 1rem;
+        }
+
+        .filter-scroll-wrapper {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 4px 2px;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .filter-scroll-wrapper::-webkit-scrollbar { display: none; }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-elevated);
+            color: var(--fg-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--border-elevated);
+            color: var(--fg-primary);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, rgba(212, 160, 86, 0.15), rgba(212, 160, 86, 0.08));
+            border-color: var(--border-accent);
+            color: var(--accent-primary);
+            box-shadow: 0 0 15px rgba(212, 160, 86, 0.1);
+        }
+
+        .nav-arrow {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+            border-radius: 8px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            color: var(--fg-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-arrow:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .nav-arrow.hidden {
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .nav-arrow svg { width: 16px; height: 16px; }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 48px;
+        }
+
+        .pagination-btn {
+            width: 44px;
+            height: 44px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            color: var(--fg-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            background: rgba(212, 160, 86, 0.1);
+        }
+
+        .pagination-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .pagination-info {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--fg-muted);
+            padding: 0 16px;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(6, 10, 16, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.2, 0, 0.2, 1);
+        }
+
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+
+        .modal-panel {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-elevated);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 1200px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.4s cubic-bezier(0.2, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .modal-overlay.active .modal-panel { transform: scale(1); }
+
+        /* Code Block */
+        .code-block {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            position: relative;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .code-content {
+            padding: 1rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            color: var(--fg-secondary);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        /* Input Area */
+        .data-input {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            color: var(--fg-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            padding: 1rem;
+            width: 100%;
+            min-height: 100px;
+            resize: vertical;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .data-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        #preview-canvas {
+            width: 100%;
+            height: 100%;
+            min-height: 300px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--accent-primary), #c49347);
+            color: var(--bg-deep);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px rgba(212, 160, 86, 0.5);
+        }
+
+        .btn-secondary {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px solid var(--border-accent);
+            color: var(--accent-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover { background: rgba(212, 160, 86, 0.1); }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--fg-muted);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        #no-results { text-align: center; padding: 4rem 0; color: var(--fg-muted); }
+
+        /* ------------------------------------------
+           FOOTER AESTHETICS
+           ------------------------------------------ */
+        .footer-upgrade {
+            position: relative;
+            border-top: 1px solid transparent;
+            background: radial-gradient(ellipse 80% 50% at 50% 100%, rgba(212, 160, 86, 0.04) 0%, transparent 70%);
+        }
+
+        /* Gradient top border for footer */
+        .footer-upgrade::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-elevated), transparent);
+        }
+
+        .footer-link {
+            position: relative;
+            color: var(--fg-secondary);
+            transition: color 0.3s;
+            text-decoration: none;
+        }
+
+        .footer-link:hover { color: var(--accent-primary); }
+
+        .footer-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent-primary);
+            transition: width 0.3s ease;
+        }
+
+        .footer-link:hover::after { width: 100%; }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .hero-title { font-size: 2.5rem; }
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Background Layers -->
+    <div class="bg-atmosphere"></div>
+    <div class="bg-pattern"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 nav-blur">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <!-- Left Side: Back Button -->
+            <a href="#" class="nav-back-btn" onclick="history.back(); return false;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Back</span>
+            </a>
+
+            <!-- Right Side: Context Title -->
+            <div class="nav-context">
+                <span class="text-[var(--fg-muted)]">Toolbox</span>
+                <span class="w-px h-3 bg-[var(--border-elevated)]"></span>
+                <span class="text-[var(--accent-primary)]">Data Visualization</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="pt-32 pb-8 px-6">
+        <div class="max-w-7xl mx-auto">
+
+            <h1 class="font-display text-5xl md:text-6xl lg:text-7xl font-semibold mb-6 animate-in stagger-2 hero-title"
+                style="letter-spacing: -0.03em; line-height: 1.1;">
+                Data Visualization
+            </h1>
+
+            <p class="text-[var(--fg-secondary)] text-lg md:text-xl max-w-2xl mb-10 animate-in stagger-3"
+                style="line-height: 1.7;">
+                Select a technique to configure parameters, input data arrays, and export production-ready Python and
+                JavaScript code modules.
+            </p>
+
+            <!-- Search & Filters -->
+            <div class="animate-in stagger-4 mb-8">
+                <div class="search-container mb-4">
+                    <svg class="search-icon w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <input type="text" id="search-input" placeholder="Search techniques..." class="search-input"
+                        aria-label="Search tools" autocomplete="off" />
+
+                    <!-- Search Results Dropdown -->
+                    <div id="search-dropdown" class="search-dropdown">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Dynamic Filter Navigation -->
+                <div class="filter-nav-container font-mono text-xs">
+                    <button id="nav-left" class="nav-arrow hidden" aria-label="Scroll left">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+
+                    <div id="filter-wrapper" class="filter-scroll-wrapper">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                    </div>
+
+                    <button id="nav-right" class="nav-arrow hidden" aria-label="Scroll right">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Accent Line -->
+    <div class="accent-line max-w-7xl mx-auto mb-12"></div>
+
+    <!-- Main Content -->
+    <main id="library" class="pb-24 px-6">
+        <div class="max-w-7xl mx-auto">
+
+            <div id="grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" role="list">
+                <!-- Cards injected here -->
+            </div>
+
+            <div id="no-results" class="hidden">
+                No matching techniques found.
+            </div>
+
+            <div id="pagination" class="pagination">
+                <button class="pagination-btn" id="prev-btn" aria-label="Previous page"><svg width="16" height="16"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg></button>
+                <span class="pagination-info"><span id="current-page">1</span> / <span id="total-pages">1</span></span>
+                <button class="pagination-btn" id="next-btn" aria-label="Next page"><svg width="16" height="16"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg></button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div id="modal" class="modal-overlay">
+        <div class="modal-panel">
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center p-6 border-b border-white/5">
+                <div class="flex items-center gap-4">
+                    <div id="modal-icon" class="icon-wrapper" style="margin-bottom: 0;"></div>
+                    <div>
+                        <div class="font-mono text-xs text-[var(--accent-primary)] uppercase tracking-wider"
+                            id="modal-category">Category</div>
+                        <div class="text-xl font-display font-semibold" id="modal-title">Technique Name</div>
+                    </div>
+                </div>
+                <button id="modal-close" class="p-2 hover:bg-white/5 rounded-lg transition-colors" aria-label="Close">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Split Layout -->
+            <div class="flex-1 grid grid-cols-1 lg:grid-cols-2 overflow-hidden">
+
+                <!-- Left: Configuration & Code -->
+                <div class="border-r border-white/5 flex flex-col bg-[var(--bg-primary)] p-6 overflow-y-auto">
+                    <!-- Input Section -->
+                    <div class="mb-6">
+                        <label class="block font-mono text-xs text-[var(--fg-muted)] mb-2 uppercase">Data Input
+                            Array</label>
+                        <textarea id="data-input" class="data-input" placeholder="Paste array data here..."></textarea>
+                        <div class="flex justify-between items-center mt-3">
+                            <span class="font-mono text-xs text-[var(--fg-muted)]" id="data-status">Status: Waiting for
+                                input</span>
+                            <button id="btn-update" class="btn-secondary">
+                                Generate
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Code Tabs -->
+                    <div class="flex border-b border-white/5 mb-4">
+                        <button
+                            class="tab-btn active flex-1 py-2 font-mono text-xs border-b-2 border-[var(--accent-primary)] text-[var(--accent-primary)]"
+                            data-tab="python">Python</button>
+                        <button
+                            class="tab-btn flex-1 py-2 font-mono text-xs border-b-2 border-transparent text-[var(--fg-muted)] hover:text-white"
+                            data-tab="js">JavaScript</button>
+                    </div>
+
+                    <!-- Code Output -->
+                    <div class="flex-1 overflow-auto">
+                        <div id="python-panel" class="code-panel">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>matplotlib_seaborn.py</span>
+                                    <button class="copy-btn" data-target="code-python">Copy</button>
+                                </div>
+                                <pre class="code-content" id="code-python"></pre>
+                            </div>
+                        </div>
+                        <div id="js-panel" class="code-panel hidden">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>plotly.js</span>
+                                    <button class="copy-btn" data-target="code-js">Copy</button>
+                                </div>
+                                <pre class="code-content" id="code-js"></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Preview & Info -->
+                <div class="flex flex-col bg-[var(--bg-elevated)] p-6">
+                    <!-- Preview -->
+                    <div class="flex-1 relative min-h-[200px] mb-6">
+                        <div
+                            class="absolute top-0 right-0 font-mono text-xs text-[var(--fg-muted)] z-10 uppercase tracking-wider">
+                            Preview</div>
+                        <canvas id="preview-canvas"></canvas>
+                    </div>
+
+                    <!-- Info Grid -->
+                    <div
+                        class="grid grid-cols-2 gap-4 text-xs font-mono bg-[var(--bg-primary)] rounded-xl p-4 border border-white/5">
+                        <div>
+                            <span class="text-[var(--fg-muted)] block mb-1 uppercase">Preservation</span>
+                            <span id="modal-preserved" class="text-[var(--fg-primary)]">-</span>
+                        </div>
+                        <div>
+                            <span class="text-[var(--fg-muted)] block mb-1 uppercase">Lossiness</span>
+                            <span id="modal-lossiness">-</span>
+                        </div>
+                        <div>
+                            <span class="text-[var(--fg-muted)] block mb-1 uppercase">Scalability</span>
+                            <span id="modal-scalability">-</span>
+                        </div>
+                        <div>
+                            <span class="text-[var(--fg-muted)] block mb-1 uppercase">Use Case</span>
+                            <span id="modal-usecase">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer-upgrade py-16 px-6 mt-auto">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+                
+                <!-- Brand & Description -->
+                <div>
+                    <h3 class="font-display text-xl font-semibold text-[var(--fg-primary)] mb-3 tracking-tight">Epistemic Toolbox</h3>
+                    <p class="text-sm text-[var(--fg-muted)] leading-relaxed max-w-md">A comprehensive library of visualization techniques. Transforming raw data into meaningful visual representations through computational precision.</p>
+                </div>
+
+                <!-- Navigation Links -->
+                <div class="flex justify-start md:justify-end">
+                    <div>
+                        <h4 class="font-mono text-xs text-[var(--accent-primary)] uppercase tracking-widest mb-5">Library</h4>
+                        <ul class="space-y-3">
+                            <li><a href="#" class="footer-link text-sm">Documentation</a></li>
+                            <li><a href="#" class="footer-link text-sm">API Reference</a></li>
+                            <li><a href="#" class="footer-link text-sm">Contributing</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // =============================================
+        // STATE & DATA LOADING
+        // =============================================
+        let techniques = [];
+        let filteredTechniques = [];
+        let currentPage = 1;
+        const itemsPerPage = 9;
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let categories = new Set();
+
+        const DEFAULT_DATA = [
+            12.4, 15.1, 13.8, 12.9, 19.2, 18.5, 22.1, 25.3, 27.8, 30.2,
+            34.1, 33.5, 31.9, 29.4, 25.6, 45.2, 50.1, 55.8, 52.3, 48.6,
+            120.5, // Outlier
+            12.1, 14.5, 16.7, 28.9, 31.2, 35.6
+        ];
+
+        // =============================================
+        // INIT
+        // =============================================
+        async function init() {
+            await loadData();
+            setupEventListeners();
+            document.getElementById('data-input').value = DEFAULT_DATA.join(', ');
+        }
+
+        async function loadData() {
+            try {
+                const response = await fetch('../../data/viz.json');
+                techniques = await response.json();
+
+                techniques.forEach(t => {
+                    if (t.category) categories.add(t.category);
+                });
+
+                renderDynamicFilters();
+                filteredTechniques = [...techniques];
+                renderGrid();
+            } catch (error) {
+                console.error('Could not load techniques:', error);
+                document.getElementById('grid').innerHTML = `<div class="col-span-full text-center text-[var(--fg-muted)] py-20">Error loading data/viz.json</div>`;
+            }
+        }
+
+        // =============================================
+        // RENDERING
+        // =============================================
+
+        function renderDynamicFilters() {
+            const wrapper = document.getElementById('filter-wrapper');
+            wrapper.innerHTML = `<button class="filter-btn active" data-filter="all">All</button>`;
+
+            categories.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = 'filter-btn';
+                btn.dataset.filter = cat;
+                btn.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+                wrapper.appendChild(btn);
+            });
+
+            wrapper.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentFilter = e.target.dataset.filter;
+                    currentPage = 1;
+                    renderGrid();
+                });
+            });
+
+            checkScrollArrows();
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('grid');
+            const noResults = document.getElementById('no-results');
+            const paginationEl = document.getElementById('pagination');
+
+            let tempData = [...techniques];
+
+            if (currentFilter !== 'all') {
+                tempData = tempData.filter(t => t.category === currentFilter);
+            }
+
+            if (searchQuery) {
+                tempData = tempData.filter(t =>
+                    t.name.toLowerCase().includes(searchQuery) ||
+                    t.desc.toLowerCase().includes(searchQuery) ||
+                    t.category.toLowerCase().includes(searchQuery)
+                );
+            }
+
+            filteredTechniques = tempData;
+
+            const totalPages = Math.ceil(filteredTechniques.length / itemsPerPage);
+            if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const pageData = filteredTechniques.slice(start, start + itemsPerPage);
+
+            if (filteredTechniques.length === 0) {
+                grid.innerHTML = '';
+                noResults.classList.remove('hidden');
+                paginationEl.style.display = 'none';
+                return;
+            }
+
+            noResults.classList.add('hidden');
+            grid.innerHTML = '';
+
+            pageData.forEach((tech, i) => {
+                const card = document.createElement('div');
+                card.className = 'tool-card animate-in';
+                card.style.animationDelay = `${i * 0.08}s`;
+                card.setAttribute('role', 'listitem');
+                card.tabIndex = 0;
+
+                card.innerHTML = `
+                    <div class="icon-wrapper"><svg viewBox="0 0 24 24">${tech.svg}</svg></div>
+                    <span class="tag tag-primary">${tech.category}</span>
+                    <h3 class="font-display text-lg font-semibold mt-3 mb-2">${tech.name}</h3>
+                    <p class="text-sm text-[var(--fg-secondary)] leading-relaxed mb-4">${tech.desc}</p>
+                    <div class="mt-4 pt-4 border-t border-white/5 flex justify-between font-mono text-xs">
+                        <span class="text-[var(--fg-muted)] uppercase">Scalability</span>
+                        <span class="text-[var(--accent-secondary)]">${tech.scalability}</span>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => openModal(tech));
+                card.addEventListener('keydown', (e) => { if (e.key === 'Enter') openModal(tech); });
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+                    card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+                });
+
+                grid.appendChild(card);
+            });
+
+            if (totalPages > 1) {
+                paginationEl.style.display = 'flex';
+                document.getElementById('current-page').textContent = currentPage;
+                document.getElementById('total-pages').textContent = totalPages;
+                document.getElementById('prev-btn').disabled = currentPage === 1;
+                document.getElementById('next-btn').disabled = currentPage === totalPages;
+            } else {
+                paginationEl.style.display = 'none';
+            }
+        }
+
+        // =============================================
+        // SEARCH DROPDOWN
+        // =============================================
+        function handleSearchInput(e) {
+            const query = e.target.value.toLowerCase();
+            searchQuery = query;
+
+            const dropdown = document.getElementById('search-dropdown');
+
+            if (!query) {
+                dropdown.classList.remove('active');
+                currentPage = 1;
+                renderGrid();
+                return;
+            }
+
+            const matches = techniques.filter(t =>
+                t.name.toLowerCase().includes(query) ||
+                t.desc.toLowerCase().includes(query)
+            ).slice(0, 5);
+
+            if (matches.length > 0) {
+                dropdown.innerHTML = matches.map(t => `
+                    <div class="search-result-item" data-id="${t.id}">
+                        <div class="search-result-title">
+                            <span>${t.name}</span>
+                            <span class="tag tag-primary" style="margin:0; padding: 2px 6px;">${t.category}</span>
+                        </div>
+                        <div class="search-result-desc">${t.desc}</div>
+                        <div class="search-result-stats">
+                            <span>Scalability: <span style="color: var(--accent-secondary)">${t.scalability}</span></span>
+                            <span>Lossiness: <span style="color: var(--fg-secondary)">${t.lossiness}</span></span>
+                        </div>
+                    </div>
+                `).join('');
+
+                dropdown.classList.add('active');
+
+                dropdown.querySelectorAll('.search-result-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const id = item.dataset.id;
+                        const tech = techniques.find(t => t.id === id);
+                        if (tech) {
+                            openModal(tech);
+                            dropdown.classList.remove('active');
+                            document.getElementById('search-input').value = '';
+                            searchQuery = '';
+                        }
+                    });
+                });
+            } else {
+                dropdown.innerHTML = `<div class="p-4 text-center text-[var(--fg-muted)] text-sm">No results found</div>`;
+                dropdown.classList.add('active');
+            }
+
+            currentPage = 1;
+            renderGrid();
+        }
+
+        function checkScrollArrows() {
+            const wrapper = document.getElementById('filter-wrapper');
+            const leftArr = document.getElementById('nav-left');
+            const rightArr = document.getElementById('nav-right');
+
+            if (wrapper.scrollWidth > wrapper.clientWidth) {
+                leftArr.classList.remove('hidden');
+                rightArr.classList.remove('hidden');
+            } else {
+                leftArr.classList.add('hidden');
+                rightArr.classList.add('hidden');
+            }
+        }
+
+        // =============================================
+        // EVENT LISTENERS
+        // =============================================
+        function setupEventListeners() {
+            const searchInput = document.getElementById('search-input');
+            searchInput.addEventListener('input', handleSearchInput);
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.search-container')) {
+                    document.getElementById('search-dropdown').classList.remove('active');
+                }
+            });
+
+            const wrapper = document.getElementById('filter-wrapper');
+            document.getElementById('nav-left').addEventListener('click', () => {
+                wrapper.scrollBy({ left: -200, behavior: 'smooth' });
+            });
+            document.getElementById('nav-right').addEventListener('click', () => {
+                wrapper.scrollBy({ left: 200, behavior: 'smooth' });
+            });
+
+            document.getElementById('prev-btn').addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderGrid();
+                    document.getElementById('library').scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+
+            document.getElementById('next-btn').addEventListener('click', () => {
+                const totalPages = Math.ceil(filteredTechniques.length / itemsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderGrid();
+                    document.getElementById('library').scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+
+            document.getElementById('modal-close').addEventListener('click', closeModal);
+            document.getElementById('modal').addEventListener('click', (e) => {
+                if (e.target.id === 'modal') closeModal();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeModal();
+            });
+            document.getElementById('btn-update').addEventListener('click', handleGenerate);
+
+            setupTabs();
+
+            window.addEventListener('resize', checkScrollArrows);
+        }
+
+        // =============================================
+        // MODAL & LOGIC
+        // =============================================
+        const previewCanvas = document.getElementById('preview-canvas');
+        const ctx = previewCanvas.getContext('2d');
+        let currentTechnique = null;
+        let currentData = [...DEFAULT_DATA];
+
+        function openModal(tech) {
+            currentTechnique = tech;
+            document.getElementById('modal-title').textContent = tech.name;
+            document.getElementById('modal-category').textContent = tech.category.toUpperCase();
+            document.getElementById('modal-icon').innerHTML = `<svg viewBox="0 0 24 24">${tech.svg}</svg>`;
+            document.getElementById('modal-preserved').textContent = tech.preserved;
+            document.getElementById('modal-lossiness').textContent = tech.lossiness;
+            document.getElementById('modal-scalability').textContent = tech.scalability;
+            document.getElementById('modal-usecase').textContent = tech.useCase;
+
+            handleGenerate();
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        function handleGenerate() {
+            const rawVal = document.getElementById('data-input').value;
+            currentData = parseData(rawVal);
+            document.getElementById('data-status').textContent = `Status: ${currentData.length} points parsed`;
+            generateCode();
+            drawPreview();
+        }
+
+        function parseData(str) {
+            if (!str.trim()) return [];
+            return str.split(/[\s,;\n]+/).map(s => parseFloat(s.trim())).filter(n => !isNaN(n) && isFinite(n));
+        }
+
+        // =============================================
+        // CODE GENERATION
+        // =============================================
+        function generateCode() {
+            const dataStr = currentData.length > 0 ? `[${currentData.join(', ')}]` : '[/* paste data here */]';
+            const colorHex = '#d4a056';
+
+            const pyCode = `import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+
+# Data Configuration
+data = np.array(${dataStr})
+
+# Visualization
+plt.figure(figsize=(10, 6))
+plt.style.use('dark_background')
+
+ ${getPythonPlotLogic(currentTechnique.id, colorHex)}
+
+plt.title("${currentTechnique.name}", color='white', fontsize=14)
+plt.tight_layout()
+plt.show()`;
+
+            const jsCode = `// Dependencies: 
+// <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"><`+ `/script>
+
+const data = ${dataStr};
+
+const trace = ${getJSPlotLogic(currentTechnique.id, colorHex)};
+
+const layout = {
+  title: '${currentTechnique.name}',
+  paper_bgcolor: 'rgba(0,0,0,0)',
+  plot_bgcolor: 'rgba(0,0,0,0)',
+  font: { color: '#e8eef5', family: 'Inter, sans-serif' },
+  xaxis: { gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' },
+  yaxis: { gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' }
+};
+
+Plotly.newPlot('myDiv', [trace], layout);`;
+
+            document.getElementById('code-python').textContent = pyCode;
+            document.getElementById('code-js').textContent = jsCode;
+        }
+
+        function getPythonPlotLogic(id, color) {
+            switch (id) {
+                case 'histogram': return `plt.hist(data, bins=20, color='${color}', alpha=0.7, edgecolor='white')\nplt.xlabel('Value'); plt.ylabel('Frequency')`;
+                case 'kde': return `sns.kdeplot(data, fill=True, color='${color}', alpha=0.5)\nplt.xlabel('Value'); plt.ylabel('Density')`;
+                case 'boxplot': return `plt.boxplot(data, vert=True, patch_artist=True,\n            boxprops=dict(facecolor='${color}', alpha=0.5))\nplt.ylabel('Value')`;
+                case 'violin': return `sns.violinplot(data, color='${color}', inner='box')\nplt.ylabel('Value')`;
+                case 'line': return `plt.plot(data, color='${color}', linewidth=2)\nplt.xlabel('Index'); plt.ylabel('Value')`;
+                case 'area': return `plt.fill_between(range(len(data)), data, color='${color}', alpha=0.4)\nplt.plot(data, color='${color}', linewidth=2)\nplt.xlabel('Index'); plt.ylabel('Value')`;
+                case 'bar': return `plt.bar(range(len(data)), data, color='${color}')\nplt.xlabel('Index'); plt.ylabel('Value')`;
+                case 'strip': return `sns.stripplot(data, color='${color}', size=8, jitter=True)`;
+                case 'ecdf': return `x = np.sort(data)\ny = np.arange(1, len(x) + 1) / len(x)\nplt.plot(x, y, marker='.', linestyle='none', color='${color}')\nplt.xlabel('Value'); plt.ylabel('ECDF')`;
+                default: return `plt.plot(data, color='${color}')`;
+            }
+        }
+
+        function getJSPlotLogic(id, color) {
+            switch (id) {
+                case 'histogram': return `{ x: data, type: 'histogram', marker: { color: '${color}' }, nbinsx: 20 }`;
+                case 'kde':
+                case 'violin': return `{ y: data, type: 'violin', box: { visible: true }, marker: { color: '${color}' }, opacity: 0.6 }`;
+                case 'boxplot': return `{ y: data, type: 'box', marker: { color: '${color}' }, boxpoints: 'outliers' }`;
+                case 'line': return `{ y: data, type: 'scatter', mode: 'lines', line: { color: '${color}', width: 2 } }`;
+                case 'area': return `{ y: data, type: 'scatter', mode: 'lines', fill: 'tozeroy', fillcolor: 'rgba(212,160,86,0.3)', line: { color: '${color}' } }`;
+                case 'bar': return `{ y: data, type: 'bar', marker: { color: '${color}' } }`;
+                case 'strip': return `{ y: data, type: 'box', boxpoints: 'all', jitter: 0.5, pointpos: 0, marker: { color: '${color}' }, box: { visible: false } }`;
+                default: return `{ y: data, type: 'scatter', mode: 'lines+markers', marker: { color: '${color}' } }`;
+            }
+        }
+
+        // =============================================
+        // CANVAS DRAWING
+        // =============================================
+        function drawPreview() {
+            const rect = previewCanvas.getBoundingClientRect();
+            previewCanvas.width = rect.width * 2;
+            previewCanvas.height = rect.height * 2;
+            ctx.scale(2, 2);
+
+            const w = rect.width;
+            const h = rect.height;
+            const pad = 40;
+
+            ctx.clearRect(0, 0, w, h);
+
+            if (currentData.length === 0) {
+                ctx.fillStyle = '#505058';
+                ctx.font = '12px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText('No valid data', w / 2, h / 2);
+                return;
+            }
+
+            const min = Math.min(...currentData);
+            const max = Math.max(...currentData);
+            const range = max - min || 1;
+
+            ctx.strokeStyle = '#d4a056';
+            ctx.fillStyle = '#d4a056';
+            ctx.lineWidth = 1.5;
+
+            const xScale = (i) => pad + (i / Math.max(1, currentData.length - 1)) * (w - pad * 2);
+            const yScale = (v) => h - pad - ((v - min) / range) * (h - pad * 2);
+
+            switch (currentTechnique.id) {
+                case 'histogram':
+                    const bins = 15;
+                    const binW = (w - pad * 2) / bins;
+                    const counts = Array(bins).fill(0);
+                    currentData.forEach(d => {
+                        const idx = Math.min(bins - 1, Math.floor(((d - min) / range) * bins));
+                        counts[idx]++;
+                    });
+                    const maxC = Math.max(...counts);
+                    ctx.fillStyle = 'rgba(212, 160, 86, 0.6)';
+                    counts.forEach((c, i) => {
+                        const barH = (c / maxC) * (h - pad * 2);
+                        ctx.fillRect(pad + i * binW + 1, h - pad - barH, binW - 2, barH);
+                    });
+                    break;
+
+                case 'boxplot':
+                    const sorted = [...currentData].sort((a, b) => a - b);
+                    const q1 = sorted[Math.floor(sorted.length * 0.25)];
+                    const med = sorted[Math.floor(sorted.length * 0.5)];
+                    const q3 = sorted[Math.floor(sorted.length * 0.75)];
+
+                    ctx.fillStyle = 'rgba(212, 160, 86, 0.2)';
+                    ctx.fillRect(w / 2 - 40, yScale(q3), 80, yScale(q1) - yScale(q3));
+                    ctx.strokeRect(w / 2 - 40, yScale(q3), 80, yScale(q1) - yScale(q3));
+
+                    ctx.beginPath();
+                    ctx.moveTo(w / 2 - 40, yScale(med));
+                    ctx.lineTo(w / 2 + 40, yScale(med));
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.moveTo(w / 2, yScale(q3));
+                    ctx.lineTo(w / 2, yScale(max));
+                    ctx.moveTo(w / 2, yScale(q1));
+                    ctx.lineTo(w / 2, yScale(min));
+                    ctx.stroke();
+                    break;
+
+                case 'line':
+                case 'area':
+                case 'ecdf':
+                case 'sorted':
+                    ctx.beginPath();
+                    currentData.forEach((d, i) => {
+                        const x = xScale(i);
+                        const y = yScale(d);
+                        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                    });
+                    ctx.stroke();
+                    if (currentTechnique.id === 'area') {
+                        ctx.lineTo(xScale(currentData.length - 1), h - pad);
+                        ctx.lineTo(xScale(0), h - pad);
+                        ctx.closePath();
+                        ctx.fillStyle = 'rgba(212, 160, 86, 0.2)';
+                        ctx.fill();
+                    }
+                    break;
+
+                case 'bar':
+                    const bw = (w - pad * 2) / currentData.length - 2;
+                    ctx.fillStyle = 'rgba(212, 160, 86, 0.6)';
+                    currentData.forEach((d, i) => {
+                        ctx.fillRect(xScale(i) - bw / 2, yScale(d), bw, h - pad - yScale(d));
+                    });
+                    break;
+
+                default:
+                    currentData.forEach((d, i) => {
+                        ctx.beginPath();
+                        ctx.arc(xScale(i), yScale(d), 3, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+            }
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(pad, h - pad);
+            ctx.lineTo(w - pad, h - pad);
+            ctx.moveTo(pad, h - pad);
+            ctx.lineTo(pad, pad);
+            ctx.stroke();
+        }
+
+        function setupTabs() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => {
+                        b.classList.remove('active');
+                        b.style.borderColor = 'transparent';
+                        b.style.color = 'var(--fg-muted)';
+                    });
+                    btn.classList.add('active');
+                    btn.style.borderColor = 'var(--accent-primary)';
+                    btn.style.color = 'var(--accent-primary)';
+
+                    const tabId = btn.dataset.tab;
+                    document.querySelectorAll('.code-panel').forEach(p => p.classList.add('hidden'));
+                    document.getElementById(`${tabId}-panel`).classList.remove('hidden');
+                });
+            });
+
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const target = document.getElementById(btn.dataset.target);
+                    navigator.clipboard.writeText(target.textContent);
+                    const orig = btn.textContent;
+                    btn.textContent = 'Copied';
+                    btn.style.color = 'var(--accent-secondary)';
+                    btn.style.borderColor = 'var(--accent-secondary)';
+                    setTimeout(() => {
+                        btn.textContent = orig;
+                        btn.style.color = '';
+                        btn.style.borderColor = '';
+                    }, 1500);
+                });
+            });
+        }
+
+        // Start App
+        init();
+    </script>
+</body>
+
+</html>

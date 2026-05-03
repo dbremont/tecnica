@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Example Tool - Reference Implementation</title>
+    <style>
+        /* ============================================
+           EPISTEMIC TOOLBOX TOOL REFERENCE IMPLEMENTATION
+           ============================================ */
+        
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 2rem;
+            color: #f0f4f8;
+            background: #0d1117;
+            line-height: 1.6;
+        }
+
+        h1 {
+            color: #d4a84b;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        h2 {
+            color: #5ec4b2;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #8b95a5;
+        }
+
+        /* Button Styles */
+        button {
+            background: #5ec4b2;
+            color: #0d1117;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background: #4ab3a3;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Status Display */
+        .status-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(20, 26, 35, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+        }
+
+        .status-message {
+            padding: 1rem;
+            background: rgba(94, 196, 178, 0.1);
+            border: 1px solid rgba(94, 196, 178, 0.3);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-message.warning {
+            background: rgba(212, 168, 75, 0.1);
+            border-color: rgba(212, 168, 75, 0.3);
+        }
+
+        /* Counter Display */
+        .counter-display {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .counter-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #d4a84b;
+            font-family: 'Space Grotesk', monospace;
+        }
+
+        /* Event Log */
+        .event-log {
+            margin-top: 1.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(13, 17, 23, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .event-log-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #8b95a5;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .event-entry {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            padding: 0.5rem;
+            margin-bottom: 0.25rem;
+            border-left: 2px solid rgba(94, 196, 178, 0.5);
+            background: rgba(94, 196, 178, 0.05);
+        }
+
+        .event-entry.error {
+            border-left-color: rgba(212, 168, 75, 0.5);
+            background: rgba(212, 168, 75, 0.05);
+        }
+
+        .event-time {
+            color: #4a5568;
+            margin-right: 0.5rem;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: #0d1117;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 85vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(20, 26, 35, 0.5);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f0f4f8;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .modal-close {
+            width: 34px !important;
+            height: 34px !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #8b95a5 !important;
+            cursor: pointer;
+            padding: 0 !important;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(212, 168, 75, 0.2) !important;
+            border-color: #d4a84b !important;
+            color: #d4a84b !important;
+        }
+
+        .modal-body {
+            padding: 2rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-section {
+            margin-bottom: 2rem;
+        }
+
+        .modal-section h3 {
+            color: #d4a84b;
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .modal-section h4 {
+            color: #5ec4b2;
+            font-size: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-section code {
+            background: rgba(20, 26, 35, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #5ec4b2;
+        }
+
+        .modal-section pre {
+            background: rgba(13, 17, 23, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .modal-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .modal-section li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #8b95a5;
+        }
+
+        .modal-section li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #d4a84b;
+        }
+
+        .event-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background: rgba(94, 196, 178, 0.15);
+            border: 1px solid rgba(94, 196, 178, 0.3);
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #5ec4b2;
+            margin: 0 0.25rem;
+        }
+
+        /* Scrollbar Styles */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(20, 26, 35, 0.5);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <h1>Example Tool</h1>
+    <p>Reference implementation demonstrating the Epistemic Toolbox tool communication protocol.</p>
+
+    <button id="action-btn">Increment Counter</button>
+    <button id="decrement-btn" style="background: rgba(212, 168, 75, 0.2); color: #d4a84b; margin-left: 0.5rem;">Decrement</button>
+
+    <div class="status-section">
+        <div class="status-message" id="status">Status: Ready</div>
+        <div class="counter-display">
+            <span style="color: #8b95a5;">Counter:</span>
+            <span class="counter-value" id="counter">0</span>
+        </div>
+    </div>
+
+    <div class="event-log">
+        <div class="event-log-title">Event Log</div>
+        <div id="event-log-entries"></div>
+    </div>
+
+    <!-- Help Section (Modal Overlay) -->
+    <div class="modal-overlay" id="help-section">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Tool Communication Protocol</div>
+                <button class="modal-close" id="modal-close">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3>Overview</h3>
+                    <p>This tool demonstrates the Epistemic Toolbox communication protocol. Tools receive commands from the viewer and emit events back, enabling bidirectional communication while maintaining CSS isolation via Shadow DOM.</p>
+                </div>
+
+                <div class="modal-section">
+                    <h3>Viewer-to-Tool Commands</h3>
+                    <p>Tools should listen for these custom events dispatched by the viewer:</p>
+                    
+                    <h4><code>tool-openHelp</code></h4>
+                    <ul>
+                        <li>Purpose: Opens the tool's help/documentation</li>
+                        <li>Detail: No additional data required</li>
+                    </ul>
+
+                    <h4><code>tool-reset</code></h4>
+                    <ul>
+                        <li>Purpose: Resets the tool to its initial state</li>
+                        <li>Detail: No additional data required</li>
+                        <li>Response: Tool should emit <span class="event-badge">tool-stateChanged</span> with action "reset"</li>
+                    </ul>
+
+                    <h4><code>tool-refresh</code></h4>
+                    <ul>
+                        <li>Purpose: Refreshes or reloads tool data</li>
+                        <li>Detail: No additional data required</li>
+                        <li>Response: Tool should emit <span class="event-badge">tool-stateChanged</span> with action "refresh"</li>
+                    </ul>
+
+                    <h4><code>tool-[custom]</code></h4>
+                    <ul>
+                        <li>Purpose: Tool-specific custom commands</li>
+                        <li>Detail: Custom data in event.detail object</li>
+                        <li>Example: <code>tool-exportData</code> with format specification</li>
+                    </ul>
+                </div>
+
+                <div class="modal-section">
+                    <h3>Tool-to-Viewer Events</h3>
+                    <p>Tools should emit these events to communicate with the viewer:</p>
+
+                    <h4><code>tool-ready</code></h4>
+                    <ul>
+                        <li>Purpose: Signals that the tool is fully loaded and initialized</li>
+                        <li>When to emit: After all scripts have executed and tool is ready</li>
+                        <li>Detail object: { name: string, version: string, [metadata] }</li>
+                    </ul>
+
+                    <h4><code>tool-stateChanged</code></h4>
+                    <ul>
+                        <li>Purpose: Reports significant state changes to the viewer</li>
+                        <li>When to emit: After reset, refresh, or major state updates</li>
+                        <li>Detail object: { action: string, [stateData] }</li>
+                    </ul>
+
+                    <h4><code>tool-error</code></h4>
+                    <ul>
+                        <li>Purpose: Reports errors to the viewer</li>
+                        <li>When to emit: When unrecoverable errors occur</li>
+                        <li>Detail object: { message: string, [errorDetails] }</li>
+                    </ul>
+                </div>
+
+                <div class="modal-section">
+                    <h3>Implementation Example</h3>
+                    <pre>// Listen for viewer commands
+document.addEventListener('tool-reset', (e) => {
+    // Reset tool state
+    resetTool();
+    
+    // Notify viewer
+    document.dispatchEvent(new CustomEvent('tool-stateChanged', {
+        detail: { action: 'reset', timestamp: Date.now() },
+        bubbles: true,
+        composed: true
+    }));
+});
+
+// Notify viewer when ready
+document.dispatchEvent(new CustomEvent('tool-ready', {
+    detail: { name: 'My Tool', version: '1.0.0' },
+    bubbles: true,
+    composed: true
+}));</pre>
+                </div>
+
+                <div class="modal-section">
+                    <h3>Best Practices</h3>
+                    <ul>
+                        <li>Always emit <span class="event-badge">tool-ready</span> after initialization</li>
+                        <li>Emit <span class="event-badge">tool-stateChanged</span> after major state changes</li>
+                        <li>Handle errors gracefully and emit <span class="event-badge">tool-error</span> when appropriate</li>
+                        <li>Use <code>bubbles: true</code> and <code>composed: true</code> for events to cross Shadow DOM boundary</li>
+                        <li>Include relevant metadata in event detail objects</li>
+                        <li>Maintain clean state management for easy reset operations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // EPISTEMIC TOOLBOX TOOL COMMUNICATION PROTOCOL
+        // REFERENCE IMPLEMENTATION
+        // ============================================
+
+        // ============================================
+        // GET SHADOW ROOT REFERENCE
+        // ============================================
+        
+        // The viewer sets window.__toolShadowRoot__ before executing this script
+        // This gives us access to the Shadow DOM for element queries
+        const root = window.__toolShadowRoot__;
+
+        // ============================================
+        // TOOL STATE MANAGEMENT
+        // ============================================
+
+        const initialState = {
+            counter: 0,
+            lastAction: null,
+            timestamp: Date.now()
+        };
+
+        let toolState = { ...initialState };
+
+        /**
+         * Reset tool to initial state
+         * Called by viewer 'tool-reset' command
+         */
+        function resetTool() {
+            toolState = { ...initialState, timestamp: Date.now() };
+            updateUI();
+            logEvent('Tool reset to initial state');
+            
+            // Emit state change to viewer
+            emitStateChange('reset', { counter: toolState.counter });
+        }
+
+        /**
+         * Refresh tool data
+         * Called by viewer 'tool-refresh' command
+         */
+        function refreshTool() {
+            toolState.timestamp = Date.now();
+            updateUI();
+            logEvent('Tool data refreshed');
+            
+            // Emit state change to viewer
+            emitStateChange('refresh', { timestamp: toolState.timestamp });
+        }
+
+        // ============================================
+        // UI UPDATE FUNCTIONS
+        // ============================================
+
+        // Safely get DOM elements with null checks
+        let statusDiv = null;
+        let counterDiv = null;
+        let eventLogEntries = null;
+        
+        /**
+         * Get DOM elements<>
+         */
+        function getToolElements() {
+            if (root) {
+                statusDiv = root.getElementById('status');
+                counterDiv = root.getElementById('counter');
+                eventLogEntries = root.getElementById('event-log-entries');
+            }
+        }
+        
+        // Call this immediately to get elements if they exist
+        getToolElements();
+
+        /**
+         * Update UI to reflect current state
+         */
+        function updateUI() {
+            // Ensure elements exist before updating
+            if (!counterDiv || !statusDiv) {
+                getToolElements();
+            }
+            if (counterDiv) counterDiv.textContent = toolState.counter;
+            if (statusDiv) {
+                statusDiv.textContent = `Status: ${toolState.lastAction || 'Ready'}`;
+                statusDiv.className = 'status-message';
+            }
+        }
+
+        /**
+         * Log an event to the event display
+         * @param {string} message - Event message
+         * @param {boolean} isError - Whether this is an error
+         */
+        function logEvent(message, isError = false) {
+            // Ensure elements exist
+            if (!eventLogEntries) {
+                getToolElements();
+            }
+            
+            // If still null, log to console instead
+            if (!eventLogEntries) {
+                console.log('[Tool Event]', message);
+                return;
+            }
+            
+            const entry = document.createElement('div');
+            entry.className = 'event-entry' + (isError ? ' error' : '');
+            
+            const time = new Date().toLocaleTimeString();
+            entry.innerHTML = `<span class="event-time">[${time}]</span>${message}`;
+            
+            eventLogEntries.appendChild(entry);
+            eventLogEntries.scrollTop = eventLogEntries.scrollHeight;
+        }
+
+        /**
+         * Show status message with optional warning style
+         * @param {string} message - Status message
+         * @param {boolean} isWarning - Whether to show as warning
+         */
+        function showStatus(message, isWarning = false) {
+            // Ensure element exists
+            if (!statusDiv) {
+                getToolElements();
+            }
+            
+            if (statusDiv) {
+                statusDiv.textContent = `Status: ${message}`;
+                statusDiv.className = 'status-message' + (isWarning ? ' warning' : '');
+                toolState.lastAction = message;
+            }
+        }
+
+        // ============================================
+        // EVENT EMITTERS (TOOL → VIEWER)
+        // ============================================
+
+        /**
+         * Emit tool-stateChanged event to viewer
+         * @param {string} action - Action that caused state change
+         * @param {Object} data - Additional state data
+         */
+        function emitStateChange(action, data = {}) {
+            document.dispatchEvent(new CustomEvent('tool-stateChanged', {
+                detail: { action, ...data },
+                bubbles: true,
+                composed: true
+            }));
+        }
+
+        /**
+         * Emit tool-error event to viewer
+         * @param {string} message - Error message
+         * @param {Object} details - Additional error details
+         */
+        function emitError(message, details = {}) {
+            document.dispatchEvent(new CustomEvent('tool-error', {
+                detail: { message, ...details },
+                bubbles: true,
+                composed: true
+            }));
+        }
+
+        // ============================================
+        // HELP SECTION FUNCTIONALITY
+        // ============================================
+
+        /**
+         * Toggle help section visibility
+         * Called by tool-openHelp event listener
+         * Use global __toolShadowRoot__ variable to access elements
+         */
+        function toggleHelp() {
+            const helpSection = root ? root.getElementById('help-section') : null;
+            if (helpSection) {
+                helpSection.classList.toggle('show');
+                const isOpen = helpSection.classList.contains('show');
+                logEvent(isOpen ? 'Help section opened' : 'Help section closed');
+            } else {
+                console.error('Help section element not found');
+            }
+        }
+
+        // ============================================
+        // EVENT LISTENERS (VIEWER → TOOL)
+        // ============================================
+        // These must be outside requestAnimationFrame so functions are available immediately
+
+        /**
+         * Handle 'tool-openHelp' command from viewer
+         * Toggles the help section visibility
+         */
+        document.addEventListener('tool-openHelp', (e) => {
+            logEvent('Received command: tool-openHelp');
+            toggleHelp();
+        });
+
+        /**
+         * Handle 'tool-reset' command from viewer
+         * Resets tool to initial state
+         */
+        document.addEventListener('tool-reset', (e) => {
+            logEvent('Received command: tool-reset');
+            resetTool();
+        });
+
+        /**
+         * Handle 'tool-refresh' command from viewer
+         * Refreshes tool data
+         */
+        document.addEventListener('tool-refresh', (e) => {
+            logEvent('Received command: tool-refresh');
+            refreshTool();
+        });
+
+        /**
+         * Handle custom commands from viewer
+         * Example: tool-exportData, tool-getState, etc.
+         */
+        document.addEventListener('tool-', (e) => {
+            // Extract custom command name from event type
+            const command = e.type.replace('tool-', '');
+            logEvent(`Received custom command: tool-${command}`, command === 'error');
+            
+            // Handle custom commands here
+            // This is a template for tool-specific functionality
+        });
+
+        // ============================================
+        // INTERACTIVE ELEMENTS
+        // ============================================
+        
+        // Get DOM elements - they're available immediately since HTML was injected before script execution
+        getToolElements();
+        
+        // Increment button handler
+        const actionBtn = root ? root.getElementById('action-btn') : null;
+        if (actionBtn) {
+            actionBtn.addEventListener('click', function() {
+                toolState.counter++;
+                toolState.lastAction = 'incremented';
+                updateUI();
+                showStatus(`Counter: ${toolState.counter}`);
+                
+                // Emit state change for significant updates
+                if (toolState.counter % 5 === 0) {
+                    emitStateChange('increment', { counter: toolState.counter });
+                }
+            });
+        }
+
+        // Decrement button handler
+        const decrementBtn = root ? root.getElementById('decrement-btn') : null;
+        if (decrementBtn) {
+            decrementBtn.addEventListener('click', function() {
+                toolState.counter = Math.max(0, toolState.counter - 1);
+                toolState.lastAction = 'decremented';
+                updateUI();
+                showStatus(`Counter: ${toolState.counter}`);
+            });
+        }
+
+        // ============================================
+        // HELP SECTION ELEMENTS SETUP
+        // ============================================
+
+        const modalCloseBtn = root ? root.getElementById('modal-close') : null;
+
+        if (modalCloseBtn) {
+            modalCloseBtn.addEventListener('click', toggleHelp);
+        }
+
+        // ============================================
+        // COMMAND REGISTRATION
+        // ============================================
+        function registerToolCommands() {
+            document.dispatchEvent(new CustomEvent('tool-registerCommands', {
+                detail: {
+                    commands: [
+                        {
+                            toolName: 'Example Tool',
+                            command: 'increment',
+                            icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+                            label: 'Increment',
+                            description: 'Increment the counter by 1'
+                        },
+                        {
+                            toolName: 'Example Tool',
+                            command: 'decrement',
+                            icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+                            label: 'Decrement',
+                            description: 'Decrement the counter by 1'
+                        }
+                    ]
+                },
+                bubbles: true,
+                composed: true
+            }));
+        }
+
+        // ============================================
+        // CUSTOM COMMAND HANDLERS
+        // ============================================
+        document.addEventListener('tool-increment', (e) => {
+            logEvent('Received command: tool-increment');
+            toolState.counter++;
+            toolState.lastAction = 'incremented';
+            updateUI();
+            showStatus(`Counter: ${toolState.counter}`);
+            
+            // Emit state change for significant updates
+            if (toolState.counter % 5 === 0) {
+                emitStateChange('increment', { counter: toolState.counter });
+            }
+        });
+
+        document.addEventListener('tool-decrement', (e) => {
+            logEvent('Received command: tool-decrement');
+            toolState.counter = Math.max(0, toolState.counter - 1);
+            toolState.lastAction = 'decremented';
+            updateUI();
+            showStatus(`Counter: ${toolState.counter}`);
+        });
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+
+        /**
+         * Initialize the tool
+         * Called when tool is fully loaded
+         */
+        function initializeTool() {
+            logEvent('Tool initialization started');
+            
+            // Initialize UI
+            updateUI();
+            
+            // Register commands with viewer (before tool-ready)
+            registerToolCommands();
+            
+            // Notify viewer that tool is ready
+            document.dispatchEvent(new CustomEvent('tool-ready', {
+                detail: {
+                    name: 'Example Tool',
+                    version: '1.0.0',
+                    description: 'Reference implementation of Epistemic Toolbox communication protocol',
+                    capabilities: ['counter', 'help', 'reset', 'refresh', 'increment', 'decrement']
+                },
+                bubbles: true,
+                composed: true
+            }));
+            
+            logEvent('Tool ready - emitted tool-ready event');
+        }
+
+        // Initialize tool immediately - DOM is already loaded
+        initializeTool();
+    </script>
+</body>
+</html>

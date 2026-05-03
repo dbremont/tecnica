@@ -1850,7 +1850,7 @@
 <body>
     <aside class="toolbox" id="sidebar">
         <div class="sb-header"><span class="sb-eyebrow">Philosophia Artium Technicarum</span>
-            <h2 class="sb-title">Practice Explorer</h2>
+            <h2 class="sb-title">Tecnica</h2>
             <p class="sb-subtitle">Mapping the architecture of technical practice.</p>
         </div>
         <div class="sb-search">
@@ -1919,7 +1919,6 @@
             <div class="proj-chip active" data-proj="default">Force</div>
             <div class="proj-chip" data-proj="category">Clusters</div>
             <div class="proj-chip" data-proj="layer">Layers</div>
-            <div class="proj-chip" data-proj="inheritance">Inheritance</div>
             <div class="proj-chip" data-proj="confidence">Confidence</div>
             <div class="proj-chip" data-proj="radial">Radial</div>
             <div class="proj-chip" data-proj="chord">Chord</div>
@@ -1994,7 +1993,7 @@
         var CL = [], CLB = {}, CC = {}, CS = {};
         var LL = [], LLB = {}, LC = {};
         var FL = [], FC = {}, FLB = {}, TFM = {};
-        var PL = { default:'Force', category:'Clusters', layer:'Layers', inheritance:'Inheritance', confidence:'Confidence', radial:'Radial', chord:'Chord' };
+        var PL = { default:'Force', category:'Clusters', layer:'Layers', confidence:'Confidence', radial:'Radial', chord:'Chord' };
         var SP = ['confidence', 'radial'];
         var layC = {};
 
@@ -2050,7 +2049,7 @@
         function pG(data) { deriveSchema(data); nM = {}; nodes = []; gE = []; cNC = {}; CL.forEach(function (c) { cNC[c] = 0 }); minY = Infinity; maxY = -Infinity; maxIL = 1; data.forEach(function (r) { var c = r.category || 'Reality'; if (!cNC.hasOwnProperty(c)) cNC[c] = 0; cNC[c]++; var ch = r.historicalContext ? r.historicalContext.chronology || [] : []; ch.forEach(function (v) { if (v.year < minY) minY = v.year; if (v.year > maxY) maxY = v.year }); if ((r.inheritanceLevel || 0) > maxIL) maxIL = r.inheritanceLevel }); if (minY === Infinity) { minY = 1920; maxY = 2024 } tRF.min = minY; tRF.max = maxY; tR.min = minY; tR.max = maxY; data.forEach(function (r) { var c = r.category || 'Reality'; var layer = r.layer || CLL[c] || ''; var ch = r.historicalContext ? r.historicalContext.chronology || [] : []; var ey = ch.length > 0 ? ch.reduce(function (m, v) { return v.year < m ? v.year : m }, ch[0].year) : (minY + maxY) / 2; nodes.push({ id: r.id, name: r.name || r.id, category: c, layer: layer, inheritanceLevel: r.inheritanceLevel || 0, description: r.description || '', longDescription: r.longDescription || '', categoryAmbiguity: r.metadata ? r.metadata.categoryAmbiguity || null : null, functionalRoles: r.functionalRoles || [], realityDomains: r.realityDomains || [], historicalContext: r.historicalContext || null, specific: r.specific || {}, rawRelationships: r.relationships || [], metadata: r.metadata || {}, earliestYear: ey, confidence: r.metadata ? r.metadata.confidenceScore ?? 0.5 : 0.5, observability: r.specific ? r.specific.observability || 'observable' : 'observable', x: W / 2 + (Math.random() - .5) * 300, y: H / 2 + (Math.random() - .5) * 300, targetX: W / 2, targetY: H / 2, vx: 0, vy: 0, fx: 0, fy: 0, degree: 0, centrality: 0, baseSize: 7, visible: true, pinned: false }); nM[r.id] = nodes[nodes.length - 1] }); var eS = new Set(); data.forEach(function (r) { var sId = r.id; (r.relationships || []).forEach(function (rel) { var tId = rel.targetNodeId; if (!nM[tId]) return; var ek = sId + '|' + rel.relationshipType + '|' + tId; if (eS.has(ek)) return; eS.add(ek); var fam = rel.relationshipFamily || TFM[rel.relationshipType] || ff(); gE.push({ source: sId, target: tId, type: rel.relationshipType, family: fam, description: rel.description || '', visible: true }); nM[sId].degree++; nM[tId].degree++ }) }); var md = Math.max(1, nodes.reduce(function (a, n) { return Math.max(a, n.degree) }, 0)); nodes.forEach(function (n) { n.centrality = n.degree / md }); rCC(); rLC() }
         function rCC() { CL.forEach(function (c, i) { var a = (i / CL.length) * 2 * Math.PI - Math.PI / 2, r = Math.min(W, H) * .35; catC[c] = { x: W / 2 + Math.cos(a) * r, y: H / 2 + Math.sin(a) * r } }) }
         function rLC() { var vl = LL.filter(function (l) { return aLayers.has(l) }); layC = {}; var n = vl.length; if (!n) return; vl.forEach(function (l, i) { layC[l] = { y: (H * (i + 1)) / (n + 1) } }) }
-        function sTick() { if (curProj === 'chord') return; var isS = SP.includes(curProj); if (isS) { if (strSet) return; cST(); var mx = 0; nodes.forEach(function (n) { if (!n.visible) return; var dx = n.targetX - n.x, dy = n.targetY - n.y, d = Math.sqrt(dx * dx + dy * dy); if (d > mx) mx = d; n.x += dx * .08; n.y += dy * .08; n.vx = 0; n.vy = 0 }); if (mx < .4) { strSet = true; sPC(curProj) } return } if (alpha < AS) { alpha = 0; sPC(curProj); return } nodes.forEach(function (n) { n.fx = 0; n.fy = 0 }); var gv = curProj === 'default' ? CG : CG * .15; nodes.forEach(function (n) { if (n.pinned || !n.visible) return; n.fx += (W / 2 - n.x) * gv; n.fy += (H / 2 - n.y) * gv }); for (var i = 0; i < nodes.length; i++) { if (!nodes[i].visible) continue; for (var j = i + 1; j < nodes.length; j++) { if (!nodes[j].visible) continue; var a = nodes[i], b = nodes[j], dx = b.x - a.x, dy = b.y - a.y, ds = dx * dx + dy * dy; if (ds < 1) ds = 1; var f = REP / ds, ag = Math.atan2(dy, dx), fx = Math.cos(ag) * f, fy = Math.sin(ag) * f; if (!a.pinned) { a.fx -= fx; a.fy -= fy } if (!b.pinned) { b.fx += fx; b.fy += fy } } } gE.forEach(function (e) { if (!e.visible) return; var s = nM[e.source], t = nM[e.target]; if (!s || !t || !s.visible || !t.visible) return; var dx = t.x - s.x, dy = t.y - s.y, d = Math.sqrt(dx * dx + dy * dy); if (d < 1) d = 1; var dp = d - SL, f = SS * dp, fx = (dx / d) * f, fy = (dy / d) * f; if (!s.pinned) { s.fx += fx; s.fy += fy } if (!t.pinned) { t.fx -= fx; t.fy -= fy } }); if (curProj === 'default') { var cg = {}; nodes.forEach(function (n) { if (!n.visible) return; if (!cg[n.category]) cg[n.category] = []; cg[n.category].push(n) }); Object.values(cg).forEach(function (g) { if (g.length < 2) return; var cx = 0, cy = 0; g.forEach(function (n) { cx += n.x; cy += n.y }); cx /= g.length; cy /= g.length; g.forEach(function (n) { if (n.pinned) return; n.fx += (cx - n.x) * CC2; n.fy += (cy - n.y) * CC2 }) }) } else if (curProj === 'category') { nodes.forEach(function (n) { if (n.pinned || !n.visible || !catC[n.category]) return; var t = catC[n.category]; n.fx += (t.x - n.x) * .08; n.fy += (t.y - n.y) * .08 }) } else if (curProj === 'inheritance') { nodes.forEach(function (n) { if (n.pinned || !n.visible) return; var ty = 80 + n.inheritanceLevel * (H - 160) / Math.max(1, maxIL); n.fx += (W / 2 - n.x) * .02; n.fy += (ty - n.y) * .08 }) } nodes.forEach(function (n) { if (n.pinned || !n.visible) return; n.vx = (n.vx + n.fx) * DMP; n.vy = (n.vy + n.fy) * DMP; n.x += n.vx * alpha; n.y += n.vy * alpha; n.x = Math.max(30, Math.min(W - 30, n.x)); n.y = Math.max(30, Math.min(H - 30, n.y)) }); alpha *= DR }
+        function sTick() { if (curProj === 'chord') return; var isS = SP.includes(curProj); if (isS) { if (strSet) return; cST(); var mx = 0; nodes.forEach(function (n) { if (!n.visible) return; var dx = n.targetX - n.x, dy = n.targetY - n.y, d = Math.sqrt(dx * dx + dy * dy); if (d > mx) mx = d; n.x += dx * .08; n.y += dy * .08; n.vx = 0; n.vy = 0 }); if (mx < .4) { strSet = true; sPC(curProj) } return } if (alpha < AS) { alpha = 0; sPC(curProj); return } nodes.forEach(function (n) { n.fx = 0; n.fy = 0 }); var gv = curProj === 'default' ? CG : CG * .15; nodes.forEach(function (n) { if (n.pinned || !n.visible) return; n.fx += (W / 2 - n.x) * gv; n.fy += (H / 2 - n.y) * gv }); for (var i = 0; i < nodes.length; i++) { if (!nodes[i].visible) continue; for (var j = i + 1; j < nodes.length; j++) { if (!nodes[j].visible) continue; var a = nodes[i], b = nodes[j], dx = b.x - a.x, dy = b.y - a.y, ds = dx * dx + dy * dy; if (ds < 1) ds = 1; var f = REP / ds, ag = Math.atan2(dy, dx), fx = Math.cos(ag) * f, fy = Math.sin(ag) * f; if (!a.pinned) { a.fx -= fx; a.fy -= fy } if (!b.pinned) { b.fx += fx; b.fy += fy } } } gE.forEach(function (e) { if (!e.visible) return; var s = nM[e.source], t = nM[e.target]; if (!s || !t || !s.visible || !t.visible) return; var dx = t.x - s.x, dy = t.y - s.y, d = Math.sqrt(dx * dx + dy * dy); if (d < 1) d = 1; var dp = d - SL, f = SS * dp, fx = (dx / d) * f, fy = (dy / d) * f; if (!s.pinned) { s.fx += fx; s.fy += fy } if (!t.pinned) { t.fx -= fx; t.fy -= fy } }); if (curProj === 'default') { var cg = {}; nodes.forEach(function (n) { if (!n.visible) return; if (!cg[n.category]) cg[n.category] = []; cg[n.category].push(n) }); Object.values(cg).forEach(function (g) { if (g.length < 2) return; var cx = 0, cy = 0; g.forEach(function (n) { cx += n.x; cy += n.y }); cx /= g.length; cy /= g.length; g.forEach(function (n) { if (n.pinned) return; n.fx += (cx - n.x) * CC2; n.fy += (cy - n.y) * CC2 }) }) } else if (curProj === 'category') { nodes.forEach(function (n) { if (n.pinned || !n.visible || !catC[n.category]) return; var t = catC[n.category]; n.fx += (t.x - n.x) * .08; n.fy += (t.y - n.y) * .08 }) } nodes.forEach(function (n) { if (n.pinned || !n.visible) return; n.vx = (n.vx + n.fx) * DMP; n.vy = (n.vy + n.fy) * DMP; n.x += n.vx * alpha; n.y += n.vy * alpha; n.x = Math.max(30, Math.min(W - 30, n.x)); n.y = Math.max(30, Math.min(H - 30, n.y)) }); alpha *= DR }
         function cST() { var vc = CL.filter(function (c) { return aCats.has(c) }).sort(); var ci = {}; vc.forEach(function (c, i) { ci[c] = i }); var nc = vc.length; if (curProj === 'confidence') { var mr = Math.min(W, H) * .42, as = (2 * Math.PI) / Math.max(1, nc); nodes.forEach(function (n) { if (!n.visible) return; var tr = (1 - n.confidence) * mr, ci2 = ci[n.category] !== undefined ? ci[n.category] : 0, an = ci2 * as - Math.PI / 2; n.targetX = W / 2 + Math.cos(an) * tr; n.targetY = H / 2 + Math.sin(an) * tr }) } else if (curProj === 'radial') { var mr2 = Math.min(W, H) * .4, as2 = (2 * Math.PI) / Math.max(1, nc); nodes.forEach(function (n) { if (!n.visible) return; var tr = Math.max(60, (n.inheritanceLevel / Math.max(1, maxIL)) * mr2), ci3 = ci[n.category] !== undefined ? ci[n.category] : 0, ta = ci3 * as2 - Math.PI / 2; n.targetX = W / 2 + Math.cos(ta) * tr; n.targetY = H / 2 + Math.sin(ta) * tr }) } else if (curProj === 'layer') { var vl = LL.filter(function (l) { return aLayers.has(l) }).sort(); var ln = {}; vl.forEach(function (l, i) { ln[l] = i }); var nl = vl.length; if (!nl) return; var lpc = {}, lpi = {}; nodes.forEach(function (n) { if (!n.visible || !n.layer || ln[n.layer] === undefined) return; if (!lpc[n.layer]) { lpc[n.layer] = 0; lpi[n.layer] = 0 } lpc[n.layer]++ }); nodes.forEach(function (n) { if (!n.visible || !n.layer || ln[n.layer] === undefined) return; var li = ln[n.layer]; var ty = (H * (li + 1)) / (nl + 1); var cnt = Math.max(1, lpc[n.layer] || 1); var idx = lpi[n.layer] || 0; var tx = W * .1 + (idx + .5) / cnt * W * .8; n.targetX = tx; n.targetY = ty; lpi[n.layer] = idx + 1 }) } }
         function dSh(x, y, sz, sh) { var s = Math.max(2, sz); ctx.beginPath(); if (sh === 'square') ctx.rect(x - s / 2, y - s / 2, s, s); else if (sh === 'diamond') { ctx.moveTo(x, y - s / 2); ctx.lineTo(x + s / 2, y); ctx.lineTo(x, y + s / 2); ctx.lineTo(x - s / 2, y); ctx.closePath() } else if (sh === 'hexagon') { for (var i = 0; i < 6; i++) { var a = (Math.PI / 3) * i - Math.PI / 6, px = x + (s / 2) * Math.cos(a), py = y + (s / 2) * Math.sin(a); i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py) } ctx.closePath() } else if (sh === 'triangle') { ctx.moveTo(x, y - s / 2); ctx.lineTo(x + s / 2, y + s / 2); ctx.lineTo(x - s / 2, y + s / 2); ctx.closePath() } else ctx.arc(x, y, Math.max(1, s / 2), 0, Math.PI * 2); ctx.fill() }
         function stSh(x, y, sz, sh) { var s = Math.max(2, sz); ctx.beginPath(); if (sh === 'square') ctx.rect(x - s / 2, y - s / 2, s, s); else if (sh === 'diamond') { ctx.moveTo(x, y - s / 2); ctx.lineTo(x + s / 2, y); ctx.lineTo(x, y + s / 2); ctx.lineTo(x - s / 2, y); ctx.closePath() } else if (sh === 'hexagon') { for (var i = 0; i < 6; i++) { var a = (Math.PI / 3) * i - Math.PI / 6, px = x + (s / 2) * Math.cos(a), py = y + (s / 2) * Math.sin(a); i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py) } ctx.closePath() } else if (sh === 'triangle') { ctx.moveTo(x, y - s / 2); ctx.lineTo(x + s / 2, y + s / 2); ctx.lineTo(x - s / 2, y + s / 2); ctx.closePath() } else ctx.arc(x, y, Math.max(1, s / 2), 0, Math.PI * 2); ctx.stroke() }
@@ -2080,7 +2079,6 @@
             if (curProj === 'radial') { var mr2 = Math.min(W, H) * .4; for (var l = 0; l <= maxIL; l++) { var r = Math.max(60, (l / Math.max(1, maxIL)) * mr2); ctx.beginPath(); ctx.arc(W / 2, H / 2, r, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(255,255,255,0.03)'; ctx.lineWidth = 1; ctx.stroke(); ctx.font = "500 9px 'Inter'"; ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(255,255,255,0.06)'; ctx.fillText('Level ' + l, W / 2, H / 2 - r - 8) } }
             if (curProj === 'layer') { var vl2 = LL.filter(function (l) { return aLayers.has(l) }).sort(); var nl2 = vl2.length; if (nl2) { ctx.font = "500 9px 'JetBrains Mono'"; ctx.textAlign = 'right'; vl2.forEach(function (l, i) { var yy = (H * (i + 1)) / (nl2 + 1); ctx.fillStyle = hexToRGBA(LC[l] || '#888', .22); ctx.fillText((LLB[l] || l).replace(' Space', ''), 46, yy + 3); ctx.beginPath(); ctx.moveTo(54, yy); ctx.lineTo(W - 50, yy); ctx.strokeStyle = hexToRGBA(LC[l] || '#888', .035); ctx.lineWidth = 1; ctx.stroke() }) } }
             if (curProj === 'category') { ctx.font = "500 11px 'Inter'"; ctx.textAlign = 'center'; Object.keys(catC).forEach(function (c) { if (!aCats.has(c)) return; var p = catC[c]; ctx.fillStyle = hexToRGBA(CC[c], .2); ctx.fillText((CLB[c] || c).toUpperCase(), p.x, p.y - 48) }) }
-            if (curProj === 'inheritance') { ctx.font = "500 9px 'JetBrains Mono'"; ctx.textAlign = 'right'; for (var l2 = 0; l2 <= maxIL; l2++) { var yy = 80 + l2 * (H - 160) / Math.max(1, maxIL); ctx.fillStyle = 'rgba(255,255,255,0.06)'; ctx.fillText('L' + l2, 40, yy + 3); ctx.beginPath(); ctx.moveTo(50, yy); ctx.lineTo(W - 50, yy); ctx.strokeStyle = 'rgba(255,255,255,0.02)'; ctx.lineWidth = 1; ctx.stroke() } }
             if (sH) { var hg = {}; nodes.forEach(function (n) { if (!n.visible) return; if (!hg[n.category]) hg[n.category] = []; hg[n.category].push(n) }); Object.entries(hg).forEach(function (en) { var cat = en[0], g = en[1]; if (g.length < 3) return; var cx = 0, cy = 0; g.forEach(function (n) { cx += n.x; cy += n.y }); cx /= g.length; cy /= g.length; var so = g.slice().sort(function (a, b) { return Math.atan2(a.y - cy, a.x - cx) - Math.atan2(b.y - cy, b.x - cx) }); ctx.beginPath(); var f = so[0]; ctx.moveTo((f.x + cx) / 2, (f.y + cy) / 2); for (var si = 0; si < so.length; si++) { var c = so[si], nx = so[(si + 1) % so.length], cpx = c.x + (c.x - cx) * .1, cpy = c.y + (c.y - cy) * .1, mx = (c.x + nx.x) / 2 + ((c.x + nx.x) / 2 - cx) * .1, my = (c.y + nx.y) / 2 + ((c.y + nx.y) / 2 - cy) * .1; ctx.quadraticCurveTo(cpx, cpy, mx, my) } ctx.closePath(); var ihc = pFocus && pFocus.category === cat; var col = CC[cat] || '#FFF'; ctx.fillStyle = hexToRGBA(col, ihc ? .035 : .007); ctx.strokeStyle = hexToRGBA(col, ihc ? .12 : .02); ctx.lineWidth = 1; ctx.fill(); ctx.stroke() }) }
             if (pFocus) { ctx.fillStyle = 'rgba(6,7,16,0.45)'; ctx.fillRect(-10000, -10000, 20000, 20000) }
             var now = performance.now();
@@ -2107,70 +2105,324 @@
         sI.addEventListener('focus', function () { clearTimeout(ddBT); if (sI.value.trim().toLowerCase()) { rDR(); oDD() } });
         sI.addEventListener('input', function () { var q = sI.value.trim().toLowerCase(); if (q) { rDR(); oDD() } else { cDD(); dselN() } sCl.classList.toggle('visible', sI.value.length > 0) });
         sI.addEventListener('blur', function () { ddBT = setTimeout(cDD, 200) });
-        sI.addEventListener('keydown', function (e) { if (!ddOpen || !fRes.length) return; if (e.key === 'ArrowDown') { e.preventDefault(); kbFI = Math.min(kbFI + 1, fRes.length - 1); uKF() } else if (e.key === 'ArrowUp') { e.preventDefault(); kbFI = Math.max(kbFI - 1, 0); uKF() } else if (e.key === 'Enter') { e.preventDefault(); if (kbFI >= 0 && kbFI < fRes.length) selSN(fRes[kbFI]); else if (fRes.length) selSN(fRes[0]) } else if (e.key === 'Escape') { e.preventDefault(); cDD(); sI.blur() } });
-        sCl.addEventListener('mousedown', function (e) { e.preventDefault(); dselN(); sI.focus() });
-        sSC.addEventListener('click', function () { dselN(); sI.focus() });
-        sDD.addEventListener('mousedown', function (e) { e.preventDefault(); clearTimeout(ddBT); sI.focus() });
-        sDD.addEventListener('mouseenter', function () { clearTimeout(ddBT) });
-        window.addEventListener('scroll', function () { if (ddOpen) pDD() }, { passive: true });
-        window.addEventListener('resize', function () { if (ddOpen) pDD() });
+        sI.addEventListener('keydown', function (e) {
+            if (!ddOpen) { if (e.key === 'ArrowDown' && fRes.length) { rDR(); oDD(); e.preventDefault(); return } return }
+            if (e.key === 'ArrowDown') { e.preventDefault(); kbFI = Math.min(kbFI + 1, fRes.length - 1); uKF() }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); kbFI = Math.max(kbFI - 1, 0); uKF() }
+            else if (e.key === 'Enter' && kbFI >= 0 && kbFI < fRes.length) { e.preventDefault(); selSN(fRes[kbFI]) }
+            else if (e.key === 'Escape') { cDD(); sI.blur() }
+        });
+        sDD.addEventListener('mousedown', function (e) { e.preventDefault(); clearTimeout(ddBT) });
+        sCl.addEventListener('click', function () { dselN(); cDD(); sI.focus() });
+        sSC.addEventListener('click', function () { dselN() });
 
-        function s2y(v) { return Math.round(tRF.min + (v / 1000) * (tRF.max - tRF.min)) }
-        function uTF() { var mi = document.getElementById('time-min'), ma = document.getElementById('time-max'); var mv = parseInt(mi.value), xv = parseInt(ma.value); if (mv > xv - 10) { if (mv > xv) { mv = xv; mi.value = mv } else { xv = mv + 10; ma.value = xv } } tR.min = s2y(mv); tR.max = s2y(xv); document.getElementById('time-min-label').textContent = tR.min; document.getElementById('time-max-label').textContent = tR.max; var f = document.getElementById('time-fill'); f.style.left = (mv / 10) + '%'; f.style.width = ((xv - mv) / 10) + '%'; f.classList.toggle('active', mv > 5 || xv < 995); uV(); uTS() }
-        function rTF() { document.getElementById('time-min').value = 0; document.getElementById('time-max').value = 1000; tR.min = tRF.min; tR.max = tRF.max; var f = document.getElementById('time-fill'); f.style.left = '0%'; f.style.width = '100%'; f.classList.remove('active'); uV(); uTS() }
-        function uTS() { var ir = nodes.filter(function (n) { return n.earliestYear >= tR.min && n.earliestYear <= tR.max && aCats.has(n.category) && (!n.layer || aLayers.has(n.layer)) }).length; document.getElementById('time-visible-count').textContent = ir; document.getElementById('time-total-count').textContent = nodes.length }
-        function uV() { nodes.forEach(function (n) { n.visible = aCats.has(n.category) && n.earliestYear >= tR.min && n.earliestYear <= tR.max && (!n.layer || aLayers.has(n.layer)) }); gE.forEach(function (e) { var s = nM[e.source], t = nM[e.target]; e.visible = s && t && s.visible && t.visible && aFams.has(e.family) }); alpha = Math.max(alpha, .5); uTS() }
-        function rAF() { aCats = new Set(CL); document.querySelectorAll('#category-toggles input[data-cat]').forEach(function (i) { i.checked = true }); aLayers = new Set(LL); document.querySelectorAll('#layer-toggles input[data-layer]').forEach(function (i) { i.checked = true }); aFams = new Set(FL); document.querySelectorAll('#family-chips .chip').forEach(function (c) { c.classList.add('active'); var f = c.dataset.fam; if (f) { var h = FC[f] || '#48e8d8'; c.style.borderColor = hexToRGBA(h, .15); c.style.borderLeftColor = hexToRGBA(h, .5) } }); rTF(); dselN(); nodes.forEach(function (n) { n.baseSize = 7 }); uV(); alpha = 1; fCam() }
-        function uCU(pj) { document.querySelectorAll('#lens-controls .toggle-item').forEach(function (i) { var cf = (i.dataset.conflict || '').split(','); var d = cf.includes(pj); i.classList.toggle('disabled', d); if (d) i.querySelector('input').checked = false }); canvas.classList.toggle('locked', pj === 'chord'); document.getElementById('hud-proj').innerText = PL[pj] || pj }
-        function bUI() {
-            /* Layer toggles */
-            var ltCt = document.getElementById('layer-toggles'); ltCt.innerHTML = '';
-            LL.forEach(function (l) { var lb = document.createElement('label'); lb.className = 'toggle-item'; lb.innerHTML = '<input type="checkbox" checked data-layer="' + l + '"><span class="checkmark"></span><span class="cat-dot" style="background:' + (LC[l] || '#888') + '"></span>' + (LLB[l] || l); lb.querySelector('input').addEventListener('change', function (e) { if (e.target.checked) aLayers.add(l); else aLayers.delete(l); rLC(); uV() }); ltCt.appendChild(lb) });
-            document.getElementById('layer-group').style.display = LL.length ? 'block' : 'none';
+        /* ── Time Slider ── */
+        var tMinEl = document.getElementById('time-min'), tMaxEl = document.getElementById('time-max');
+        var tMinLbl = document.getElementById('time-min-label'), tMaxLbl = document.getElementById('time-max-label');
+        var tFill = document.getElementById('time-fill'), tVC = document.getElementById('time-visible-count'), tTC = document.getElementById('time-total-count');
+        function uTS() {
+            var v1 = parseInt(tMinEl.value), v2 = parseInt(tMaxEl.value);
+            if (v1 > v2) { var tmp = v1; v1 = v2; v2 = tmp }
+            var range = tRF.max - tRF.min;
+            tR.min = tRF.min + (v1 / 1000) * range;
+            tR.max = tRF.min + (v2 / 1000) * range;
+            tMinLbl.textContent = Math.round(tR.min);
+            tMaxLbl.textContent = Math.round(tR.max);
+            var pL = (v1 / 1000) * 100, pW = ((v2 - v1) / 1000) * 100;
+            tFill.style.left = pL + '%'; tFill.style.width = pW + '%';
+            tFill.classList.toggle('active', v1 > 0 || v2 < 1000);
+            uFilt()
+        }
+        tMinEl.addEventListener('input', uTS);
+        tMaxEl.addEventListener('input', uTS);
 
-            /* Category toggles grouped by layer */
-            var ctCt = document.getElementById('category-toggles'); ctCt.innerHTML = '';
-            var mappedSet = new Set(Object.keys(CLL));
-            LL.forEach(function (l) {
-                var lcats = CL.filter(function (c) { return CLL[c] === l }); if (!lcats.length) return;
-                var lnc = 0; lcats.forEach(function (c) { lnc += (cNC[c] || 0) });
-                var hd = document.createElement('div'); hd.className = 'sb-layer-header';
-                hd.innerHTML = '<span class="sb-layer-header-dot" style="background:' + (LC[l] || '#888') + '"></span>' + l.replace(' Space', '').toUpperCase() + '<span class="sb-layer-header-count">' + lnc + '</span>';
-                ctCt.appendChild(hd);
-                lcats.forEach(function (c) { var lb = document.createElement('label'); lb.className = 'toggle-item'; lb.innerHTML = '<input type="checkbox" checked data-cat="' + c + '"><span class="checkmark"></span><span class="cat-dot" style="background:' + (CC[c] || '#888') + '"></span>' + (CLB[c] || c) + '<span class="node-count">' + (cNC[c] || 0) + '</span>'; lb.querySelector('input').addEventListener('change', function (e) { if (e.target.checked) aCats.add(c); else aCats.delete(c); uV() }); ctCt.appendChild(lb) })
+        /* ── Filter Logic ── */
+        function uFilt() {
+            nodes.forEach(function (n) {
+                var catOk = aCats.has(n.category);
+                var famOk = true;
+                var layOk = aLayers.has(n.layer);
+                var timeOk = n.earliestYear >= tR.min && n.earliestYear <= tR.max;
+                if (!aFams.size || aFams.size === FL.length) { famOk = true } else {
+                    famOk = n.rawRelationships.some(function (r) { return aFams.has(r.relationshipFamily || TFM[r.relationshipType] || ff()) })
+                }
+                n.visible = catOk && famOk && layOk && timeOk
             });
-            /* Unmapped categories fallback */
-            var unmapped = CL.filter(function (c) { return !mappedSet.has(c) });
-            if (unmapped.length) { var uhd = document.createElement('div'); uhd.className = 'sb-layer-header'; uhd.innerHTML = '<span class="sb-layer-header-dot" style="background:#555"></span>UNCLASSIFIED<span class="sb-layer-header-count">' + unmapped.reduce(function (s, c) { return s + (cNC[c] || 0) }, 0) + '</span>'; ctCt.appendChild(uhd); unmapped.forEach(function (c) { var lb = document.createElement('label'); lb.className = 'toggle-item'; lb.innerHTML = '<input type="checkbox" checked data-cat="' + c + '"><span class="checkmark"></span><span class="cat-dot" style="background:' + (CC[c] || '#888') + '"></span>' + (CLB[c] || c) + '<span class="node-count">' + (cNC[c] || 0) + '</span>'; lb.querySelector('input').addEventListener('change', function (e) { if (e.target.checked) aCats.add(c); else aCats.delete(c); uV() }); ctCt.appendChild(lb) }) }
-
-            /* Relationship family chips */
-            var fc2 = document.getElementById('family-chips'); fc2.innerHTML = '';
-            FL.forEach(function (f) { var ch = document.createElement('div'); ch.className = 'chip active'; ch.dataset.fam = f; var h = FC[f] || '#48e8d8'; ch.style.borderLeftColor = hexToRGBA(h, .5); ch.innerText = FLB[f] || friendlyLabel(f); ch.addEventListener('click', function () { ch.classList.toggle('active'); if (aFams.has(f)) aFams.delete(f); else aFams.add(f); if (ch.classList.contains('active')) { ch.style.borderColor = hexToRGBA(h, .15); ch.style.borderLeftColor = hexToRGBA(h, .5) } else { ch.style.borderColor = ''; ch.style.borderLeftColor = '' } uV() }); fc2.appendChild(ch) });
-
-            /* Projection chips */
-            document.querySelectorAll('#projection-chips .proj-chip').forEach(function (ch) { ch.addEventListener('click', function () { var np = ch.getAttribute('data-proj'); if (np === curProj) return; sPC(curProj); document.querySelectorAll('#projection-chips .proj-chip').forEach(function (c) { c.classList.remove('active') }); ch.classList.add('active'); curProj = np; if (SP.includes(curProj)) { strSet = false; if (!rPC(curProj)) { alpha = 1; cST(); nodes.forEach(function (n) { if (!n.visible) return; n.x = W / 2 + (Math.random() - .5) * 100; n.y = H / 2 + (Math.random() - .5) * 100 }) } } else if (curProj === 'chord') { } else { if (!rPC(curProj)) alpha = 1; else alpha = 0 } unpinNode(); uCU(curProj); uPS(); if (curProj !== 'chord') fCam() }) });
-
-            document.getElementById('time-min').addEventListener('input', uTF);
-            document.getElementById('time-max').addEventListener('input', uTF);
-            document.getElementById('reset-all-btn').addEventListener('click', rAF);
-            document.getElementById('qa-fit').addEventListener('click', function () { camTgt = null; fCam() });
-            document.getElementById('ip-close-btn').addEventListener('click', unpinNode);
-            document.getElementById('sidebar-toggle-btn').addEventListener('click', tSB);
-            uTF(); uCU('default')
+            gE.forEach(function (e) {
+                var s = nM[e.source], t = nM[e.target];
+                e.visible = s && t && s.visible && t.visible && aFams.has(e.family)
+            });
+            tVC.textContent = nodes.filter(function (n) { return n.visible }).length;
+            tTC.textContent = nodes.length;
+            uDTog(); uDLay()
         }
 
-        canvas.addEventListener('mousemove', function (e) { var r = canvas.getBoundingClientRect(); mS.x = e.clientX - r.left; mS.y = e.clientY - r.top; if (dragN) { var w = s2w(mS.x, mS.y); dragN.x = w.x; dragN.y = w.y; dragN.targetX = w.x; dragN.targetY = w.y; dragN.vx = 0; dragN.vy = 0 } else if (isPan && curProj !== 'chord') { camTgt = null; cam.x = e.clientX - panS.x; cam.y = e.clientY - panS.y } });
-        canvas.addEventListener('mousedown', function (e) { if (curProj === 'chord') return; if (hovN) { dragN = hovN; dragN.pinned = true; alpha = Math.max(alpha, .5); canvas.style.cursor = 'grabbing' } else { isPan = true; panS = { x: e.clientX - cam.x, y: e.clientY - cam.y }; canvas.style.cursor = 'grabbing' } });
-        canvas.addEventListener('dblclick', function (e) { if (curProj === 'chord') return; if (hovN) { if (pinN && pinN.id === hovN.id) unpinNode(); else pinNode(hovN) } else unpinNode() });
-        window.addEventListener('mouseup', function () { if (dragN) { dragN.pinned = false; dragN = null } else if (isPan) isPan = false; canvas.style.cursor = curProj === 'chord' ? 'default' : 'grab' });
-        canvas.addEventListener('wheel', function (e) { if (curProj === 'chord') return; e.preventDefault(); var f = e.deltaY > 0 ? .92 : 1.08, r = canvas.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top; camTgt = null; cam.x = mx - (mx - cam.x) * f; cam.y = my - (my - cam.y) * f; cam.z = Math.max(.1, Math.min(5, cam.z * f)) }, { passive: false });
-        canvas.addEventListener('mouseleave', function () { mS.x = -9999; mS.y = -9999; hovN = null; document.getElementById('tooltip').style.display = 'none'; document.getElementById('chord-tooltip').style.display = 'none' });
-        document.getElementById('minimap-wrap').addEventListener('click', function (e) { if (!nodes.length) return; var wr = document.getElementById('minimap-wrap'), r = wr.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top, mw = r.width, mh = r.height; var x1 = Infinity, x2 = -Infinity, y1 = Infinity, y2 = -Infinity; nodes.forEach(function (n) { if (n.x < x1) x1 = n.x; if (n.x > x2) x2 = n.x; if (n.y < y1) y1 = n.y; if (n.y > y2) y2 = n.y }); var p = 100; x1 -= p; x2 += p; y1 -= p; y2 += p; var rx = Math.max(1, x2 - x1), ry = Math.max(1, y2 - y1), sc = Math.min(mw / rx, mh / ry), ox = (mw - rx * sc) / 2, oy = (mh - ry * sc) / 2; camTgt = { x: W / 2 - ((mx - ox) / sc + x1) * cam.z, y: H / 2 - ((my - oy) / sc + y1) * cam.z, z: cam.z } });
-        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { if (ddOpen) { cDD(); sI.blur(); return } unpinNode(); dselN(); sI.blur() } if (e.key === 'f' && !e.ctrlKey && !e.metaKey && document.activeElement.tagName !== 'INPUT') { e.preventDefault(); camTgt = null; fCam() } if (e.key === '/' && !e.ctrlKey && !e.metaKey && document.activeElement.tagName !== 'INPUT') { e.preventDefault(); sI.focus(); sI.select() } });
-        function tSB() { document.body.classList.toggle('sidebar-collapsed'); setTimeout(function () { resize(); uPS(); if (ddOpen) pDD() }, 550) }
-        window.addEventListener('resize', function () { resize(); uPS(); if (ddOpen) pDD() });
-        resize(); loadData();
+        /* ── Build Category Toggles ── */
+        function bCT() {
+            var c = document.getElementById('category-toggles'); c.innerHTML = '';
+            var layers = {};
+            CL.forEach(function (cat) { var lay = CLL[cat] || 'Other'; if (!layers[lay]) layers[lay] = []; layers[lay].push(cat) });
+            Object.keys(layers).forEach(function (lay) {
+                var layColor = LPC[lay] || '#888';
+                var hdr = document.createElement('div'); hdr.className = 'sb-layer-header';
+                hdr.innerHTML = '<span class="sb-layer-header-dot" style="background:' + layColor + '"></span>' + lay.replace(' Space', '') + '<span class="sb-layer-header-count">' + layers[lay].length + '</span>';
+                c.appendChild(hdr);
+                layers[lay].forEach(function (cat) {
+                    var col = CC[cat] || '#888', cnt = cNC[cat] || 0;
+                    var lbl = document.createElement('label'); lbl.className = 'toggle-item';
+                    lbl.innerHTML = '<input type="checkbox" data-cat="' + cat + '" checked><span class="checkmark"></span><span class="cat-dot" style="background:' + col + '"></span>' + (CLB[cat] || cat) + '<span class="node-count">' + cnt + '</span>';
+                    lbl.querySelector('input').addEventListener('change', function () {
+                        if (this.checked) aCats.add(cat); else aCats.delete(cat); uFilt()
+                    });
+                    c.appendChild(lbl)
+                })
+            })
+        }
+
+        /* ── Build Layer Toggles ── */
+        function bLT() {
+            if (!LL.length) { document.getElementById('layer-group').style.display = 'none'; return }
+            document.getElementById('layer-group').style.display = '';
+            var c = document.getElementById('layer-toggles'); c.innerHTML = '';
+            LL.forEach(function (lay) {
+                var col = LC[lay] || '#888', cnt = nodes.filter(function (n) { return n.layer === lay }).length;
+                var lbl = document.createElement('label'); lbl.className = 'toggle-item';
+                lbl.innerHTML = '<input type="checkbox" data-layer="' + lay + '" checked><span class="checkmark"></span><span class="cat-dot" style="background:' + col + '"></span>' + (LLB[lay] || lay) + '<span class="node-count">' + cnt + '</span>';
+                lbl.querySelector('input').addEventListener('change', function () {
+                    if (this.checked) aLayers.add(lay); else aLayers.delete(lay); uFilt()
+                });
+                c.appendChild(lbl)
+            })
+        }
+
+        /* ── Update Disabled States ── */
+        function uDTog() {
+            document.querySelectorAll('#category-toggles .toggle-item').forEach(function (lbl) {
+                var inp = lbl.querySelector('input'), cat = inp.dataset.cat;
+                var cnt = nodes.filter(function (n) { return n.category === cat && n.visible !== false }).length;
+                lbl.querySelector('.node-count').textContent = cnt;
+                var hasVis = nodes.some(function (n) { return n.category === cat && n.visible });
+                lbl.classList.toggle('disabled', !hasVis && !aCats.has(cat))
+            })
+        }
+        function uDLay() {
+            document.querySelectorAll('#layer-toggles .toggle-item').forEach(function (lbl) {
+                var inp = lbl.querySelector('input'), lay = inp.dataset.layer;
+                var cnt = nodes.filter(function (n) { return n.layer === lay && n.visible }).length;
+                lbl.querySelector('.node-count').textContent = cnt;
+                lbl.classList.toggle('disabled', cnt === 0 && !aLayers.has(lay))
+            })
+        }
+
+        /* ── Build Family Chips ── */
+        function bFC() {
+            var c = document.getElementById('family-chips'); c.innerHTML = '';
+            FL.forEach(function (fam) {
+                var col = FC[fam] || '#888', lbl = FLB[fam] || friendlyLabel(fam);
+                var cnt = gE.filter(function (e) { return e.family === fam }).length;
+                var ch = document.createElement('button'); ch.className = 'chip active';
+                ch.style.borderLeftColor = hexToRGBA(col, .5);
+                ch.textContent = lbl + ' (' + cnt + ')';
+                ch.dataset.family = fam;
+                ch.addEventListener('click', function () {
+                    if (aFams.has(fam)) aFams.delete(fam); else aFams.add(fam);
+                    this.classList.toggle('active', aFams.has(fam));
+                    uFilt()
+                });
+                c.appendChild(ch)
+            })
+        }
+
+        /* ── Lens Conflict Resolution ── */
+        document.querySelectorAll('#lens-controls .toggle-item').forEach(function (lbl) {
+            lbl.querySelector('input').addEventListener('change', function () {
+                if (!this.checked) return;
+                var conflicts = lbl.dataset.conflict ? lbl.dataset.conflict.split(',') : [];
+                conflicts.forEach(function (cid) {
+                    var el = document.getElementById('lens-' + cid);
+                    if (el && el.checked) { el.checked = false; el.dispatchEvent(new Event('change')) }
+                })
+            })
+        });
+
+        /* ── Projection Switching ── */
+        document.querySelectorAll('.proj-chip').forEach(function (chip) {
+            chip.addEventListener('click', function () {
+                var pj = this.dataset.proj;
+                if (pj === curProj) return;
+                sPC(curProj);
+                document.querySelectorAll('.proj-chip').forEach(function (c) { c.classList.remove('active') });
+                this.classList.add('active');
+                curProj = pj; alpha = 1; strSet = false;
+                document.getElementById('hud-proj').innerText = PL[pj] || pj;
+                uLS(); rCC(); rLC();
+                if (SP.includes(pj)) { cST(); nodes.forEach(function (n) { if (n.visible) { n.x += (n.targetX - n.x) * .3; n.y += (n.targetY - n.y) * .3 } }) }
+                else if (pj === 'chord') { nodes.forEach(function (n) { n.visible = false }); gE.forEach(function (e) { e.visible = false }) }
+                else { uFilt() }
+                uPS()
+            })
+        });
+
+        function uLS() {
+            var isChord = curProj === 'chord';
+            var isSP2 = SP.includes(curProj);
+            ['hulls', 'heatmap', 'centrality', 'confidence-color', 'flow', 'observability'].forEach(function (id) {
+                var el = document.getElementById('lens-' + id);
+                if (!el) return;
+                el.disabled = isChord;
+                if (isChord) el.checked = false;
+                el.closest('.toggle-item').classList.toggle('disabled', isChord)
+            });
+            var hulls = document.getElementById('lens-hulls');
+            if (isSP2 && !hulls.disabled) { hulls.checked = false }
+            if (curProj === 'confidence') { var cc = document.getElementById('lens-confidence-color'); if (!cc.disabled) cc.checked = true }
+            if (curProj === 'default') { var fl = document.getElementById('lens-flow'); if (!fl.disabled) fl.checked = true }
+        }
+
+        /* ── Canvas Events ── */
+        canvas.addEventListener('mousedown', function (e) {
+            if (e.button !== 0) return;
+            wM = s2w(e.offsetX, e.offsetY);
+            if (curProj === 'chord') return;
+            var cd = 14, hit = null;
+            nodes.forEach(function (n) { if (!n.visible) return; var dx = n.x - wM.x, dy = n.y - wM.y, d = Math.sqrt(dx * dx + dy * dy); if (d < cd) { cd = d; hit = n } });
+            if (hit) { dragN = hit; canvas.classList.add('locked') }
+            else { isPan = true; panS.x = e.offsetX; panS.y = e.offsetY; camTgt = null }
+        });
+        canvas.addEventListener('mousemove', function (e) {
+            mS.x = e.offsetX; mS.y = e.offsetY;
+            if (dragN) {
+                var wp = s2w(e.offsetX, e.offsetY);
+                dragN.x = wp.x; dragN.y = wp.y; dragN.vx = 0; dragN.vy = 0; dragN.pinned = true;
+                alpha = Math.max(alpha, .3);
+                canvas.style.cursor = 'grabbing'
+            } else if (isPan) {
+                var dx = e.offsetX - panS.x, dy = e.offsetY - panS.y;
+                cam.x += dx; cam.y += dy; camTgt = null;
+                panS.x = e.offsetX; panS.y = e.offsetY
+            } else {
+                wM = s2w(e.offsetX, e.offsetY);
+                var cd = 14; hovN = null;
+                nodes.forEach(function (n) { if (!n.visible) return; var dx2 = n.x - wM.x, dy2 = n.y - wM.y, d = Math.sqrt(dx2 * dx2 + dy2 * dy2); if (d < cd) { cd = d; hovN = n } });
+                canvas.style.cursor = hovN ? 'pointer' : (curProj === 'chord' ? 'default' : 'grab')
+            }
+        });
+        canvas.addEventListener('mouseup', function (e) {
+            if (dragN) {
+                if (!e.shiftKey) dragN.pinned = false;
+                var moved = Math.abs(dragN.vx) + Math.abs(dragN.vy);
+                if (moved < 2) pinNode(dragN);
+                dragN = null; canvas.classList.remove('locked')
+            }
+            if (isPan) isPan = false
+        });
+        canvas.addEventListener('mouseleave', function () {
+            if (dragN) { if (!window._shiftHeld) dragN.pinned = false; dragN = null; canvas.classList.remove('locked') }
+            isPan = false; mS.x = -9999; mS.y = -9999; hovN = null
+        });
+        canvas.addEventListener('wheel', function (e) {
+            e.preventDefault();
+            var zf = e.deltaY > 0 ? .92 : 1.08;
+            var nz = Math.max(.08, Math.min(8, cam.z * zf));
+            var wx = (e.offsetX - cam.x) / cam.z, wy = (e.offsetY - cam.y) / cam.z;
+            cam.z = nz;
+            cam.x = e.offsetX - wx * cam.z;
+            cam.y = e.offsetY - wy * cam.z;
+            camTgt = null
+        }, { passive: false });
+        canvas.addEventListener('dblclick', function (e) {
+            wM = s2w(e.offsetX, e.offsetY);
+            var cd = 18, hit = null;
+            nodes.forEach(function (n) { if (!n.visible) return; var dx = n.x - wM.x, dy = n.y - wM.y, d = Math.sqrt(dx * dx + dy * dy); if (d < cd) { cd = d; hit = n } });
+            if (hit) { selSN(hit); pinNode(hit) }
+            else { unpinNode(); fCam() }
+        });
+
+        /* ── Minimap Click ── */
+        document.getElementById('minimap-wrap').addEventListener('click', function (e) {
+            var wr = this.getBoundingClientRect(), mx = e.clientX - wr.left, my = e.clientY - wr.top;
+            var mw = wr.clientWidth, mh = wr.clientHeight;
+            var vn = nodes.filter(function (n) { return n.visible });
+            if (!vn.length) return;
+            var x1 = Infinity, x2 = -Infinity, y1 = Infinity, y2 = -Infinity;
+            nodes.forEach(function (n) { if (n.x < x1) x1 = n.x; if (n.x > x2) x2 = n.x; if (n.y < y1) y1 = n.y; if (n.y > y2) y2 = n.y });
+            var p = 100; x1 -= p; x2 += p; y1 -= p; y2 += p;
+            var rx = Math.max(1, x2 - x1), ry = Math.max(1, y2 - y1), sc = Math.min(mw / rx, mh / ry);
+            var ox = (mw - rx * sc) / 2, oy = (mh - ry * sc) / 2;
+            var wx = (mx - ox) / sc + x1, wy = (my - oy) / sc + y1;
+            camTgt = { x: W / 2 - wx * cam.z, y: H / 2 - wy * cam.z, z: cam.z }
+        });
+
+        /* ── Quick Actions ── */
+        document.getElementById('qa-fit').addEventListener('click', function () {
+            if (curProj === 'chord') return;
+            unpinNode(); fCam()
+        });
+
+        /* ── Sidebar Toggle ── */
+        document.getElementById('sidebar-toggle-btn').addEventListener('click', function () {
+            document.body.classList.toggle('sidebar-collapsed');
+            setTimeout(function () { sCV(); if (dLoaded && curProj !== 'chord') fCam() }, 520)
+        });
+
+        /* ── Reset All ── */
+        document.getElementById('reset-all-btn').addEventListener('click', function () {
+            aCats = new Set(CL); aFams = new Set(FL); aLayers = new Set(LL);
+            tR.min = tRF.min; tR.max = tRF.max;
+            tMinEl.value = 0; tMaxEl.value = 1000; uTS();
+            document.querySelectorAll('#category-toggles input').forEach(function (i) { i.checked = true });
+            document.querySelectorAll('#layer-toggles input').forEach(function (i) { i.checked = true });
+            document.querySelectorAll('#family-chips .chip').forEach(function (c) { c.classList.add('active') });
+            document.getElementById('lens-hulls').checked = true;
+            document.getElementById('lens-heatmap').checked = false;
+            document.getElementById('lens-centrality').checked = false;
+            document.getElementById('lens-confidence-color').checked = false;
+            document.getElementById('lens-flow').checked = true;
+            document.getElementById('lens-observability').checked = false;
+            unpinNode(); dselN(); uFilt();
+            if (curProj !== 'default') {
+                sPC(curProj);
+                curProj = 'default'; alpha = 1; strSet = false;
+                document.querySelectorAll('.proj-chip').forEach(function (c) { c.classList.remove('active') });
+                document.querySelector('.proj-chip[data-proj="default"]').classList.add('active');
+                document.getElementById('hud-proj').innerText = 'Force';
+                uLS(); rCC(); rLC();
+                for (var i = 0; i < 400; i++) sTick();
+                sPC('default')
+            } else {
+                alpha = 1; strSet = false;
+                for (var j = 0; j < 400; j++) sTick();
+                sPC('default')
+            }
+            fCam(); uPS()
+        });
+
+        /* ── Inspect Panel Close ── */
+        document.getElementById('ip-close-btn').addEventListener('click', unpinNode);
+
+        /* ── Keyboard Shortcuts ── */
+        window.addEventListener('keydown', function (e) {
+            window._shiftHeld = e.shiftKey;
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if (e.key === 'Escape') { unpinNode(); dselN(); cDD() }
+            if (e.key === 'f' || e.key === 'F') { if (curProj !== 'chord') { unpinNode(); fCam() } }
+            if (e.key === '/' || (e.key === 'k' && (e.metaKey || e.ctrlKey))) { e.preventDefault(); sI.focus(); sI.select() }
+        });
+        window.addEventListener('keyup', function (e) { window._shiftHeld = e.shiftKey });
+
+        /* ── Build UI & Init ── */
+        function bUI() {
+            bCT(); bLT(); bFC();
+            tMinLbl.textContent = Math.round(tRF.min);
+            tMaxLbl.textContent = Math.round(tRF.max);
+            tTC.textContent = nodes.length;
+            tFill.style.left = '0%'; tFill.style.width = '100%';
+            uFilt(); uLS(); uPS()
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+        loadData();
     </script>
 </body>
-
 </html>

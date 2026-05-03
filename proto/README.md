@@ -196,6 +196,30 @@ Structure:
 | **Maintenance Burden Index**       | Combines audit staleness, dependency load, and confidence into a composite overlay showing conceptual debt hotspots.                                                | Confidence Landscape, Dependency DAG, Force Layout                                                            |
 | **Epistemic Velocity Overlay**     | Represents rate of historical conceptual change or revision frequency where data exists.                                                                            | Historical Timeline, Confidence Landscape                                                                     |
 
+3. PCA or UMAP Embedding (feature‑based)
+
+    What it does: Treat each node as a vector of features (confidence, degree, inheritance level, observability (categorical), and even one‑hot encoded categories). Then reduce to 2D using PCA, t‑SNE, or UMAP.
+
+    Why try it: Reveals latent similarity not captured by raw graph topology – e.g., nodes that are functionally similar but belong to different layers may cluster together.
+
+    Implementation: Pre‑compute embeddings in JavaScript (using e.g., umap-js or simple PCA via numeric.js) and then treat (x,y) as target positions – similar to your Confidence or Radial projections.
+
+4. Spectral Layout (Graph Laplacian)
+
+    What it does: Uses eigenvectors of the graph Laplacian to position nodes, emphasizing community structure.
+
+    Why try it: Your data has relationship families (Generative, Normative, Agentic, …). Spectral layout naturally pulls apart communities, making high‑level “spheres” of technical practice visually distinct.
+
+    Implementation: Compute the first few non‑trivial eigenvectors of the adjacency/Laplacian matrix – doable with a power iteration or numeric library.
+
+5. Bipartite Projection of “TechnicalAct ⟷ TechnicalObject”
+
+    What it does: Split nodes into two groups (e.g., Operative vs Artifact based on layer) and project them onto two parallel axes. Relationships become straight lines linking the groups.
+
+    Why try it: Highlights who uses what – e.g., “TechnicalOperator” (execution space) connected to “TechnicalFeedback” and “TechnicalFunction”. Makes bipartite structure readable.
+
+    Implementation: A two‑column layout: left = one layer group, right = another, with edges drawn horizontally. Your layer property makes this trivial.
+
 ### Generic Design Spec
 
 Tech Stack:

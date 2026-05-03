@@ -1123,5 +1123,133 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     }
+  },
+
+  {
+    "id": "data-systems-001",
+    "name": "Software Data Systems",
+    "category": "TechnicalFramework",
+    "layer": "Capability Space",
+    "inheritanceLevel": 0,
+    "description": "Software systems that manage the lifecycle of digital data, including ingestion, storage, processing, and retrieval, implemented entirely in software (not hardware‐only solutions).",
+    "longDescription": "Software data systems encompass all software‐based solutions for handling data – from local file managers to distributed processing frameworks (e.g., Apache Spark). They operate on general‐purpose computing hardware and are defined by code, algorithms, and protocols. This excludes purely mechanical or analog systems. Examples include DBMSs, data lakes, streaming engines, and message brokers.",
+    "functionalRoles": [
+      "persistent data storage",
+      "efficient query and retrieval",
+      "data integration and transformation",
+      "concurrency and transaction management",
+      "backup and disaster recovery"
+    ],
+    "realityDomains": [
+      "information systems",
+      "digital infrastructure",
+      "organizational data assets",
+      "computing environments"
+    ],
+    "historicalContext": {
+      "summary": "Data systems emerged from the need to automate record-keeping and data processing, evolving from punch-card systems to cloud-native distributed databases.",
+      "chronology": [
+        {
+          "year": 1960,
+          "event": "Integrated Data Store (IDS) – first network DBMS",
+          "associatedContext": "Early general-purpose database systems"
+        },
+        {
+          "year": 1970,
+          "event": "Edgar Codd proposes relational model",
+          "associatedContext": "Foundation of modern relational databases"
+        },
+        {
+          "year": 1990,
+          "event": "Rise of data warehousing and OLAP",
+          "associatedContext": "Business intelligence expansion"
+        },
+        {
+          "year": 2005,
+          "event": "Emergence of NoSQL systems (Bigtable, Dynamo, MongoDB)",
+          "associatedContext": "Web-scale and unstructured data demands"
+        }
+      ]
+    },
+    "specific": {
+      "infrastructureType": "Informational infrastructure – software and hardware for data lifecycle management",
+      "storageMechanism": "Hierarchical (file systems), block-level (SAN), object storage (S3), and structured (tables, documents, graphs)",
+      "communicationMode": "Network protocols: JDBC/ODBC, RESTful APIs, gRPC, message queues (Kafka, RabbitMQ), streaming (WebSockets, MQTT)"
+    },
+    "relationships": [],
+    "metadata": {
+      "tags": ["data management", "information systems", "infrastructure", "storage", "processing"],
+      "confidenceScore": 0.95,
+      "sourceReference": "User request: Data Systems",
+      "createdAt": "2026-05-03T12:00:00Z",
+      "auditTrail": []
+    }
+  },
+  {
+    "id": "database-systems-001",
+    "name": "Software Database Systems",
+    "category": "TechnicalFramework",
+    "layer": "Artifact Space",
+    "inheritanceLevel": 1,
+    "description": "A specialized class of data systems that provides structured, persistent, and transactional storage with a formal data model (e.g., relational, document, graph). Database systems expose query languages, indexing mechanisms, concurrency control, and recovery protocols to ensure reliable access and manipulation of data by multiple agents.",
+    "longDescription": "Database systems are the canonical implementation of the broader concept of data systems. They are characterized by a schema‑driven organization, ACID or BASE consistency guarantees, and a dedicated query processor (e.g., SQL engine). Examples include relational database management systems (PostgreSQL, MySQL), document stores (MongoDB), key‑value stores (Redis), and graph databases (Neo4j). Database systems serve as constitutive technical objects in larger software architectures, localizing the function of persistent state management. Their evolution moved from hierarchical (IMS) and network (IDS) models to the relational dominance (1970s–2000s) and then to polyglot persistence (2010s–present). They are governed by standards such as SQL (ISO/IEC 9075) and principles like the CAP theorem.",
+    "functionalRoles": [
+      "structured data persistence",
+      "transactional ACID compliance",
+      "declarative query execution",
+      "index-based fast retrieval",
+      "multi‑user concurrency control"
+    ],
+    "realityDomains": [
+      "software systems",
+      "transactional applications",
+      "analytical platforms",
+      "enterprise IT"
+    ],
+    "historicalContext": {
+      "summary": "Database systems formalized the relational model and query languages, becoming the dominant technical architecture for persistent data management in business and web applications.",
+      "chronology": [
+        {
+          "year": 1974,
+          "event": "System R prototype (IBM) implements SQL",
+          "associatedContext": "First relational DBMS"
+        },
+        {
+          "year": 1979,
+          "event": "Oracle V2 – first commercial relational database",
+          "associatedContext": "Rise of relational DBMS industry"
+        },
+        {
+          "year": 1980,
+          "event": "Ingres introduces query language QUEL",
+          "associatedContext": "Academic and open source relational systems"
+        },
+        {
+          "year": 2000,
+          "event": "Emergence of NoSQL databases (CouchDB, MongoDB)",
+          "associatedContext": "Response to web-scale and schema‑flexible needs"
+        }
+      ]
+    },
+    "specific": {
+      "topology": "Client‑server; optionally distributed (shared‑nothing, sharded, replicated) or embedded (SQLite)",
+      "decompositionStyle": "Modular: query parser, optimizer, executor, storage engine, transaction manager, log manager",
+      "interfaceProtocol": "SQL over TCP (e.g., PostgreSQL wire protocol, MySQL protocol); HTTP/REST for document stores (MongoDB API); binary protocols (Redis RESP)"
+    },
+    "relationships": [
+      {
+        "relationshipFamily": "TAXONOMIC_AND_CLASSIFICATORY",
+        "relationshipType": "TYPE_OF",
+        "targetNodeId": "data-systems-001",
+        "description": "Database systems are a specialized subtype of data systems, inheriting the core functions of storage and retrieval while adding schema formalism, transactional guarantees, and a declarative query language."
+      }
+    ],
+    "metadata": {
+      "tags": ["database", "DBMS", "SQL", "NoSQL", "transaction", "query processing"],
+      "confidenceScore": 0.95,
+      "sourceReference": "User request: Data Base Systems",
+      "createdAt": "2026-05-03T12:00:00Z",
+      "auditTrail": []
+    }
   }
 ]

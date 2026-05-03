@@ -1,43 +1,9 @@
 # Node Spec
 
-> Let's see how this
+Take the folowign elemetns - and output the json capturing of them using the schema - and below formulation
 
-- Reality
-- Action Interface & Actuation
-- Concrete Technical Artifact (Technical Object)
-- Technical Blueprint
-- Technical Agent
-- Technical Process (Activity)
-- Technical Standard
-- Technical Constraint
-- Technical Infrastructure
-- Technical Feedback
-- Technical Act
-- Technical Principle
-- Technical Strategy
-- Technical Framework
-- Technical Operator
-- Production Technical Object
-- Constitutive Technical Object
-- Technique
-- Operative Technique
-- Constitutive Technique
-- Technical Purpose
-- Technical Function
-- Technical Architecture
-- Technical Specification
-- Technical Evolution
-- Technical Labor
-- Technical Institution
-- Technical Research
-- Technical Competence
-- Technical Failure
-- Technical Requirement
-- Verification
-- Maintenance
-- Security
-- Resource
-- Technical Obsolescence
+- Data Systems
+- Data Base Systems
 
 be catpure by the followign `schema`
 
@@ -188,14 +154,15 @@ be catpure by the followign `schema`
           "relationshipFamily": {
             "type": "string",
             "enum": [
-              "TeleologicalAndFunctional",
-              "GenerativeAndStructural",
-              "AgenticAndOperative",
-              "NormativeAndRegulative",
-              "EvaluativeAndCorrective",
-              "StrategicAndContextual",
-              "TemporalAndEvolutionary",
-              "ConstitutiveAndMereological"
+              "TELEOLOGICAL_AND_FUNCTIONAL",
+              "GENERATIVE_AND_STRUCTURAL",
+              "AGENTIC_AND_OPERATIVE",
+              "NORMATIVE_AND_REGULATIVE",
+              "EVALUATIVE_AND_CORRECTIVE",
+              "STRATEGIC_AND_CONTEXTUAL",
+              "TEMPORAL_AND_EVOLUTIONARY",
+              "CONSTITUTIVE_AND_MEREOLOGICAL",
+              "TAXONOMIC_AND_CLASSIFICATORY"
             ],
             "description": "High-level family of the relationship."
           },
@@ -229,7 +196,8 @@ be catpure by the followign `schema`
               "SPECIALIZES_TECHNIQUE",
               "YIELDS_CONSTITUENT",
               "CONSTITUENT_GOVERNED_BY",
-              "COMPOSED_BY_CONSTITUENT"
+              "COMPOSED_BY_CONSTITUENT",
+              "TYPE_OF"
             ],
             "description": "Specific typed relationship."
           },
@@ -729,15 +697,11 @@ be catpure by the followign `schema`
 
 subject to
 
-# Philosophia Artium Technicarum et Operis
-
-> In this note, we will analyze the concept of purposeful (agentic) operation and its primary driver: technique - that is capturing technical practice.
+## Formulation
 
 > Technical practice can be characterized as the structured process by which an agent transforms, constructs, operates, and maintains material or informational artifacts to bring about desired states in the world.
 
 > This note seeks to systematize a philosophy of technique and operation that can serve as a conceptual foundation for organizing the ideas used to explain operation and praxis across diverse fields and tasks.
-
-## Formulation
 
 > Which are the sets of concept that characterize  epistemic practice? How to capture all of this concept in a database?
 
@@ -779,3 +743,40 @@ subject to
 | **Security** | The domain of technical principles, constraints, and processes concerned with protecting an artifact or system from unauthorized access, use, disclosure, disruption, modification, or destruction. It manages adversarial constraints within the operational environment. | Role-based access control (RBAC), AES-256 encryption at rest, network firewall rule sets, code obfuscation, physical perimeter fencing, multi-factor authentication (MFA), input sanitization against SQLi, hardware security modules (HSMs). |
 | **Resource** | The consumable or non-consumable inputs—matter, energy, information, time, or capital—that are required, transformed, or consumed by a Technical Agent or Process to produce, operate, or maintain an artifact. | Gallium arsenide substrate, megawatt-hours of electricity, API rate limits, engineer labor-hours, venture capital funding, silicon wafers, gigabytes of RAM, clean water for industrial cooling, developer seat licenses. |
 | **Technical Obsolescence** | The state wherein an artifact is no longer technically viable, economically justifiable, or socially supported compared to available alternatives, regardless of its current functional state. | The state wherein an artifact is no longer technically viable, economically justifiable, or socially supported compared to available alternatives, regardless of its current functional state. |
+
+
+### Which are the edged types?
+
+> Note: The specific components will be formulated in the subsequent sections.
+
+| **Relation Family** | **Relation Type** | **Description** | **Relation Signature** | **Use** |
+| --- | --- | --- | --- | --- |
+| **TELEOLOGICAL_AND_FUNCTIONAL** | `REALIZES` | Links the mechanistic behavior of a system to its ultimate intended impact. | `Technical Function` → `Technical Purpose` | Tracing *why* a system behaves a certain way; evaluating if a function actually achieves the desired purpose. |
+| **TELEOLOGICAL_AND_FUNCTIONAL** | `EMBODIES` | Connects a concrete artifact to the abstract function it performs. | `Concrete Technical Object` → `Technical Function` | Mapping physical/code instances to their operational roles; functional decomposition of a system. |
+| **TELEOLOGICAL_AND_FUNCTIONAL** | `SATISFIES` | Indicates fulfillment of a formally defined requirement or specification. | `Technical Function` / `Concrete Technical Object` → `Technical Requirement` / `Technical Specification` | Verification and validation tracing; requirements engineering gap analysis. |
+| **GENERATIVE_AND_STRUCTURAL** | `PRESCRIBES` | The generative/templating relation where a description dictates the creation of an artifact. | `Technical Blueprint` → `Concrete Technical Object` (or `Constitutive` / `Production`) | Version control tracing; understanding what design dictated the current state of an artifact. |
+| **GENERATIVE_AND_STRUCTURAL** | `INTEGRATES` | The part-whole mereological relation connecting intermediate components to final deployable systems. | `Constitutive Technical Object` → `Production Technical Object` | Bill of Materials (BOM) generation; dependency mapping; impact analysis of component failure. |
+| **GENERATIVE_AND_STRUCTURAL** | `YIELDS` | The temporal transformation relation where a process outputs an artifact or state change. | `Technical Process` → `Production Technical Object` / `Reality` (state) | Production pipeline tracking; value stream mapping. |
+| **AGENTIC_AND_OPERATIVE** | `PERFORMS` | Connects the acting entity to the situated, context-specific execution of a method. | `Technical Agent` → `Operative Technique` / `Technical Act` | Workflow analysis; human-robot task allocation; audit trails of *who* did *what*. |
+| **AGENTIC_AND_OPERATIVE** | `UTILIZES` | Indicates the employment of a specific procedural mechanism to achieve an act. | `Technical Agent` / `Operative Technique` → `Technical Operator` | Toolchain mapping; determining which verbs (operators) are available for an agent. |
+| **AGENTIC_AND_OPERATIVE** | `CONSUMES` | The depletion or transformation of inputs required to execute a process or act. | `Technical Process` / `Technical Agent` → `Resource` | Resource planning, cost analysis, bottleneck identification (e.g., CPU cycles, rare earths). |
+| **NORMATIVE_AND_REGULATIVE** | `CONSTRAINED_BY` | Indicates that an action, artifact, or process is bounded by a physical, logical, or social limit. | `Technical Process` / `Concrete Technical Object` / `Technical Agent` → `Technical Constraint` | Trade-off analysis, safety boundary marking, feasibility checking. |
+| **NORMATIVE_AND_REGULATIVE** | `GOVERNED_BY` | The normative relation enforcing adherence to a design axiom, safety rule, or interoperability mandate. | `Technical Process` / `Concrete Technical Object` / `Technical Architecture` → `Technical Standard` / `Technical Principle` | Compliance checking, code linting rules, architectural pattern enforcement. |
+| **NORMATIVE_AND_REGULATIVE** | `PROTECTS` | A specialized governance relation focused on adversarial or failure-mode constraints. | `Security` (measure/principle) → `Concrete Technical Object` / `Technical Process` | Threat modeling, attack surface mapping, security audit linking. |
+| **EVALUATIVE_AND_CORRECTIVE** | `GENERATES` | The causal link between an act performed on reality and the resulting signal. | `Technical Act` / `Reality` → `Technical Feedback` | Telemetry pipeline mapping, sensor data routing. |
+| **EVALUATIVE_AND_CORRECTIVE** | `INDICATES` | The interpretive link connecting a feedback signal to a specific state or deviation. | `Technical Feedback` → `Technical Failure` / `Technical Constraint` | Alerting logic, anomaly detection, root cause triage. |
+| **EVALUATIVE_AND_CORRECTIVE** | `MITIGATES` | The counter-entropy relation where a corrective process restores an artifact's function. | `Maintenance` → `Technical Failure` / `Reality` (degradation) | DevOps incident response tracking, physical maintenance scheduling. |
+| **EVALUATIVE_AND_CORRECTIVE** | `VALIDATES_AGAINST` | The objective testing relation comparing an artifact to its spec. | `Verification` → `Technical Specification` | CI/CD pipeline definitions, QA test case mapping. |
+| **STRATEGIC_AND_CONTEXTUAL** | `ORCHESTRATED_BY` | Links concrete operational sequences to abstract problem-structuring or planning logic. | `Technical Process` → `Technical Strategy` / `Technical Framework` | Project management methodology mapping (e.g., "This sprint is orchestrated by Agile"). |
+| **STRATEGIC_AND_CONTEXTUAL** | `SUPPORTED_BY` | The ambient reliance of an agent or process on underlying capital or structure. | `Technical Agent` / `Technical Process` → `Technical Infrastructure` | Dependency risk assessment (e.g., "This deployment relies on the power grid"). |
+| **STRATEGIC_AND_CONTEXTUAL** | `EMBEDDED_IN` | The socio-technical relation binding human labor/competence to institutional structures. | `Technical Labor` / `Technical Competence` → `Technical Institution` | Workforce planning, certification tracking, institutional knowledge mapping. |
+| **TEMPORAL_AND_EVOLUTIONARY** | `EVOLVES_FROM` | The historical trajectory linking an obsolete or prior artifact to its successor. | `Production Technical Object` (v2) → `Production Technical Object` (v1) / `Technical Evolution` | Technology radar tracking, legacy system migration planning. |
+| **TEMPORAL_AND_EVOLUTIONARY** | `SUPERSEDES` | The explicit replacement of a technique or artifact, rendering it obsolete. | `Technical Evolution` / `Production Technical Object` → `Technical Obsolescence` | Deprecation scheduling, end-of-life (EOL) management. |
+| **TEMPORAL_AND_EVOLUTIONARY** | `EXPANDS` | The relation connecting systematic investigation to the newly possible technical space. | `Technical Research` → `Technical Constraint` (loosening) / `Technical Principle` (new) | R&D portfolio impact analysis, forecasting new technical capabilities. |
+| **CONSTITUTIVE_AND_MEREOLOGICAL** | `INTEGRATES_INTO` | The strict mereological (part-to-whole) relation linking a building block to the larger system it composes. Can be recursive (parts of parts). | `Constitutive Technical Object` → `Production Technical Object` **OR** `Constitutive Technical Object` → `Constitutive Technical Object` | Bill of Materials (BOM) generation; dependency tree mapping; determining the blast radius of a localized failure. |
+| **CONSTITUTIVE_AND_MEREOLOGICAL** | `LOCALIZES_FUNCTION` | Connects a sub-component to the specific sub-function it handles on behalf of the whole system. | `Constitutive Technical Object` → `Technical Function` | Functional decomposition; isolating which component is responsible for a specific input/output transformation. |
+| **CONSTITUTIVE_AND_MEREOLOGICAL** | `SPECIALIZES_TECHNIQUE` | Links a generalized way of doing things to the highly specific, constrained method used exclusively for creating sub-components. | `Technique` → `Constitutive Technique` | Taxonomy of manufacturing methods; mapping broad capabilities (e.g., "machining") to specific industrial applications (e.g., "photolithography"). |
+| **CONSTITUTIVE_AND_MEREOLOGICAL** | `YIELDS_CONSTITUENT` | The generative relation specific to part-making. A constitutive process transforms raw resources into an intermediate building block. | `Constitutive Technique` → `Constitutive Technical Object` | Manufacturing pipeline tracking; tracing the provenance of a specific sub-assembly. |
+| **CONSTITUTIVE_AND_MEREOLOGICAL** | `CONSTITUENT_GOVERNED_BY` | The normative relation binding part-specific methods to part-specific tolerances, standards, or specs (which are often stricter than the whole-system specs). | `Constitutive Technique` / `Constitutive Technical Object` → `Technical Specification` / `Technical Standard` | Quality assurance (QA) at the factory floor level; supplier requirement tracing (e.g., a specific gear must meet a specific ISO tolerance). |
+| **CONSTITUTIVE_AND_MEREOLOGICAL** | `COMPOSED_BY_CONSTITUENT` | The inverse bridging relation, showing that a high-level operative technique applied to a whole system actually consists of executing multiple constitutive techniques on its parts. | `Operative Technique` → `Constitutive Technique` (plural/iterative) | Work-breakdown structure (WBS) generation; translating a high-level task ("assemble the engine") into sequential sub-tasks ("forge the pistons", "machine the cylinders"). |
+| **Taxonomic & TAXONOMIC_AND_CLASSIFICATORY** | `TYPE_OF` | The hierarchical taxonomic relation establishing an "is-a" linkage, connecting a specific instance, subtype, or specialized concept to its generalized parent category or class. | `Concrete Technical Object` / `Specific Technical Function` / `Constitutive Technique` → `Abstract Technical Class` / `Technical Category` | Knowledge graph inferencing, asset taxonomy management (e.g., CMDB classification), semantic consistency checking, and polymorphic querying (e.g., querying all subtypes of a "Sensor"). |

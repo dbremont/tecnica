@@ -1,6 +1,8 @@
 # Tecnica
 
-> A framework for rendering  purposeful (agentic) operation intelligible.
+> A **framework for rendering**  purposeful (agentic) operation intelligible.
+
+> We know there are **techniques for describing reality**, but these are techniques for describing, structuring, and operationalizing purposeful action within reality.
 
 ## Working On
 

@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concurrent Map — Technique Space Explorer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,200;0,400;0,500;0,700;0,900;1,400&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+    --bg: #0C0C0C;
+    --bg-elevated: #151513;
+    --bg-card: #1A1917;
+    --fg: #E5E0D8;
+    --fg-dim: #9B9589;
+    --muted: #5C574E;
+    --accent: #D4913B;
+    --accent-glow: rgba(212,145,59,0.12);
+    --accent-bright: #F0A84C;
+    --accent-dim: #8B5E20;
+    --border: #2A2622;
+    --border-light: #3A3530;
+    --code-bg: #111110;
+    --success: #6AAF6A;
+    --danger: #D45C5C;
+    --info: #5C9BD4;
+    --warn: #D4B85C;
+    --sidebar-w: 256px;
+    --font-ui: 'DM Sans', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+    font-family: var(--font-ui);
+    background-color: var(--bg);
+    background-image: radial-gradient(circle, var(--border) 0.8px, transparent 0.8px);
+    background-size: 28px 28px;
+    color: var(--fg);
+    line-height: 1.7;
+    overflow-x: hidden;
+}
+/* ---- SIDEBAR ---- */
+#sidebar {
+    position: fixed; top: 0; left: 0;
+    width: var(--sidebar-w); height: 100vh;
+    background: var(--bg-elevated);
+    border-right: 1px solid var(--border);
+    z-index: 100;
+    display: flex; flex-direction: column;
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+#sidebar .logo {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid var(--border);
+}
+#sidebar .logo span {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--muted);
+}
+#sidebar nav { flex: 1; padding: 16px 0; overflow-y: auto; }
+#sidebar nav a {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 24px;
+    font-size: 13.5px; font-weight: 400;
+    color: var(--fg-dim);
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+#sidebar nav a i { width: 18px; text-align: center; font-size: 12px; }
+#sidebar nav a:hover {
+    color: var(--fg);
+    background: rgba(255,255,255,0.02);
+}
+#sidebar nav a.active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: var(--accent-glow);
+    font-weight: 500;
+}
+#sidebar .sidebar-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    font-size: 11px; color: var(--muted);
+    line-height: 1.5;
+}
+/* ---- HAMBURGER ---- */
+#hamburger {
+    display: none;
+    position: fixed; top: 16px; left: 16px; z-index: 200;
+    width: 44px; height: 44px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--fg);
+    font-size: 18px;
+    cursor: pointer;
+    align-items: center; justify-content: center;
+}
+#overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6); z-index: 90;
+}
+/* ---- MAIN ---- */
+#content {
+    margin-left: var(--sidebar-w);
+    min-height: 100vh;
+}
+.section {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 72px 40px;
+    border-bottom: 1px solid var(--border);
+}
+.section:last-child { border-bottom: none; }
+/* ---- HERO ---- */
+.hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 14px;
+    background: var(--accent-glow);
+    border: 1px solid var(--accent-dim);
+    border-radius: 6px;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+}
+.hero-title {
+    font-size: clamp(42px, 6vw, 64px);
+    font-weight: 900;
+    line-height: 1.08;
+    letter-spacing: -1.5px;
+    color: var(--fg);
+    margin-bottom: 20px;
+}
+.hero-title em {
+    font-style: normal;
+    color: var(--accent);
+}
+.hero-sub {
+    font-size: 18px;
+    font-weight: 200;
+    color: var(--fg-dim);
+    max-width: 600px;
+    line-height: 1.7;
+}
+/* ---- SECTION HEADERS ---- */
+.section-label {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+}
+.section-title {
+    font-size: 30px; font-weight: 900;
+    letter-spacing: -0.5px;
+    margin-bottom: 32px;
+    color: var(--fg);
+}
+/* ---- FUNCTION / DESC GRID ---- */
+.func-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+.func-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+}
+.func-card h4 {
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+}
+.func-card p {
+    font-size: 14.5px;
+    color: var(--fg-dim);
+    line-height: 1.75;
+}
+/* ---- ANALYSIS ---- */
+.analysis-block {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+.analysis-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 24px;
+    cursor: pointer;
+    transition: background 0.2s;
+    user-select: none;
+}
+.analysis-header:hover { background: rgba(255,255,255,0.02); }
+.analysis-header h3 {
+    font-size: 16px; font-weight: 700;
+    color: var(--fg);
+}
+.analysis-header i {
+    font-size: 12px; color: var(--muted);
+    transition: transform 0.3s ease;
+}
+.analysis-block.open .analysis-header i { transform: rotate(180deg); }
+.analysis-body {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.45s cubic-bezier(0.4,0,0.2,1);
+}
+.analysis-body-inner {
+    padding: 0 24px 24px;
+    font-size: 14.5px;
+    color: var(--fg-dim);
+    line-height: 1.85;
+}
+.analysis-body-inner strong { color: var(--fg); font-weight: 600; }
+/* ---- VISUALIZATION ---- */
+.viz-controls {
+    display: flex; align-items: center; gap: 24px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+.viz-toggle {
+    display: flex;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.viz-toggle button {
+    padding: 10px 20px;
+    background: transparent;
+    border: none;
+    color: var(--fg-dim);
+    font-family: var(--font-ui);
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.viz-toggle button.active {
+    background: var(--accent);
+    color: #0C0C0C;
+    font-weight: 700;
+}
+.viz-slider-group {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; color: var(--fg-dim);
+}
+.viz-slider-group input[type=range] {
+    width: 100px;
+    accent-color: var(--accent);
+}
+.viz-canvas-wrap {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+}
+#vizCanvas { width: 100%; display: block; border-radius: 8px; }
+.viz-stats {
+    display: flex; gap: 32px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+.viz-stat {
+    display: flex; flex-direction: column; gap: 2px;
+}
+.viz-stat-label {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--muted);
+}
+.viz-stat-value {
+    font-family: var(--font-mono);
+    font-size: 22px; font-weight: 700;
+    color: var(--accent);
+}
+.viz-legend {
+    display: flex; gap: 20px; margin-top: 14px;
+    font-size: 12px; color: var(--fg-dim);
+    flex-wrap: wrap;
+}
+.viz-legend-item {
+    display: flex; align-items: center; gap: 6px;
+}
+.viz-legend-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+}
+/* ---- TRADEOFFS ---- */
+.tradeoff-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+.tradeoff-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+}
+.tradeoff-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+}
+.tradeoff-card h4 {
+    font-size: 15px; font-weight: 700;
+    color: var(--fg);
+    margin-bottom: 10px;
+}
+.tradeoff-card p {
+    font-size: 13.5px; color: var(--fg-dim);
+    line-height: 1.7;
+}
+.tradeoff-axis {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 14px;
+    font-size: 12px; font-weight: 600;
+}
+.tradeoff-axis .ta-left { color: var(--success); }
+.tradeoff-axis .ta-right { color: var(--danger); }
+.tradeoff-axis .ta-bar {
+    flex: 1; height: 4px;
+    background: linear-gradient(90deg, var(--success), var(--warn), var(--danger));
+    border-radius: 2px;
+}
+/* ---- EVALUATION ---- */
+.eval-list { list-style: none; }
+.eval-list li {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex; gap: 20px;
+}
+.eval-list li:last-child { border-bottom: none; }
+.eval-icon {
+    width: 40px; height: 40px;
+    background: var(--accent-glow);
+    border: 1px solid var(--accent-dim);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent);
+    font-size: 16px;
+    flex-shrink: 0;
+}
+.eval-content h4 {
+    font-size: 15px; font-weight: 700;
+    color: var(--fg);
+    margin-bottom: 6px;
+}
+.eval-content p {
+    font-size: 13.5px; color: var(--fg-dim);
+    line-height: 1.7;
+}
+.eval-content code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--accent-bright);
+}
+/* ---- COMPARISON TABLE ---- */
+.table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg-card);
+}
+.table-wrap table {
+    width: 100%; border-collapse: collapse;
+    font-size: 13px;
+    min-width: 780px;
+}
+.table-wrap th {
+    padding: 14px 16px;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-elevated);
+    white-space: nowrap;
+}
+.table-wrap td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--fg-dim);
+    white-space: nowrap;
+}
+.table-wrap tr:last-child td { border-bottom: none; }
+.table-wrap tr:hover td { background: rgba(255,255,255,0.015); }
+.table-wrap td:first-child {
+    color: var(--fg);
+    font-weight: 600;
+    white-space: normal;
+}
+.dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 2px;
+}
+.dot-g { background: var(--success); }
+.dot-y { background: var(--warn); }
+.dot-r { background: var(--danger); }
+/* ---- INTEGRATION LAYERS ---- */
+.integration-stack {
+    display: flex; flex-direction: column; gap: 4px;
+    max-width: 560px;
+}
+.integration-layer {
+    padding: 18px 24px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    position: relative;
+    background: var(--bg-card);
+    transition: all 0.25s ease;
+}
+.integration-layer:hover {
+    border-color: var(--border-light);
+    transform: translateX(4px);
+}
+.integration-layer.highlighted {
+    border-color: var(--accent-dim);
+    background: var(--accent-glow);
+    box-shadow: 0 0 30px rgba(212,145,59,0.08);
+}
+.integration-layer .il-label {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+}
+.integration-layer .il-name {
+    font-weight: 700; color: var(--fg);
+}
+.integration-layer .il-desc {
+    font-size: 12.5px; color: var(--fg-dim);
+    margin-top: 2px;
+}
+.integration-layer.highlighted .il-label { color: var(--accent); }
+.integration-layer.highlighted .il-name { color: var(--accent-bright); }
+.il-arrow {
+    text-align: center; color: var(--muted); font-size: 14px;
+    padding: 2px 0;
+}
+/* ---- CODE TABS ---- */
+.code-tabs {
+    display: flex; gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0;
+}
+.code-tab {
+    padding: 12px 20px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    color: var(--fg-dim);
+    font-family: var(--font-mono);
+    font-size: 12.5px; font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: -1px;
+}
+.code-tab:hover { color: var(--fg); }
+.code-tab.active {
+    background: var(--bg-card);
+    border-color: var(--border);
+    color: var(--accent);
+    font-weight: 700;
+}
+.code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 0 12px 12px 12px;
+    padding: 24px;
+    overflow-x: auto;
+    display: none;
+}
+.code-block.active { display: block; }
+.code-block pre {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--fg-dim);
+    white-space: pre;
+    margin: 0;
+}
+.code-block .kw { color: var(--accent); font-weight: 700; }
+.code-block .ty { color: var(--info); }
+.code-block .str { color: var(--success); }
+.code-block .cmt { color: var(--muted); font-style: italic; }
+.code-block .fn { color: var(--warn); }
+.code-block .num { color: #C792EA; }
+.code-impl-label {
+    font-size: 13px; font-weight: 700;
+    color: var(--fg);
+    margin-top: 32px;
+    margin-bottom: 12px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+/* ---- LIMITS ---- */
+.limits-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+.limit-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    border-left: 3px solid var(--danger);
+}
+.limit-card h4 {
+    font-size: 14.5px; font-weight: 700;
+    color: var(--fg);
+    margin-bottom: 8px;
+}
+.limit-card p {
+    font-size: 13px; color: var(--fg-dim);
+    line-height: 1.7;
+}
+/* ---- REFERENCES ---- */
+.ref-list { list-style: none; }
+.ref-list li {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13.5px;
+}
+.ref-list li:last-child { border-bottom: none; }
+.ref-list a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+}
+.ref-list a:hover { text-decoration: underline; }
+.ref-list .ref-desc {
+    color: var(--fg-dim);
+    margin-top: 4px;
+    font-size: 12.5px;
+}
+/* ---- ANIMATIONS ---- */
+.animate-in {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.animate-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+/* ---- RESPONSIVE ---- */
+@media (max-width: 900px) {
+    .func-grid, .tradeoff-grid, .limits-grid {
+        grid-template-columns: 1fr;
+    }
+    .section { padding: 56px 24px; }
+}
+@media (max-width: 768px) {
+    #sidebar { transform: translateX(-100%); }
+    #sidebar.open { transform: translateX(0); }
+    #hamburger { display: flex; }
+    #overlay.open { display: block; }
+    #content { margin-left: 0; padding-top: 68px; }
+    .hero-title { font-size: 36px; }
+    .section { padding: 40px 20px; }
+    .viz-controls { gap: 12px; }
+    .viz-stats { gap: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .animate-in { opacity: 1; transform: none; transition: none; }
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- Hamburger -->
+<button id="hamburger" aria-label="Toggle navigation"><i class="fas fa-bars"></i></button>
+<div id="overlay"></div>
+
+<!-- Sidebar -->
+<aside id="sidebar">
+    <div class="logo"><span>Technique Space</span></div>
+    <nav>
+        <a href="#overview" class="active"><i class="fas fa-layer-group"></i> Overview</a>
+        <a href="#analysis"><i class="fas fa-microscope"></i> Analysis</a>
+        <a href="#visualization"><i class="fas fa-play-circle"></i> Visualization</a>
+        <a href="#tradeoffs"><i class="fas fa-scale-balanced"></i> Tradeoffs</a>
+        <a href="#evaluation"><i class="fas fa-chart-bar"></i> Evaluation</a>
+        <a href="#comparison"><i class="fas fa-table-columns"></i> Comparison</a>
+        <a href="#integration"><i class="fas fa-sitemap"></i> Integration</a>
+        <a href="#operationalization"><i class="fas fa-code"></i> Operationalization</a>
+        <a href="#limits"><i class="fas fa-triangle-exclamation"></i> Limits</a>
+        <a href="#references"><i class="fas fa-book"></i> References</a>
+    </nav>
+    <div class="sidebar-footer">
+        Philosophia Artium<br>Technicarum et Operis
+    </div>
+</aside>
+
+<!-- Main Content -->
+<main id="content">
+
+    <!-- OVERVIEW -->
+    <section id="overview" class="section">
+        <div class="animate-in">
+            <div class="hero-badge"><i class="fas fa-cube"></i> Constitutive Technical Object</div>
+            <h1 class="hero-title">Concurrent <em>Map</em></h1>
+            <p class="hero-sub">A key-value store engineered for safe multi-threaded access — the foundational building block through which parallel programs share mutable state without descending into data races or inconsistent reads.</p>
+        </div>
+        <div class="func-grid animate-in" style="margin-top:40px;">
+            <div class="func-card">
+                <h4>Technical Function</h4>
+                <p>Mapping keys to values with atomic read, write, and update operations that maintain internal consistency under concurrent access. Transforming parallel thread requests into conflict-managed state mutations through partitioning, locking, or lock-free coordination.</p>
+            </div>
+            <div class="func-card">
+                <h4>Technical Purpose</h4>
+                <p>Enabling shared-state parallelism without sacrificing correctness. Serving as the substrate for caches, session stores, configuration registries, index structures, and any component where multiple execution contexts must read and write overlapping key spaces simultaneously.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ANALYSIS -->
+    <section id="analysis" class="section">
+        <div class="animate-in">
+            <div class="section-label">Analyze</div>
+            <h2 class="section-title">Structural Anatomy</h2>
+        </div>
+
+        <div class="analysis-block animate-in open">
+            <div class="analysis-header" onclick="toggleAnalysis(this)">
+                <h3>The Fundamental Tension</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="analysis-body" style="max-height:400px;">
+                <div class="analysis-body-inner">
+                    A concurrent map exists at the intersection of two opposing forces: the desire for <strong>shared mutable state</strong> — a single source of truth that all threads can read and write — and the reality that parallel access to mutable state is inherently dangerous without coordination. The entire discipline of concurrent data structure design is an exercise in minimizing the cost of that coordination while preserving correctness. The concurrent map is perhaps the most common and most studied instance of this tension in software engineering.
+                </div>
+            </div>
+        </div>
+
+        <div class="analysis-block animate-in">
+            <div class="analysis-header" onclick="toggleAnalysis(this)">
+                <h3>Hash Partitioning as Structural Logic</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="analysis-body">
+                <div class="analysis-body-inner">
+                    The hash function is not merely a lookup mechanism — it is the <strong>architectural backbone</strong> of a concurrent map. By deterministically mapping keys to buckets, the hash function partitions the key space, and this partition becomes the basis for all concurrency control. In a lock-striped map, the stripe index is derived from the hash; in Java's <code>ConcurrentHashMap</code>, the same hash determines both the bin and the synchronization strategy. A poor hash function doesn't just degrade lookup performance — it degrades concurrency by creating hot spots that defeat the partitioning logic entirely.
+                </div>
+            </div>
+        </div>
+
+        <div class="analysis-block animate-in">
+            <div class="analysis-header" onclick="toggleAnalysis(this)">
+                <h3>Memory Ordering Semantics</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="analysis-body">
+                <div class="analysis-body-inner">
+                    Concurrent maps are deeply entangled with the <strong>hardware memory model</strong>. A read operation must not only see the most recent write to the target bucket — it must do so in a way that respects the platform's memory ordering rules. In Java, volatile reads and writes on bin count fields serve as memory barriers. In C++ lock-free implementations, <code>std::atomic</code> with appropriate <code>memory_order</code> parameters (acquire on read, release on write) are essential. Getting this wrong produces subtle bugs that manifest only under specific compiler optimizations and hardware reorderings — among the hardest bugs to reproduce and diagnose.
+                </div>
+            </div>
+        </div>
+
+        <div class="analysis-block animate-in">
+            <div class="analysis-header" onclick="toggleAnalysis(this)">
+                <h3>The Resize Problem</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="analysis-body">
+                <div class="analysis-body-inner">
+                    When a hash map's load factor exceeds its threshold, it must resize: allocate a larger array and rehash all entries. In a single-threaded map, this is straightforward. In a concurrent map, it is <strong>the hardest problem</strong>. During resize, multiple threads may be reading, writing, and migrating bins simultaneously. Java's <code>ConcurrentHashMap</code> uses a clever technique where the old table is gradually migrated — each bin is migrated individually when accessed, and threads can assist in the migration of other bins. Lock-free maps face an even harder version of this problem, as they cannot use locks to coordinate the migration.
+                </div>
+            </div>
+        </div>
+
+        <div class="analysis-block animate-in">
+            <div class="analysis-header" onclick="toggleAnalysis(this)">
+                <h3>Lock-Based vs. Lock-Free Paradigms</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="analysis-body">
+                <div class="analysis-body-inner">
+                    <strong>Lock-based</strong> concurrent maps use mutexes, read-write locks, or striped locks to serialize access to critical sections. They are simpler to reason about, easier to implement correctly, and generally sufficient for most workloads. <strong>Lock-free</strong> maps use atomic compare-and-swap (CAS) operations to update shared state without ever blocking. They guarantee system-wide progress (no thread can prevent others from making progress) and eliminate priority inversion and deadlock risks — but at the cost of significantly higher implementation complexity, the need for sophisticated memory reclamation schemes (hazard pointers, epoch-based reclamation), and often higher constant-factor overhead that makes them slower than lock-based alternatives at low contention levels.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VISUALIZATION -->
+    <section id="visualization" class="section">
+        <div class="animate-in">
+            <div class="section-label">Visualization</div>
+            <h2 class="section-title">Lock Strategy in Action</h2>
+        </div>
+        <div class="animate-in">
+            <div class="viz-controls">
+                <div class="viz-toggle">
+                    <button class="active" onclick="setVizMode('striped')">Striped Locks</button>
+                    <button onclick="setVizMode('global')">Global Lock</button>
+                </div>
+                <div class="viz-slider-group">
+                    <span>Threads:</span>
+                    <input type="range" id="threadSlider" min="2" max="10" value="6" oninput="setThreadCount(this.value)">
+                    <span id="threadCountLabel" style="font-family:var(--font-mono);color:var(--accent);font-weight:700;min-width:20px;">6</span>
+                </div>
+            </div>
+            <div class="viz-canvas-wrap">
+                <canvas id="vizCanvas" height="360"></canvas>
+            </div>
+            <div class="viz-stats">
+                <div class="viz-stat">
+                    <span class="viz-stat-label">Throughput</span>
+                    <span class="viz-stat-value" id="vizThroughput">0 <small style="font-size:12px;color:var(--muted);font-weight:400;">ops/s</small></span>
+                </div>
+                <div class="viz-stat">
+                    <span class="viz-stat-label">Completed</span>
+                    <span class="viz-stat-value" id="vizCompleted">0</span>
+                </div>
+                <div class="viz-stat">
+                    <span class="viz-stat-label">Contention Events</span>
+                    <span class="viz-stat-value" id="vizContention">0</span>
+                </div>
+            </div>
+            <div class="viz-legend">
+                <div class="viz-legend-item"><div class="viz-legend-dot" style="background:var(--success);"></div> Lock free</div>
+                <div class="viz-legend-item"><div class="viz-legend-dot" style="background:var(--danger);"></div> Locked</div>
+                <div class="viz-legend-item"><div class="viz-legend-dot" style="background:#5C9BD4;"></div> Thread</div>
+                <div class="viz-legend-item"><div class="viz-legend-dot" style="background:var(--accent);"></div> Working</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRADEOFFS -->
+    <section id="tradeoffs" class="section">
+        <div class="animate-in">
+            <div class="section-label">Tradeoffs</div>
+            <h2 class="section-title">Competing Constraints</h2>
+        </div>
+        <div class="tradeoff-grid animate-in">
+            <div class="tradeoff-card">
+                <h4>Throughput vs. Memory Overhead</h4>
+                <p>Lock striping reduces contention by multiplying the number of locks — but each lock, its associated bucket array, and the padding needed to avoid false sharing consume memory. A 256-stripe map uses significantly more RAM than a single-mutex wrapper for the same data.</p>
+                <div class="tradeoff-axis">
+                    <span class="ta-left">Low memory</span>
+                    <span class="ta-bar"></span>
+                    <span class="ta-right">High throughput</span>
+                </div>
+            </div>
+            <div class="tradeoff-card">
+                <h4>Consistency vs. Latency</h4>
+                <p>Linearizable maps (every operation appears atomic and instantaneous) impose stronger ordering constraints that increase latency. Relaxed consistency models — like Go's <code>sync.Map</code> which drops linearizability for read-mostly workloads — can offer lower tail latency at the cost of stale reads.</p>
+                <div class="tradeoff-axis">
+                    <span class="ta-left">Low latency</span>
+                    <span class="ta-bar"></span>
+                    <span class="ta-right">Strong consistency</span>
+                </div>
+            </div>
+            <div class="tradeoff-card">
+                <h4>Read Optimization vs. Write Optimization</h4>
+                <p>Copy-on-write (COW) maps offer lock-free reads by snapshotting the entire table on write — devastating for write throughput. Lock-striped maps balance both but optimize for neither. The optimal strategy depends entirely on the read/write ratio of the workload.</p>
+                <div class="tradeoff-axis">
+                    <span class="ta-left">Read-optimized</span>
+                    <span class="ta-bar"></span>
+                    <span class="ta-right">Write-optimized</span>
+                </div>
+            </div>
+            <div class="tradeoff-card">
+                <h4>Simplicity vs. Maximum Performance</h4>
+                <p>A <code>RwLock&lt;HashMap&gt;</code> takes 5 minutes to implement and is correct by construction. A production <code>ConcurrentHashMap</code> with incremental resizing, CAS-based bin updates, and treeified bins takes years of engineering. The performance gap justifies the complexity only at scale.</p>
+                <div class="tradeoff-axis">
+                    <span class="ta-left">Simple</span>
+                    <span class="ta-bar"></span>
+                    <span class="ta-right">Max performance</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- EVALUATION -->
+    <section id="evaluation" class="section">
+        <div class="animate-in">
+            <div class="section-label">Evaluation</div>
+            <h2 class="section-title">How to Assess a Concurrent Map</h2>
+        </div>
+        <ul class="eval-list animate-in">
+            <li>
+                <div class="eval-icon"><i class="fas fa-gauge-high"></i></div>
+                <div class="eval-content">
+                    <h4>Scalability Curves</h4>
+                    <p>Plot throughput (ops/s) against thread count (1, 2, 4, 8, 16, 32, 64). A well-designed concurrent map shows near-linear scaling up to the number of available cores, then plateaus. A poorly-designed one shows throughput degrade beyond 2-4 threads. Test at multiple read/write ratios (100/0, 90/10, 50/50, 10/90).</p>
+                </div>
+            </li>
+            <li>
+                <div class="eval-icon"><i class="fas fa-clock"></i></div>
+                <div class="eval-content">
+                    <h4>Tail Latency Analysis</h4>
+                    <p>Measure p99 and p999.9 latency under contention. Global-lock maps exhibit extreme tail latency spikes when threads queue behind a long-held lock. Lock-free maps show tighter distributions but may have higher median latency due to CAS retry overhead. Use <code>hdr_histogram</code> for high-resolution percentile tracking.</p>
+                </div>
+            </li>
+            <li>
+                <div class="eval-icon"><i class="fas fa-shield-halved"></i></div>
+                <div class="eval-content">
+                    <h4>Correctness Verification</h4>
+                    <p>Unit tests are insufficient. Use model checkers like <code>TLA+</code> to verify linearizability properties under all possible interleavings. Run <code>jcstress</code> (Java) or <code>loom</code> (C++) litmus tests to detect memory ordering violations. Employ concurrency fuzzers like <code>Knossos</code> for linearizability testing at scale.</p>
+                </div>
+            </li>
+            <li>
+                <div class="eval-icon"><i class="fas fa-fire"></i></div>
+                <div class="eval-content">
+                    <h4>Contention Profiling</h4>
+                    <p>Instrument lock acquire/release times. Measure the fraction of total operation time spent waiting for locks. Profile which specific stripes or bins are hot. Tools: <code>perf lock</code>, <code>Java Flight Recorder</code>, <code>tokio-console</code> for async runtimes. High contention on a single stripe indicates hash distribution failure.</p>
+                </div>
+            </li>
+            <li>
+                <div class="eval-icon"><i class="fas fa-memory"></i></div>
+                <div class="eval-content">
+                    <h4>Memory Footprint Measurement</h4>
+                    <p>Measure per-entry overhead (bytes per key-value pair including alignment, metadata, lock structures, and padding). Compare against the baseline <code>HashMap</code>. A 256-stripe map with padded locks can have 3-5x the per-entry overhead of a plain map — significant when holding millions of entries.</p>
+                </div>
+            </li>
+        </ul>
+    </section>
+
+    <!-- COMPARISON -->
+    <section id="comparison" class="section">
+        <div class="animate-in">
+            <div class="section-label">Comparison</div>
+            <h2 class="section-title">Approach Spectrum</h2>
+        </div>
+        <div class="table-wrap animate-in">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Approach</th>
+                        <th>Read</th>
+                        <th>Write</th>
+                        <th>Memory</th>
+                        <th>Complexity</th>
+                        <th>Consistency</th>
+                        <th>Resize</th>
+                        <th>Hot Keys</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Mutex + HashMap</td>
+                        <td><span class="dot dot-r"></span><span class="dot dot-r"></span></td>
+                        <td><span class="dot dot-r"></span><span class="dot dot-r"></span></td>
+                        <td><span class="dot dot-g"></span><span class="dot dot-g"></span></td>
+                        <td><span class="dot dot-g"></span><span class="dot dot-g"></span></td>
+                        <td>Linearizable</td>
+                        <td>Stop-the-world</td>
+                        <td><span class="dot dot-r"></span><span class="dot dot-r"></span></td>
+                    </tr>
+                    <tr>
+                        <td>RwLock + HashMap</td>
+                        <td><span class="dot dot-y"></span></td>
+                        <td><span class="dot dot-r"></span></td>
+                        <td><span class="dot dot-g"></span><span class="dot dot-g"></span></td>
+                        <td><span class="dot dot-g"></span><span class="dot dot-g"></span></td>
+                        <td>Linearizable</td>
+                        <td>Stop-the-world</td>
+                        <td><span class="dot dot-r"></span><span class="dot dot-r"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Lock-Striped Map</td>
+                        <td><span class="dot dot-y"></span><span class="dot dot-g"></span></td>
+                        <td><span class="dot dot-y"></span><span class="dot dot-g"></span></td>
+                        <td><span class="dot dot-y"></span></td>
+                        <td><span class="dot dot-y"></span></td>
+                        <td>Linearizable</td>
+                        <td>Per-stripe</td>
+                        <td><span class="dot dot-y"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Java ConcurrentHashMap</td>
+                        <td><span class="dot dot-g"></span><span class="dot dot-g"></span></td>
+                        <td><span class="dot dot-g"></span><span class="dot dot-g"></span></td>
+                        <td><span class="dot dot-y"></span></td>
+                        <td><span class="dot dot-r"></span><span class="dot dot-r"></span></td>
+                        <td>Linearizable</td>
+                        <td>Incremental</td>
+                        <td><span class="dot dot-y"></span><span class="dot dot-g"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Go sync.Map</td>
+                        <td><span class="dot dot-g"></span><span class="dot dot-g"></span></td>
+                        <td><span class="dot dot-y"></span></td>
+                        <td><span class="dot dot-r"></span></td>
+                        <td><span class="dot dot-r"></span></td>
+                        <td>Relaxed</td>
+                        <td>N/A (amortized)</td>
+                        <td><span class="dot dot-g"></span><span class="dot dot-g"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Lock-Free Map (CAS)</td>
+                        <td><span class="dot dot-g"></span><span class="dot dot-g"></span></td>
+                        <td><span class="dot dot-g"></span></td>
+                        <td><span class="dot dot-r"></span></td>
+                        <td><span class="dot dot-r"></span><span class="dot dot-r"></span></td>
+                        <td>Linearizable</td>
+                        <td>Complex</td>
+                        <td><span class="dot dot-y"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Concurrent Skip List</td>
+                        <td><span class="dot dot-g"></span></td>
+                        <td><span class="dot dot-g"></span></td>
+                        <td><span class="dot dot-r"></span><span class="dot dot-r"></span></td>
+                        <td><span class="dot dot-r"></span></td>
+                        <td>Linearizable</td>
+                        <td>N/A (no rehash)</td>
+                        <td><span class="dot dot-g"></span><span class="dot dot-g"></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p style="margin-top:16px;font-size:12.5px;color:var(--muted);">Green = excellent, Yellow = adequate, Red = poor. Ratings are relative within this specific set.</p>
+    </section>
+
+    <!-- INTEGRATION -->
+    <section id="integration" class="section">
+        <div class="animate-in">
+            <div class="section-label">Place and Integration</div>
+            <h2 class="section-title">Position in the Technical Stack</h2>
+        </div>
+        <div class="integration-stack animate-in">
+            <div class="integration-layer">
+                <div class="il-label">Application Layer</div>
+                <div class="il-name">Caches, Session Stores, Config Registries, Indexes</div>
+                <div class="il-desc">The production technical objects that consume the concurrent map as a constitutive component.</div>
+            </div>
+            <div class="il-arrow"><i class="fas fa-arrow-down"></i></div>
+            <div class="integration-layer highlighted">
+                <div class="il-label">Subject</div>
+                <div class="il-name">Concurrent Map</div>
+                <div class="il-desc">Transforms concurrent access patterns into safe, coordinated state mutations through partitioning and synchronization.</div>
+            </div>
+            <div class="il-arrow"><i class="fas fa-arrow-down"></i></div>
+            <div class="integration-layer">
+                <div class="il-label">Concurrency Primitives</div>
+                <div class="il-name">Atomics, Mutexes, RwLocks, Memory Barriers, CAS</div>
+                <div class="il-desc">The constitutive techniques and operators from which the concurrent map is composed.</div>
+            </div>
+            <div class="il-arrow"><i class="fas fa-arrow-down"></i></div>
+            <div class="integration-layer">
+                <div class="il-label">Runtime / OS</div>
+                <div class="il-name">Thread Scheduler, Memory Model, Syscall Interface</div>
+                <div class="il-desc">The technical infrastructure that provides the execution environment and memory ordering guarantees.</div>
+            </div>
+            <div class="il-arrow"><i class="fas fa-arrow-down"></i></div>
+            <div class="integration-layer">
+                <div class="il-label">Hardware</div>
+                <div class="il-name">CPU Cores, Cache Coherence (MESI), Atomic Instructions</div>
+                <div class="il-desc">The reality substrate — physical constraints that ultimately determine what synchronization strategies are possible and efficient.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- OPERATIONALIZATION -->
+    <section id="operationalization" class="section">
+        <div class="animate-in">
+            <div class="section-label">Operationalization</div>
+            <h2 class="section-title">Concrete Instances</h2>
+        </div>
+        <div class="animate-in">
+            <div class="code-tabs">
+                <button class="code-tab active" onclick="switchTab('java', this)">Java</button>
+                <button class="code-tab" onclick="switchTab('go', this)">Go</button>
+                <button class="code-tab" onclick="switchTab('rust', this)">Rust</button>
+            </div>
+            <div class="code-block active" id="tab-java"><pre><span class="cmt">// Java — ConcurrentHashMap usage patterns</span>
+<span class="kw">import</span> java.util.concurrent.ConcurrentHashMap;
+
+<span class="ty">ConcurrentHashMap</span>&lt;<span class="ty">String</span>, <span class="ty">UserInfo</span>&gt; cache = <span class="kw">new</span> <span class="ty">ConcurrentHashMap</span>&lt;&gt;();
+
+<span class="cmt">// Atomic compute-if-absent: loads from DB only on miss</span>
+<span class="ty">UserInfo</span> user = cache.<span class="fn">computeIfAbsent</span>(userId, k <span class="kw">-&gt;</span> {
+    <span class="kw">return</span> loadUserFromDb(k);
+});
+
+<span class="cmt">// Atomic merge: thread-safe counter increment</span>
+cache.<span class="fn">merge</span>(key, <span class="num">1</span>, (<span class="ty">Integer</span> old, <span class="ty">Integer</span> inc) <span class="kw">-&gt;</span> old + inc);
+
+<span class="cmt">// Bulk iteration — weakly consistent snapshot</span>
+cache.<span class="fn">forEach</span>(<span class="num">4</span>, (key, val) <span class="kw">-&gt;</span> {
+    processEntry(key, val); <span class="cmt">// parallelism = 4</span>
+});
+
+<span class="cmt">// Replace-entire-map pattern for config reload</span>
+<span class="ty">ConcurrentHashMap</span>&lt;<span class="ty">String</span>, <span class="ty">String</span>&gt; config = <span class="kw">new</span> <span class="ty">ConcurrentHashMap</span>&lt;&gt;();
+config.<span class="fn">putAll</span>(loadConfigFromDisk()); <span class="cmt">// atomic-ish swap</span></pre></div>
+            <div class="code-block" id="tab-go"><pre><span class="cmt">// Go — sync.Map usage patterns</span>
+<span class="kw">package</span> main
+
+<span class="kw">import</span> (
+    <span class="str">"fmt"</span>
+    <span class="str">"sync"</span>
+)
+
+<span class="kw">var</span> m <span class="ty">sync.Map</span>
+
+<span class="cmt">// Load or store — atomic, returns whether loaded</span>
+actual, loaded := m.<span class="fn">LoadOrStore</span>(<span class="str">"key"</span>, expensiveInit())
+<span class="kw">if</span> !loaded {
+    <span class="cmt">// value was just stored — first caller initializes</span>
+}
+
+<span class="cmt">// Load and delete atomically</span>
+val, ok := m.<span class="fn">LoadAndDelete</span>(<span class="str">"key"</span>)
+
+<span class="cmt">// Range — safe for concurrent modification</span>
+m.<span class="fn">Range</span>(<span class="kw">func</span>(key, value <span class="kw">any</span>) <span class="ty">bool</span> {
+    fmt.<span class="fn">Printf</span>(<span class="str">"%v: %v\n"</span>, key, value)
+    <span class="kw">return</span> <span class="kw">true</span> <span class="cmt">// continue; false to stop</span>
+})
+
+<span class="cmt">// Note: sync.Map optimizes for two patterns:</span>
+<span class="cmt">//   1. Stable keys written once, read many times</span>
+<span class="cmt">//   2. Disjoint key sets per goroutine</span>
+<span class="cmt">// For general use, consider a mutex + map instead.</span></pre></div>
+            <div class="code-block" id="tab-rust"><pre><span class="cmt">// Rust — DashMap (most popular concurrent map crate)</span>
+<span class="kw">use</span> dashmap::<span class="ty">DashMap</span>;
+
+<span class="kw">let</span> map: <span class="ty">DashMap</span>&lt;<span class="ty">String</span>, <span class="ty">usize</span>&gt; = <span class="ty">DashMap</span>::<span class="fn">new</span>();
+
+<span class="cmt">// Insert</span>
+map.<span class="fn">insert</span>(<span class="str">"counter"</span>.<span class="fn">to_string</span>(), <span class="num">0</span>);
+
+<span class="cmt">// Atomic read-modify-write via entry API</span>
+*map.<span class="fn">entry</span>(<span class="str">"counter"</span>.<span class="fn">to_string</span>())
+    .<span class="fn">or_insert</span>(<span class="num">0</span>) += <span class="num">1</span>;
+
+<span class="cmt">// Read — lock guard scoped to the let binding</span>
+<span class="kw">if let</span> <span class="ty">Some</span>(counter) = map.<span class="fn">get</span>(<span class="str">"counter"</span>) {
+    <span class="fn">println!</span>(<span class="str">"Count: {}"</span>, *counter);
+} <span class="cmt">// shard lock released here</span>
+
+<span class="cmt">// Remove</span>
+<span class="kw">if let</span> <span class="ty">Some</span>((_, old)) = map.<span class="fn">remove</span>(<span class="str">"counter"</span>) {
+    <span class="fn">println!</span>(<span class="str">"Removed: {}"</span>, old);
+}
+
+<span class="cmt">// Iterate — returns shard-guarded references</span>
+<span class="kw">for</span> entry <span class="kw">in</span> map.<span class="fn">iter</span>() {
+    <span class="fn">println!</span>(<span class="str">"{} = {}"</span>, entry.<span class="fn">key</span>(), entry.<span class="fn">value</span>());
+}</pre></div>
+        </div>
+
+        <div class="code-impl-label animate-in">Minimal Lock-Striped Implementation (Sketch)</div>
+        <div class="animate-in">
+            <div class="code-block active" style="border-radius:12px;"><pre><span class="cmt">// Lock-Striped HashMap — Structural essence</span>
+<span class="kw">class</span> <span class="ty">StripedHashMap</span>&lt;<span class="ty">K</span>, <span class="ty">V</span>&gt; {
+    <span class="kw">static final</span> <span class="ty">int</span> STRIPES = <span class="num">16</span>;
+    <span class="kw">final</span> <span class="ty">Object</span>[] locks  = <span class="kw">new</span> <span class="ty">Object</span>[STRIPES];
+    <span class="kw">final</span> <span class="ty">HashMap</span>&lt;<span class="ty">K</span>,<span class="ty">V</span>&gt;[] buckets = <span class="kw">new</span> <span class="ty">HashMap</span>[STRIPES];
+
+    <span class="fn">StripedHashMap</span>() {
+        <span class="kw">for</span> (<span class="ty">int</span> i = <span class="num">0</span>; i &lt; STRIPES; i++) {
+            locks[i]  = <span class="kw">new</span> <span class="ty">Object</span>();
+            buckets[i] = <span class="kw">new</span> <span class="ty">HashMap</span>&lt;&gt;();
+        }
+    }
+
+    <span class="cmt">// Hash determines both bucket AND lock — the partitioning logic</span>
+    <span class="ty">int</span> <span class="fn">stripe</span>(<span class="ty">K</span> key) {
+        <span class="kw">return</span> (key.<span class="fn">hashCode</span>() &amp; <span class="num">0x7FFFFFFF</span>) % STRIPES;
+    }
+
+    <span class="ty">V</span> <span class="fn">get</span>(<span class="ty">K</span> key) {
+        <span class="ty">int</span> s = <span class="fn">stripe</span>(key);
+        <span class="kw">synchronized</span> (locks[s]) {      <span class="cmt">// only locks one stripe</span>
+            <span class="kw">return</span> buckets[s].<span class="fn">get</span>(key);
+        }
+    }
+
+    <span class="ty">void</span> <span class="fn">put</span>(<span class="ty">K</span> key, <span class="ty">V</span> value) {
+        <span class="ty">int</span> s = <span class="fn">stripe</span>(key);
+        <span class="kw">synchronized</span> (locks[s]) {      <span class="cmt">// disjoint keys = disjoint locks</span>
+            buckets[s].<span class="fn">put</span>(key, value);
+        }
+    }
+}</pre></div>
+        </div>
+    </section>
+
+    <!-- LIMITS -->
+    <section id="limits" class="section">
+        <div class="animate-in">
+            <div class="section-label">Limits</div>
+            <h2 class="section-title">Boundary Conditions</h2>
+        </div>
+        <div class="limits-grid animate-in">
+            <div class="limit-card">
+                <h4>Hot Key Contention</h4>
+                <p>No amount of lock striping helps when all threads access the same key. A single popular cache entry will serialize all writers regardless of how many stripes exist. The hash partition is defeated when the key distribution collapses to a point.</p>
+            </div>
+            <div class="limit-card">
+                <h4>Memory Reclamation in Lock-Free Variants</h4>
+                <p>Lock-free maps cannot simply free removed nodes — another thread might still be traversing them. Solutions (hazard pointers, epoch-based reclamation) add significant complexity and overhead, partially negating the performance advantage of going lock-free.</p>
+            </div>
+            <div class="limit-card">
+                <h4>Resize as Inherent Bottleneck</h4>
+                <p>All hash-based concurrent maps must eventually rehash. Even Java's incremental resize creates contention spikes when many threads hit migrating bins simultaneously. This is a structural, not implementational, limitation of hash-based partitioning.</p>
+            </div>
+            <div class="limit-card">
+                <h4>False Sharing</h4>
+                <p>Adjacent lock counters or bucket metadata sitting on the same 64-byte cache line can cause hidden contention — threads on different cores invalidating each other's caches even when operating on logically independent stripes. Requires manual padding to defeat.</p>
+            </div>
+            <div class="limit-card">
+                <h4>The Distributed Wall</h4>
+                <p>A concurrent map operates within a single process address space. Crossing process or machine boundaries requires distributed consensus (Raft, Paxos), introducing network latency, partition tolerance tradeoffs (CAP), and an entirely different class of failure modes.</p>
+            </div>
+            <div class="limit-card">
+                <h4>Non-Deterministic Debugging</h4>
+                <p>Under concurrency, the exact interleaving of operations is non-deterministic. Bugs may manifest only under specific thread scheduling, load levels, or hardware configurations. Reproduction is often impossible without recorded execution traces, making diagnosis extraordinarily expensive.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- REFERENCES -->
+    <section id="references" class="section">
+        <div class="animate-in">
+            <div class="section-label">References</div>
+            <h2 class="section-title">Source Material</h2>
+        </div>
+        <ul class="ref-list animate-in">
+            <li>
+                <a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentHashMap.html" target="_blank" rel="noopener">Java ConcurrentHashMap (JDK 8+)</a>
+                <div class="ref-desc">Doug Lea's canonical implementation — lock-striped bins with CAS-based updates, treeified bins for high-collision chains, and incremental resize with thread-assisted migration.</div>
+            </li>
+            <li>
+                <a href="https://golang.org/pkg/sync/#Map" target="_blank" rel="noopener">Go sync.Map Design Document</a>
+                <div class="ref-desc">Explains the read-mostly / disjoint-key optimization that justifies sync.Map's relaxed consistency model over a simpler mutex+map approach.</div>
+            </li>
+            <li>
+                <a href="https://dl.acm.org/doi/10.1145/3297858.3304051" target="_blank" rel="noopener">Cliff Click, "A Lock-Free Hash Table" (JavaOne 2007)</a>
+                <div class="ref-desc">The foundational presentation of a practical lock-free hash map using CAS-linked bins — the intellectual ancestor of many modern lock-free map designs.</div>
+            </li>
+            <li>
+                <a href="https://www.elsevier.com/books/the-art-of-multiprocessor-programming/herlihy/978-0-12-415950-2" target="_blank" rel="noopener">Herlihy &amp; Shavit, "The Art of Multiprocessor Programming"</a>
+                <div class="ref-desc">Chapters 13-15 cover concurrent hash maps in depth — from coarse-grained locking through lock-free linked lists to skip lists, with formal correctness arguments.</div>
+            </li>
+            <li>
+                <a href="https://github.com/xor-gate/dashmap" target="_blank" rel="noopener">DashMap — Rust Concurrent HashMap</a>
+                <div class="ref-desc">Production-quality Rust implementation using sharded RwLocks. Source code demonstrates how ownership and borrow checking interact with concurrent map design.</div>
+            </li>
+            <li>
+                <a href="https://www.notion.so/Philosophia-Artium-Technicarum-et-Operis-355c0f5171ec808b82f8d7a85e8134cd" target="_blank" rel="noopener">Philosophia Artium Technicarum et Operis</a>
+                <div class="ref-desc">The overarching framework from which this analysis draws its categorical vocabulary: Technical Object, Constitutive vs. Production, Technical Constraint, Operative Technique, and so forth.</div>
+            </li>
+        </ul>
+    </section>
+
+</main>
+
+<script>
+/* ========== SIDEBAR & SCROLL SPY ========== */
+const sidebar = document.getElementById('sidebar');
+const hamburger = document.getElementById('hamburger');
+const overlay = document.getElementById('overlay');
+const navLinks = document.querySelectorAll('#sidebar nav a');
+const sections = document.querySelectorAll('.section');
+
+hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('open');
+});
+overlay.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+});
+navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+    });
+});
+
+// Scroll spy with IntersectionObserver
+const spyObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const id = entry.target.id;
+            navLinks.forEach(l => l.classList.remove('active'));
+            const active = document.querySelector(`#sidebar nav a[href="#${id}"]`);
+            if (active) active.classList.add('active');
+        }
+    });
+}, { rootMargin: '-20% 0px -60% 0px' });
+sections.forEach(s => spyObserver.observe(s));
+
+/* ========== SCROLL ANIMATIONS ========== */
+const animObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, { threshold: 0.08 });
+document.querySelectorAll('.animate-in').forEach(el => animObserver.observe(el));
+
+/* ========== ANALYSIS ACCORDION ========== */
+function toggleAnalysis(header) {
+    const block = header.parentElement;
+    const body = block.querySelector('.analysis-body');
+    const isOpen = block.classList.contains('open');
+    if (isOpen) {
+        body.style.maxHeight = '0';
+        block.classList.remove('open');
+    } else {
+        body.style.maxHeight = body.scrollHeight + 'px';
+        block.classList.add('open');
+    }
+}
+
+/* ========== CODE TABS ========== */
+function switchTab(lang, btn) {
+    document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.code-block[id^="tab-"]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + lang).classList.add('active');
+}
+
+/* ========== VISUALIZATION ========== */
+const canvas = document.getElementById('vizCanvas');
+const ctx = canvas.getContext('2d');
+let vizMode = 'striped'; // 'striped' | 'global'
+let numThreads = 6;
+const NUM_BUCKETS = 8;
+const BUCKET_COLS = 4;
+const BUCKET_ROWS = 2;
+
+// Color palette for threads
+const THREAD_COLORS = [
+    '#5C9BD4','#D45C8C','#6AAF6A','#D4B85C','#C77DBA',
+    '#5CD4C7','#D48A5C','#8A6AD4','#D45C5C','#5CD46A'
+];
+
+// State
+let buckets = [];
+let threads = [];
+let globalLocked = false;
+let globalLockedBy = -1;
+let opsCompleted = 0;
+let contentionEvents = 0;
+let opsThisSecond = 0;
+let throughputDisplay = 0;
+let lastSecond = performance.now();
+
+// Resize canvas to container
+function resizeCanvas() {
+    const wrap = canvas.parentElement;
+    const w = wrap.clientWidth - 40; // padding
+    canvas.width = w * window.devicePixelRatio;
+    canvas.height = 360 * window.devicePixelRatio;
+    canvas.style.width = w + 'px';
+    canvas.style.height = '360px';
+    ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+    initBuckets();
+}
+
+function initBuckets() {
+    const cw = canvas.width / window.devicePixelRatio;
+    const ch = canvas.height / window.devicePixelRatio;
+    const bucketW = Math.min(100, (cw - 60) / BUCKET_COLS - 12);
+    const bucketH = 50;
+    const totalW = BUCKET_COLS * (bucketW + 12) - 12;
+    const startX = (cw - totalW) / 2;
+    const startY = 60;
+    buckets = [];
+    for (let r = 0; r < BUCKET_ROWS; r++) {
+        for (let c = 0; c < BUCKET_COLS; c++) {
+            const idx = r * BUCKET_COLS + c;
+            buckets.push({
+                x: startX + c * (bucketW + 12),
+                y: startY + r * (bucketH + 12),
+                w: bucketW,
+                h: bucketH,
+                idx: idx,
+                locked: false,
+                lockedBy: -1
+            });
+        }
+    }
+}
+
+function initThreads() {
+    const cw = canvas.width / window.devicePixelRatio;
+    const ch = canvas.height / window.devicePixelRatio;
+    threads = [];
+    for (let i = 0; i < numThreads; i++) {
+        threads.push(createThread(i, cw, ch));
+    }
+}
+
+function createThread(id, cw, ch) {
+    const targetBucket = Math.floor(Math.random() * NUM_BUCKETS);
+    const b = buckets[targetBucket];
+    return {
+        id: id,
+        x: 40 + Math.random() * (cw - 80),
+        y: ch - 40 - Math.random() * 40,
+        targetBucket: targetBucket,
+        state: 'moving', // moving, waiting, working, done
+        color: THREAD_COLORS[id % THREAD_COLORS.length],
+        progress: 0,
+        workDuration: 40 + Math.random() * 60,
+        waitTimer: 0,
+        speed: 1.5 + Math.random() * 1.5
+    };
+}
+
+function setVizMode(mode) {
+    vizMode = mode;
+    document.querySelectorAll('.viz-toggle button').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    // Reset state
+    buckets.forEach(b => { b.locked = false; b.lockedBy = -1; });
+    globalLocked = false;
+    globalLockedBy = -1;
+    opsCompleted = 0;
+    contentionEvents = 0;
+    opsThisSecond = 0;
+    throughputDisplay = 0;
+    initThreads();
+}
+
+function setThreadCount(n) {
+    numThreads = parseInt(n);
+    document.getElementById('threadCountLabel').textContent = n;
+    buckets.forEach(b => { b.locked = false; b.lockedBy = -1; });
+    globalLocked = false;
+    globalLockedBy = -1;
+    opsCompleted = 0;
+    contentionEvents = 0;
+    opsThisSecond = 0;
+    throughputDisplay = 0;
+    initThreads();
+}
+
+function updateThreads() {
+    const cw = canvas.width / window.devicePixelRatio;
+    const ch = canvas.height / window.devicePixelRatio;
+
+    threads.forEach(t => {
+        const b = buckets[t.targetBucket];
+        const tx = b.x + b.w / 2;
+        const ty = b.y + b.h + 20;
+
+        if (t.state === 'moving') {
+            const dx = tx - t.x;
+            const dy = ty - t.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 4) {
+                // Arrived at bucket — try to acquire lock
+                if (vizMode === 'global') {
+                    if (!globalLocked) {
+                        globalLocked = true;
+                        globalLockedBy = t.id;
+                        t.state = 'working';
+                        t.progress = 0;
+                    } else {
+                        t.state = 'waiting';
+                        t.waitTimer = 0;
+                        contentionEvents++;
+                    }
+                } else {
+                    // Striped: each bucket has its own lock
+                    if (!b.locked) {
+                        b.locked = true;
+                        b.lockedBy = t.id;
+                        t.state = 'working';
+                        t.progress = 0;
+                    } else {
+                        t.state = 'waiting';
+                        t.waitTimer = 0;
+                        contentionEvents++;
+                    }
+                }
+            } else {
+                t.x += (dx / dist) * t.speed;
+                t.y += (dy / dist) * t.speed;
+            }
+        } else if (t.state === 'waiting') {
+            t.waitTimer++;
+            // Check if lock is available
+            if (vizMode === 'global') {
+                if (!globalLocked) {
+                    globalLocked = true;
+                    globalLockedBy = t.id;
+                    t.state = 'working';
+                    t.progress = 0;
+                }
+            } else {
+                if (!b.locked) {
+                    b.locked = true;
+                    b.lockedBy = t.id;
+                    t.state = 'working';
+                    t.progress = 0;
+                }
+            }
+        } else if (t.state === 'working') {
+            t.progress += 1 / t.workDuration;
+            if (t.progress >= 1) {
+                // Release lock
+                if (vizMode === 'global') {
+                    globalLocked = false;
+                    globalLockedBy = -1;
+                } else {
+                    b.locked = false;
+                    b.lockedBy = -1;
+                }
+                opsCompleted++;
+                opsThisSecond++;
+                // Pick new target
+                t.targetBucket = Math.floor(Math.random() * NUM_BUCKETS);
+                t.state = 'moving';
+                t.progress = 0;
+            }
+        }
+    });
+}
+
+function drawViz() {
+    const cw = canvas.width / window.devicePixelRatio;
+    const ch = canvas.height / window.devicePixelRatio;
+    ctx.clearRect(0, 0, cw, ch);
+
+    // Draw global lock indicator
+    if (vizMode === 'global') {
+        const lockX = cw / 2;
+        const lockY = 22;
+        ctx.beginPath();
+        ctx.arc(lockX, lockY, 8, 0, Math.PI * 2);
+        ctx.fillStyle = globalLocked ? '#D45C5C' : '#6AAF6A';
+        ctx.fill();
+        ctx.font = '600 11px "DM Sans", sans-serif';
+        ctx.fillStyle = '#9B9589';
+        ctx.textAlign = 'center';
+        ctx.fillText('GLOBAL LOCK', lockX, lockY + 24);
+    }
+
+    // Draw buckets
+    buckets.forEach((b, i) => {
+        // Bucket background
+        const isLocked = vizMode === 'global' ? globalLocked : b.locked;
+        ctx.fillStyle = isLocked ? 'rgba(212,92,92,0.08)' : 'rgba(106,175,106,0.05)';
+        ctx.strokeStyle = isLocked ? 'rgba(212,92,92,0.5)' : 'rgba(42,38,34,0.8)';
+        ctx.lineWidth = 1.5;
+        roundRect(ctx, b.x, b.y, b.w, b.h, 8);
+        ctx.fill();
+        ctx.stroke();
+
+        // Bucket label
+        ctx.font = '700 12px "IBM Plex Mono", monospace';
+        ctx.fillStyle = '#5C574E';
+        ctx.textAlign = 'center';
+        ctx.fillText('B' + i, b.x + b.w / 2, b.y + b.h / 2 + 4);
+
+        // Striped lock indicator
+        if (vizMode === 'striped') {
+            ctx.beginPath();
+            ctx.arc(b.x + b.w - 10, b.y + 10, 5, 0, Math.PI * 2);
+            ctx.fillStyle = b.locked ? '#D45C5C' : '#6AAF6A';
+            ctx.fill();
+        }
+    });
+
+    // Draw threads
+    threads.forEach(t => {
+        const b = buckets[t.targetBucket];
+        const tx = b.x + b.w / 2;
+        const ty = b.y + b.h + 20;
+
+        // Connection line
+        ctx.beginPath();
+        ctx.moveTo(t.x, t.y);
+        ctx.lineTo(tx, ty);
+        ctx.strokeStyle = t.color + '30';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Thread circle
+        ctx.beginPath();
+        ctx.arc(t.x, t.y, 7, 0, Math.PI * 2);
+        if (t.state === 'working') {
+            ctx.fillStyle = '#D4913B';
+            ctx.strokeStyle = '#F0A84C';
+        } else if (t.state === 'waiting') {
+            ctx.fillStyle = t.color + '60';
+            ctx.strokeStyle = t.color + '80';
+        } else {
+            ctx.fillStyle = t.color;
+            ctx.strokeStyle = t.color;
+        }
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Thread ID
+        ctx.font = '700 8px "IBM Plex Mono", monospace';
+        ctx.fillStyle = t.state === 'waiting' ? '#5C574E' : '#0C0C0C';
+        ctx.textAlign = 'center';
+        ctx.fillText(t.id, t.x, t.y + 3);
+
+        // Progress bar when working
+        if (t.state === 'working') {
+            const barW = b.w - 8;
+            const barH = 4;
+            const barX = b.x + 4;
+            const barY = b.y + b.h + 8;
+            ctx.fillStyle = 'rgba(42,38,34,0.6)';
+            roundRect(ctx, barX, barY, barW, barH, 2);
+            ctx.fill();
+            ctx.fillStyle = '#D4913B';
+            roundRect(ctx, barX, barY, Math.max(1, barW * t.progress), barH, 2);
+            ctx.fill();
+        }
+
+        // Waiting indicator
+        if (t.state === 'waiting') {
+            const dots = '.'.repeat((Math.floor(t.waitTimer / 15) % 3) + 1);
+            ctx.font = '500 10px "DM Sans", sans-serif';
+            ctx.fillStyle = '#D45C5C';
+            ctx.textAlign = 'center';
+            ctx.fillText('wait' + dots, t.x, t.y - 14);
+        }
+    });
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+    r = Math.min(r, Math.max(0.01, w / 2), Math.max(0.01, h / 2));
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+}
+
+function updateStats() {
+    const now = performance.now();
+    if (now - lastSecond >= 1000) {
+        throughputDisplay = opsThisSecond;
+        opsThisSecond = 0;
+        lastSecond = now;
+    }
+    document.getElementById('vizThroughput').innerHTML =
+        throughputDisplay + ' <small style="font-size:12px;color:var(--muted);font-weight:400;">ops/s</small>';
+    document.getElementById('vizCompleted').textContent = opsCompleted;
+    document.getElementById('vizContention').textContent = contentionEvents;
+}
+
+function vizLoop() {
+    updateThreads();
+    drawViz();
+    updateStats();
+    requestAnimationFrame(vizLoop);
+}
+
+// Initialize
+window.addEventListener('resize', () => { resizeCanvas(); initThreads(); });
+resizeCanvas();
+initThreads();
+vizLoop();
+</script>
+</body>
+</html>

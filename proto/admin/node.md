@@ -1,9 +1,12 @@
 # Node Spec
 
-Take the folowign elemetns - and output the json capturing of them using the schema - and below formulation
+Take the following concept:
 
-- Data Systems
-- Data Base Systems
+- Concurrent Hashmap Design & Implementation
+
+Goal:
+
+- Output a json following this schema capturing the concept - subject the fomurlation provided in the last parts of the document
 
 be catpure by the followign `schema`
 
@@ -74,7 +77,8 @@ be catpure by the followign `schema`
         "Maintenance",
         "Security",
         "Resource",
-        "TechnicalObsolescence"
+        "TechnicalObsolescence",
+        "TechnicalProblem"
       ],
       "description": "Ontological classification of the node within the technical practice framework."
     },
@@ -317,7 +321,9 @@ be catpure by the followign `schema`
     { "if": { "properties": { "category": { "const": "Maintenance" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/MaintenanceSpecific" } } } },
     { "if": { "properties": { "category": { "const": "Security" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/SecuritySpecific" } } } },
     { "if": { "properties": { "category": { "const": "Resource" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/ResourceSpecific" } } } },
-    { "if": { "properties": { "category": { "const": "TechnicalObsolescence" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalObsolescenceSpecific" } } } }
+    { "if": { "properties": { "category": { "const": "TechnicalObsolescence" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalObsolescenceSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalProblem" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalProblemSpecific" } } } }
+
   ],
   "$defs": {
     "RealitySpecific": {
@@ -691,9 +697,70 @@ be catpure by the followign `schema`
       "additionalProperties": false
     }
   },
+"TechnicalProblemSpecific": {
+      "type": "object",
+      "required": ["problemClass", "problemOrigin", "affectedDimension", "resolutionStatus"],
+      "properties": {
+        "problemClass": {
+          "type": "string",
+          "enum": [
+            "performance",
+            "reliability",
+            "safety",
+            "compatibility",
+            "scalability",
+            "maintainability",
+            "efficiency",
+            "accuracy",
+            "robustness",
+            "interoperability",
+            "manufacturability",
+            "environmental",
+            "other"
+          ],
+          "description": "Primary classification of the problem's nature within the technical system."
+        },
+        "problemOrigin": {
+          "type": "string",
+          "enum": [
+            "designDeficiency",
+            "materialLimitation",
+            "processVariability",
+            "environmentalFactor",
+            "interfaceMismatch",
+            "knowledgeGap",
+            "requirementConflict",
+            "constraintViolation",
+            "emergentBehavior",
+            "externalDisruption",
+            "other"
+          ],
+          "description": "Causal origin category identifying where the problem was introduced or manifested."
+        },
+        "affectedDimension": {
+          "type": "string",
+          "description": "The technical dimension or subsystem where the problem manifests (e.g., 'thermal management subsystem', 'data pipeline latency', 'structural load path')."
+        },
+        "resolutionStatus": {
+          "type": "string",
+          "enum": [
+            "unresolved",
+            "underInvestigation",
+            "mitigated",
+            "resolved",
+            "acceptedRisk",
+            "transferred",
+            "wontFix"
+          ],
+          "description": "Current state of the problem's resolution lifecycle."
+        }
+      },
+      "additionalProperties": false
+  },
   "additionalProperties": false
 }
 ```
+
 
 subject to
 
@@ -724,6 +791,8 @@ subject to
 | **Technical Operator** | Formal, procedural, or physical mechanism used to transform, assemble, verify, or maintain technical artifacts. Operators are the “verbs” of technical practice. | Milling (subtractive), injection moulding (formative), soldering (joining), refactoring (code transformation), integration testing, heat‑treating, etching, calibration, patching, container orchestration, concrete pouring. |
 | **Production Technical Object** | The final, deployable artifact that fulfills the ultimate technical purpose in its operational environment. It is the end-product of the technical process, ready to deliver value, effect, or service to a user or broader system. | A completed consumer smartphone, a commissioned nuclear reactor, a deployed SaaS platform, a delivered commercial aircraft, a released video game, an operational MRI machine. |
 | **Constitutive Technical Object** | An intermediate artifact, component, or sub-assembly that serves as a building block within a larger Production Technical Object. It possesses localized functions but derives its ultimate purpose from integration into the whole. | A lithium-ion battery cell, a microcontroller chip, a custom UI widget library, a milled chassis frame, a ball bearing, a normalized SQL database schema, a precast concrete pillar. |
+| **Technical Problem** | A structured discrepancy between a current or projected state of Reality and a desired Technical Function, Specification, or Purpose. It defines the precise boundary of necessary intervention—arising from an unmet Technical Requirement, a Technical Failure, or the friction of Technical Constraints—and serves as the primary catalyst that compels a Technical Agent to initiate a Technical Process. | "Achieving sub-200ms database query latency despite a projected 10x increase in concurrent load"; "Reducing the mass of a load-bearing drone arm by 20% without violating material yield strength limits"; "Preventing electromagnetic interference in a compact circuit layout where spatial separation of components is physically impossible"; "Rerouting a municipal water main around an unmapped geological fault zone without exceeding the allocated capital budget.” |
+| **Technical Requirement** | Formalized desired state, need, or performance objective that initiates technical practice | "The vehicle shall achieve 0-60 mph in under 5 seconds"; "The system must support 99.99% uptime"; "The device shall not exceed 50 decibels at 1 meter under load"; "User passwords must be salted and hashed.” |
 | **Technique** | The generalized, culturally or professionally transmitted body of knowledge regarding how to achieve a specific type of technical effect. A codified or tacit "way of doing" that transcends a singular execution. | Arc welding, precision machining, chromatography, forging, test-driven development, microservices design, cognitive walkthrough, statistical process control. |
 | **Operative Technique** | The context-specific, situated application of a generalized Technique by a Technical Agent to transform a specific material or informational state. The technique as actively performed in situ. | A welder executing a specific TIG pass on an aluminum pipe; a developer applying test-driven development to write an authentication module; a machinist setting specific feed rates for titanium. |
 | **Constitutive Technique** | The specialized methods, processes, and know-how dedicated specifically to the creation, testing, and integration of Constitutive Technical Objects. The "making of the parts." | Photolithography for semiconductors, die-casting for engine blocks, unit testing for software modules, powder metallurgy for gears, spectral analysis for raw material verification. |
@@ -737,13 +806,11 @@ subject to
 | **Technical Research** | Systematic, methodological investigation aimed at discovering new technical principles, materials, processes, or capabilities, expanding the boundary of the technically possible. | Developing solid-state battery chemistry; testing a novel aerodynamic hull shape in a wind tunnel; training a new large language model architecture; synthesizing a new polymer blend; exploring quantum error correction algorithms. |
 | **Technical Competence** | The embodied, acquired capacity of a Technical Agent to reliably execute Technical Processes and Operative Techniques, yielding successful outcomes within accepted tolerances. | A senior surgeon’s ability to perform a laparoscopic procedure; a master machinist’s intuitive feel for cutting speeds; a principal engineer’s aptitude for system design; a pilot’s muscle memory for emergency procedures. |
 | **Technical Failure** | The state or event wherein an artifact or process deviates from its Technical Specification or required Technical Function under specified operating conditions, potentially leading to loss of purpose, safety hazards, or systemic degradation. | Stack overflow crash in production; fatigue-induced fracture of an aircraft fuselage; thermal runaway in a lithium battery; failure of a SCADA system to close a valve; bridge collapse under load; authentication bypass vulnerability. |
-| **Technical Requirement** | Formalized desired state, need, or performance objective that initiates technical practice | "The vehicle shall achieve 0-60 mph in under 5 seconds"; "The system must support 99.99% uptime"; "The device shall not exceed 50 decibels at 1 meter under load"; "User passwords must be salted and hashed.” |
 | **Verification** | The systematic process of evaluating an artifact, process, or service to determine whether it accurately fulfills its Technical Specification or Blueprint. It answers the question of "Are we building the system right?" through objective evidence. | Code linting/static analysis, physical dimension inspection with calipers, unit testing, circuit continuity checking, code review against a style guide, automated regression testing, model checking against formal properties. |
 | **Maintenance** | The ordered set of technical acts and processes performed on an operational artifact to retain it in, or restore it to, a state in which it can reliably perform its Technical Function. It counteracts the entropic degradation imposed by Reality. | Replacing worn brake pads, applying a security patch to an OS, lubricating a bearing, clearing a blocked pipe, defragmenting a hard drive, recalibrating a sensor array, scraping and repainting a steel hull. |
 | **Security** | The domain of technical principles, constraints, and processes concerned with protecting an artifact or system from unauthorized access, use, disclosure, disruption, modification, or destruction. It manages adversarial constraints within the operational environment. | Role-based access control (RBAC), AES-256 encryption at rest, network firewall rule sets, code obfuscation, physical perimeter fencing, multi-factor authentication (MFA), input sanitization against SQLi, hardware security modules (HSMs). |
 | **Resource** | The consumable or non-consumable inputs—matter, energy, information, time, or capital—that are required, transformed, or consumed by a Technical Agent or Process to produce, operate, or maintain an artifact. | Gallium arsenide substrate, megawatt-hours of electricity, API rate limits, engineer labor-hours, venture capital funding, silicon wafers, gigabytes of RAM, clean water for industrial cooling, developer seat licenses. |
 | **Technical Obsolescence** | The state wherein an artifact is no longer technically viable, economically justifiable, or socially supported compared to available alternatives, regardless of its current functional state. | The state wherein an artifact is no longer technically viable, economically justifiable, or socially supported compared to available alternatives, regardless of its current functional state. |
-
 
 ### Which are the edged types?
 

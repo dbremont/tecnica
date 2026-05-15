@@ -15,7 +15,8 @@
     "historicalContext",
     "specific",
     "relationships",
-    "metadata"
+    "metadata",
+    "references"
   ],
   "properties": {
     "id": {
@@ -64,7 +65,8 @@
         "Maintenance",
         "Security",
         "Resource",
-        "TechnicalObsolescence"
+        "TechnicalObsolescence",
+        "TechnicalProblem"
       ],
       "description": "Ontological classification of the node within the technical practice framework."
     },
@@ -269,6 +271,33 @@
         }
       },
       "additionalProperties": false
+    },
+    "references": {
+      "type": "array",
+      "description": "External references, citations, papers, books, standards, repositories, datasets, or knowledge sources associated with the conceptual node.",
+      "items": {
+        "type": "object",
+        "required": [
+          "title",
+          "description"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Canonical title or name of the reference."
+          },
+          "link": {
+            "type": "string",
+            "format": "uri",
+            "description": "Optional URL, DOI, repository link, or other resolvable reference identifier."
+          },
+          "description": {
+            "type": "string",
+            "description": "Short explanation of the relevance or contribution of the reference."
+          }
+        },
+        "additionalProperties": false
+      }
     }
   },
   "allOf": [
@@ -307,7 +336,9 @@
     { "if": { "properties": { "category": { "const": "Maintenance" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/MaintenanceSpecific" } } } },
     { "if": { "properties": { "category": { "const": "Security" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/SecuritySpecific" } } } },
     { "if": { "properties": { "category": { "const": "Resource" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/ResourceSpecific" } } } },
-    { "if": { "properties": { "category": { "const": "TechnicalObsolescence" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalObsolescenceSpecific" } } } }
+    { "if": { "properties": { "category": { "const": "TechnicalObsolescence" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalObsolescenceSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalProblem" } } }, "then": { "properties": { "specific": { "$ref": "#/$defs/TechnicalProblemSpecific" } } } }
+
   ],
   "$defs": {
     "RealitySpecific": {
@@ -680,6 +711,66 @@
       },
       "additionalProperties": false
     }
+  },
+"TechnicalProblemSpecific": {
+      "type": "object",
+      "required": ["problemClass", "problemOrigin", "affectedDimension", "resolutionStatus"],
+      "properties": {
+        "problemClass": {
+          "type": "string",
+          "enum": [
+            "performance",
+            "reliability",
+            "safety",
+            "compatibility",
+            "scalability",
+            "maintainability",
+            "efficiency",
+            "accuracy",
+            "robustness",
+            "interoperability",
+            "manufacturability",
+            "environmental",
+            "other"
+          ],
+          "description": "Primary classification of the problem's nature within the technical system."
+        },
+        "problemOrigin": {
+          "type": "string",
+          "enum": [
+            "designDeficiency",
+            "materialLimitation",
+            "processVariability",
+            "environmentalFactor",
+            "interfaceMismatch",
+            "knowledgeGap",
+            "requirementConflict",
+            "constraintViolation",
+            "emergentBehavior",
+            "externalDisruption",
+            "other"
+          ],
+          "description": "Causal origin category identifying where the problem was introduced or manifested."
+        },
+        "affectedDimension": {
+          "type": "string",
+          "description": "The technical dimension or subsystem where the problem manifests (e.g., 'thermal management subsystem', 'data pipeline latency', 'structural load path')."
+        },
+        "resolutionStatus": {
+          "type": "string",
+          "enum": [
+            "unresolved",
+            "underInvestigation",
+            "mitigated",
+            "resolved",
+            "acceptedRisk",
+            "transferred",
+            "wontFix"
+          ],
+          "description": "Current state of the problem's resolution lifecycle."
+        }
+      },
+      "additionalProperties": false
   },
   "additionalProperties": false
 }

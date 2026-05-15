@@ -6,13 +6,30 @@
     "layer": "Problem Space",
     "inheritanceLevel": 0,
     "description": "The ontological substrate comprising physical, chemical, biological, informational, and social structures that constrain and respond to technical intervention.",
-    "functionalRoles": ["Constraint imposition", "Affordance provision", "Outcome validation"],
-    "realityDomains": ["Physical", "Biological", "Informational", "Social"],
+    "functionalRoles": [
+      "Constraint imposition",
+      "Affordance provision",
+      "Outcome validation"
+    ],
+    "realityDomains": [
+      "Physical",
+      "Biological",
+      "Informational",
+      "Social"
+    ],
     "historicalContext": {
       "summary": "Recognized as the medium of action since the emergence of technical practice; formalized in engineering as the 'real world' against which designs are tested.",
       "chronology": [
-        { "year": -3000, "event": "Early metalworking acknowledges material resistance", "associatedContext": "Craft practice" },
-        { "year": 1687, "event": "Newton's laws formalize physical constraints", "associatedContext": "Scientific revolution" }
+        {
+          "year": -3000,
+          "event": "Early metalworking acknowledges material resistance",
+          "associatedContext": "Craft practice"
+        },
+        {
+          "year": 1687,
+          "event": "Newton's laws formalize physical constraints",
+          "associatedContext": "Scientific revolution"
+        }
       ]
     },
     "specific": {
@@ -23,10 +40,18 @@
       "conceptEvaluationNote": "Foundational layer; all technical acts operate within reality."
     },
     "relationships": [
-      { "relationshipFamily": "TeleologicalAndFunctional", "relationshipType": "SATISFIES", "targetNodeId": "technical_purpose_001", "description": "Technical purposes are validated against reality" }
+      {
+        "relationshipFamily": "TeleologicalAndFunctional",
+        "relationshipType": "SATISFIES",
+        "targetNodeId": "technical_purpose_001",
+        "description": "Technical purposes are validated against reality"
+      }
     ],
     "metadata": {
-      "tags": ["ontology", "foundation"],
+      "tags": [
+        "ontology",
+        "foundation"
+      ],
       "confidenceScore": 1.0,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -40,13 +65,29 @@
     "layer": "Execution Space",
     "inheritanceLevel": 0,
     "description": "The motoric and encoding boundary through which an agent imparts energy, information, or structure onto reality.",
-    "functionalRoles": ["Energy transduction", "Intent encoding", "Effector control"],
-    "realityDomains": ["Cyber-physical", "Human-machine", "Digital systems"],
+    "functionalRoles": [
+      "Energy transduction",
+      "Intent encoding",
+      "Effector control"
+    ],
+    "realityDomains": [
+      "Cyber-physical",
+      "Human-machine",
+      "Digital systems"
+    ],
     "historicalContext": {
       "summary": "Evolved from hand tools to CNC and API-driven actuation.",
       "chronology": [
-        { "year": 1784, "event": "Mechanical governor as feedback actuator", "associatedContext": "Industrial revolution" },
-        { "year": 1952, "event": "First CNC machine", "associatedContext": "Numerical control" }
+        {
+          "year": 1784,
+          "event": "Mechanical governor as feedback actuator",
+          "associatedContext": "Industrial revolution"
+        },
+        {
+          "year": 1952,
+          "event": "First CNC machine",
+          "associatedContext": "Numerical control"
+        }
       ]
     },
     "specific": {
@@ -55,10 +96,18 @@
       "encodingFormat": "G-code (ISO 6983)"
     },
     "relationships": [
-      { "relationshipFamily": "AgenticAndOperative", "relationshipType": "PERFORMS", "targetNodeId": "technical_act_001", "description": "Enables technical acts" }
+      {
+        "relationshipFamily": "AgenticAndOperative",
+        "relationshipType": "PERFORMS",
+        "targetNodeId": "technical_act_001",
+        "description": "Enables technical acts"
+      }
     ],
     "metadata": {
-      "tags": ["actuation", "interface"],
+      "tags": [
+        "actuation",
+        "interface"
+      ],
       "confidenceScore": 0.95,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -72,12 +121,24 @@
     "layer": "Artifact Space",
     "inheritanceLevel": 0,
     "description": "A specific, fully-specified object, system, or code module that has been produced or operated; the primary carrier of technical effect.",
-    "functionalRoles": ["Carrier of technical effect", "Performance evaluation", "Operational unit"],
-    "realityDomains": ["Manufacturing", "Software", "Infrastructure"],
+    "functionalRoles": [
+      "Carrier of technical effect",
+      "Performance evaluation",
+      "Operational unit"
+    ],
+    "realityDomains": [
+      "Manufacturing",
+      "Software",
+      "Infrastructure"
+    ],
     "historicalContext": {
       "summary": "Central to technical practice since chipped stone tools; modern instantiation includes software binaries.",
       "chronology": [
-        { "year": -2500000, "event": "Oldowan stone tools", "associatedContext": "Early hominin technology" }
+        {
+          "year": -2500000,
+          "event": "Oldowan stone tools",
+          "associatedContext": "Early hominin technology"
+        }
       ]
     },
     "specific": {
@@ -87,10 +148,18 @@
       "functionalState": "operational"
     },
     "relationships": [
-      { "relationshipFamily": "GenerativeAndStructural", "relationshipType": "YIELDS", "targetNodeId": "production_object_001", "description": "Can be a production object" }
+      {
+        "relationshipFamily": "GenerativeAndStructural",
+        "relationshipType": "YIELDS",
+        "targetNodeId": "production_object_001",
+        "description": "Can be a production object"
+      }
     ],
     "metadata": {
-      "tags": ["artifact", "instantiated"],
+      "tags": [
+        "artifact",
+        "instantiated"
+      ],
       "confidenceScore": 1.0,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -104,25 +173,52 @@
     "layer": "Artifact Space",
     "inheritanceLevel": 0,
     "description": "Generative description that prescribes how to create, assemble, or configure an artifact.",
-    "functionalRoles": ["Prescription", "Reproduction", "Standardization"],
-    "realityDomains": ["Design", "Manufacturing", "Software engineering"],
+    "functionalRoles": [
+      "Prescription",
+      "Reproduction",
+      "Standardization"
+    ],
+    "realityDomains": [
+      "Design",
+      "Manufacturing",
+      "Software engineering"
+    ],
     "historicalContext": {
       "summary": "From architectural drawings to infrastructure-as-code templates.",
       "chronology": [
-        { "year": 1400, "event": "Renaissance architectural drawings", "associatedContext": "Early modern design" },
-        { "year": 2010, "event": "Infrastructure-as-code emerges", "associatedContext": "Cloud computing" }
+        {
+          "year": 1400,
+          "event": "Renaissance architectural drawings",
+          "associatedContext": "Early modern design"
+        },
+        {
+          "year": 2010,
+          "event": "Infrastructure-as-code emerges",
+          "associatedContext": "Cloud computing"
+        }
       ]
     },
     "specific": {
       "representationFormat": "CAD + BOM",
       "formalism": "STEP AP242",
-      "generativeRules": ["Tolerance stack-up", "Material selection rules"]
+      "generativeRules": [
+        "Tolerance stack-up",
+        "Material selection rules"
+      ]
     },
     "relationships": [
-      { "relationshipFamily": "GenerativeAndStructural", "relationshipType": "GENERATES", "targetNodeId": "concrete_artifact_001", "description": "Blueprint generates concrete artifacts" }
+      {
+        "relationshipFamily": "GenerativeAndStructural",
+        "relationshipType": "GENERATES",
+        "targetNodeId": "concrete_artifact_001",
+        "description": "Blueprint generates concrete artifacts"
+      }
     ],
     "metadata": {
-      "tags": ["design", "prescription"],
+      "tags": [
+        "design",
+        "prescription"
+      ],
       "confidenceScore": 0.98,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -136,25 +232,49 @@
     "layer": "Capability Space",
     "inheritanceLevel": 0,
     "description": "Entity that executes technical operations by utilizing tools, energy, and instructions.",
-    "functionalRoles": ["Execution", "Decision making", "Adaptation"],
-    "realityDomains": ["Human labor", "Industrial automation", "Software systems"],
+    "functionalRoles": [
+      "Execution",
+      "Decision making",
+      "Adaptation"
+    ],
+    "realityDomains": [
+      "Human labor",
+      "Industrial automation",
+      "Software systems"
+    ],
     "historicalContext": {
       "summary": "From artisans to autonomous robots and CI/CD pipelines.",
       "chronology": [
-        { "year": 1961, "event": "Unimate industrial robot", "associatedContext": "First industrial robot" }
+        {
+          "year": 1961,
+          "event": "Unimate industrial robot",
+          "associatedContext": "First industrial robot"
+        }
       ]
     },
     "specific": {
       "agentType": "hybridSystem",
-      "capabilities": ["Sensing", "Actuation", "Planning"],
+      "capabilities": [
+        "Sensing",
+        "Actuation",
+        "Planning"
+      ],
       "autonomyLevel": "supervised autonomous",
       "goalStructure": "Hierarchical task network"
     },
     "relationships": [
-      { "relationshipFamily": "AgenticAndOperative", "relationshipType": "PERFORMS", "targetNodeId": "technical_process_001", "description": "Agents execute processes" }
+      {
+        "relationshipFamily": "AgenticAndOperative",
+        "relationshipType": "PERFORMS",
+        "targetNodeId": "technical_process_001",
+        "description": "Agents execute processes"
+      }
     ],
     "metadata": {
-      "tags": ["agent", "autonomy"],
+      "tags": [
+        "agent",
+        "autonomy"
+      ],
       "confidenceScore": 0.95,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -168,25 +288,50 @@
     "layer": "Execution Space",
     "inheritanceLevel": 0,
     "description": "Ordered sequence of technical acts that transform inputs into outputs.",
-    "functionalRoles": ["Transformation", "Coordination", "Reproducibility"],
-    "realityDomains": ["Production", "Software development", "Maintenance"],
+    "functionalRoles": [
+      "Transformation",
+      "Coordination",
+      "Reproducibility"
+    ],
+    "realityDomains": [
+      "Production",
+      "Software development",
+      "Maintenance"
+    ],
     "historicalContext": {
       "summary": "Systematized with division of labor and assembly lines.",
       "chronology": [
-        { "year": 1913, "event": "Ford moving assembly line", "associatedContext": "Mass production" }
+        {
+          "year": 1913,
+          "event": "Ford moving assembly line",
+          "associatedContext": "Mass production"
+        }
       ]
     },
     "specific": {
       "processType": "Assembly line",
-      "inputs": ["Raw materials", "Energy"],
-      "outputs": ["Finished artifact"],
+      "inputs": [
+        "Raw materials",
+        "Energy"
+      ],
+      "outputs": [
+        "Finished artifact"
+      ],
       "validationMethod": "Statistical process control"
     },
     "relationships": [
-      { "relationshipFamily": "GenerativeAndStructural", "relationshipType": "COMPOSED_BY_CONSTITUENT", "targetNodeId": "technical_act_001", "description": "Process composed of acts" }
+      {
+        "relationshipFamily": "GenerativeAndStructural",
+        "relationshipType": "COMPOSED_BY_CONSTITUENT",
+        "targetNodeId": "technical_act_001",
+        "description": "Process composed of acts"
+      }
     ],
     "metadata": {
-      "tags": ["process", "workflow"],
+      "tags": [
+        "process",
+        "workflow"
+      ],
       "confidenceScore": 0.98,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -200,12 +345,24 @@
     "layer": "Governance Space",
     "inheritanceLevel": 0,
     "description": "Normative specification that governs form, fit, function, safety, or performance.",
-    "functionalRoles": ["Interoperability", "Safety", "Quality assurance"],
-    "realityDomains": ["Industrial", "Information technology", "Healthcare"],
+    "functionalRoles": [
+      "Interoperability",
+      "Safety",
+      "Quality assurance"
+    ],
+    "realityDomains": [
+      "Industrial",
+      "Information technology",
+      "Healthcare"
+    ],
     "historicalContext": {
       "summary": "Arise from industrialization; modern standards bodies like ISO.",
       "chronology": [
-        { "year": 1901, "event": "First national standards body (BSI)", "associatedContext": "Standardization movement" }
+        {
+          "year": 1901,
+          "event": "First national standards body (BSI)",
+          "associatedContext": "Standardization movement"
+        }
       ]
     },
     "specific": {
@@ -214,10 +371,18 @@
       "measurementBasis": "Quality management principles"
     },
     "relationships": [
-      { "relationshipFamily": "NormativeAndRegulative", "relationshipType": "GOVERNED_BY", "targetNodeId": "concrete_artifact_001", "description": "Artifacts governed by standards" }
+      {
+        "relationshipFamily": "NormativeAndRegulative",
+        "relationshipType": "GOVERNED_BY",
+        "targetNodeId": "concrete_artifact_001",
+        "description": "Artifacts governed by standards"
+      }
     ],
     "metadata": {
-      "tags": ["standard", "norm"],
+      "tags": [
+        "standard",
+        "norm"
+      ],
       "confidenceScore": 0.99,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -231,12 +396,24 @@
     "layer": "Problem Space",
     "inheritanceLevel": 0,
     "description": "Bound on achievable action imposed by physical law, material properties, resource availability, or regulation.",
-    "functionalRoles": ["Boundary setting", "Trade-off driving", "Feasibility limitation"],
-    "realityDomains": ["Physical", "Economic", "Regulatory"],
+    "functionalRoles": [
+      "Boundary setting",
+      "Trade-off driving",
+      "Feasibility limitation"
+    ],
+    "realityDomains": [
+      "Physical",
+      "Economic",
+      "Regulatory"
+    ],
     "historicalContext": {
       "summary": "Recognized since earliest technologies; formalized in design optimization.",
       "chronology": [
-        { "year": 1850, "event": "Stress-strain concepts formalized", "associatedContext": "Materials science" }
+        {
+          "year": 1850,
+          "event": "Stress-strain concepts formalized",
+          "associatedContext": "Materials science"
+        }
       ]
     },
     "specific": {
@@ -245,10 +422,18 @@
       "failureMode": "Plastic deformation"
     },
     "relationships": [
-      { "relationshipFamily": "NormativeAndRegulative", "relationshipType": "CONSTRAINED_BY", "targetNodeId": "blueprint_001", "description": "Blueprints respect constraints" }
+      {
+        "relationshipFamily": "NormativeAndRegulative",
+        "relationshipType": "CONSTRAINED_BY",
+        "targetNodeId": "blueprint_001",
+        "description": "Blueprints respect constraints"
+      }
     ],
     "metadata": {
-      "tags": ["constraint", "limit"],
+      "tags": [
+        "constraint",
+        "limit"
+      ],
       "confidenceScore": 0.97,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -262,12 +447,25 @@
     "layer": "Capability Space",
     "inheritanceLevel": 0,
     "description": "Ambient capital—material, energetic, informational, institutional—that makes sustained technical practice possible.",
-    "functionalRoles": ["Enabling", "Sustaining", "Scaling"],
-    "realityDomains": ["Energy", "Transport", "Digital", "Institutional"],
+    "functionalRoles": [
+      "Enabling",
+      "Sustaining",
+      "Scaling"
+    ],
+    "realityDomains": [
+      "Energy",
+      "Transport",
+      "Digital",
+      "Institutional"
+    ],
     "historicalContext": {
       "summary": "Developed with civilization; backbone of modern technical society.",
       "chronology": [
-        { "year": 1882, "event": "First power grid (Pearl Street Station)", "associatedContext": "Electrical infrastructure" }
+        {
+          "year": 1882,
+          "event": "First power grid (Pearl Street Station)",
+          "associatedContext": "Electrical infrastructure"
+        }
       ]
     },
     "specific": {
@@ -276,10 +474,18 @@
       "communicationMode": "SCADA"
     },
     "relationships": [
-      { "relationshipFamily": "StrategicAndContextual", "relationshipType": "SUPPORTED_BY", "targetNodeId": "process_001", "description": "Processes rely on infrastructure" }
+      {
+        "relationshipFamily": "StrategicAndContextual",
+        "relationshipType": "SUPPORTED_BY",
+        "targetNodeId": "process_001",
+        "description": "Processes rely on infrastructure"
+      }
     ],
     "metadata": {
-      "tags": ["infrastructure", "capital"],
+      "tags": [
+        "infrastructure",
+        "capital"
+      ],
       "confidenceScore": 0.96,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -293,12 +499,24 @@
     "layer": "EvaluativeAndCorrective",
     "inheritanceLevel": 0,
     "description": "Signal that indicates real-world effect of a technical act, enabling adjustment and error correction.",
-    "functionalRoles": ["Correction", "Optimization", "Learning"],
-    "realityDomains": ["Control systems", "Software monitoring", "Quality control"],
+    "functionalRoles": [
+      "Correction",
+      "Optimization",
+      "Learning"
+    ],
+    "realityDomains": [
+      "Control systems",
+      "Software monitoring",
+      "Quality control"
+    ],
     "historicalContext": {
       "summary": "Central to cybernetics; from Watt governor to modern observability.",
       "chronology": [
-        { "year": 1788, "event": "Watt centrifugal governor", "associatedContext": "First automatic feedback controller" }
+        {
+          "year": 1788,
+          "event": "Watt centrifugal governor",
+          "associatedContext": "First automatic feedback controller"
+        }
       ]
     },
     "specific": {
@@ -307,10 +525,18 @@
       "adaptationTarget": "Actuator output"
     },
     "relationships": [
-      { "relationshipFamily": "EvaluativeAndCorrective", "relationshipType": "INDICATES", "targetNodeId": "technical_failure_001", "description": "Feedback can indicate failure" }
+      {
+        "relationshipFamily": "EvaluativeAndCorrective",
+        "relationshipType": "INDICATES",
+        "targetNodeId": "technical_failure_001",
+        "description": "Feedback can indicate failure"
+      }
     ],
     "metadata": {
-      "tags": ["feedback", "control"],
+      "tags": [
+        "feedback",
+        "control"
+      ],
       "confidenceScore": 0.98,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -324,12 +550,22 @@
     "layer": "Execution Space",
     "inheritanceLevel": 0,
     "description": "Primitive, non-decomposable operation that a technical agent performs on reality or an artifact.",
-    "functionalRoles": ["Atomic transformation", "Building block of processes"],
-    "realityDomains": ["Physical manipulation", "Information modification"],
+    "functionalRoles": [
+      "Atomic transformation",
+      "Building block of processes"
+    ],
+    "realityDomains": [
+      "Physical manipulation",
+      "Information modification"
+    ],
     "historicalContext": {
       "summary": "Fundamental unit of technical work; described in industrial engineering as basic motion elements.",
       "chronology": [
-        { "year": 1920, "event": "Therbligs introduced", "associatedContext": "Motion study" }
+        {
+          "year": 1920,
+          "event": "Therbligs introduced",
+          "associatedContext": "Motion study"
+        }
       ]
     },
     "specific": {
@@ -339,10 +575,18 @@
       "outcome": "Two pieces with new edges"
     },
     "relationships": [
-      { "relationshipFamily": "AgenticAndOperative", "relationshipType": "PERFORMS", "targetNodeId": "agent_001", "description": "Technical act performed by agent" }
+      {
+        "relationshipFamily": "AgenticAndOperative",
+        "relationshipType": "PERFORMS",
+        "targetNodeId": "agent_001",
+        "description": "Technical act performed by agent"
+      }
     ],
     "metadata": {
-      "tags": ["act", "primitive"],
+      "tags": [
+        "act",
+        "primitive"
+      ],
       "confidenceScore": 0.98,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -356,12 +600,24 @@
     "layer": "Governance Space",
     "inheritanceLevel": 0,
     "description": "Foundational design law, operating axiom, or reliability rule governing technical interventions.",
-    "functionalRoles": ["Guidance", "Risk reduction", "Design quality"],
-    "realityDomains": ["Engineering", "Software", "Safety"],
+    "functionalRoles": [
+      "Guidance",
+      "Risk reduction",
+      "Design quality"
+    ],
+    "realityDomains": [
+      "Engineering",
+      "Software",
+      "Safety"
+    ],
     "historicalContext": {
       "summary": "Emerged from failures and best practices; codified in engineering handbooks.",
       "chronology": [
-        { "year": 1960, "event": "Fail-safe principle widespread in aerospace", "associatedContext": "Jet age safety" }
+        {
+          "year": 1960,
+          "event": "Fail-safe principle widespread in aerospace",
+          "associatedContext": "Jet age safety"
+        }
       ]
     },
     "specific": {
@@ -370,10 +626,18 @@
       "applicability": "Safety-critical systems"
     },
     "relationships": [
-      { "relationshipFamily": "NormativeAndRegulative", "relationshipType": "GOVERNED_BY", "targetNodeId": "blueprint_001", "description": "Blueprints adhere to principles" }
+      {
+        "relationshipFamily": "NormativeAndRegulative",
+        "relationshipType": "GOVERNED_BY",
+        "targetNodeId": "blueprint_001",
+        "description": "Blueprints adhere to principles"
+      }
     ],
     "metadata": {
-      "tags": ["principle", "design rule"],
+      "tags": [
+        "principle",
+        "design rule"
+      ],
       "confidenceScore": 0.97,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -387,13 +651,28 @@
     "layer": "Capability Space",
     "inheritanceLevel": 0,
     "description": "Context-sensitive, resource-aware regime of planning and decision-making organizing technical work.",
-    "functionalRoles": ["Planning", "Resource allocation", "Risk management"],
-    "realityDomains": ["Project management", "Product development"],
+    "functionalRoles": [
+      "Planning",
+      "Resource allocation",
+      "Risk management"
+    ],
+    "realityDomains": [
+      "Project management",
+      "Product development"
+    ],
     "historicalContext": {
       "summary": "From waterfall to Agile; reflects evolution of software and manufacturing.",
       "chronology": [
-        { "year": 1970, "event": "Waterfall model formalized", "associatedContext": "Software engineering" },
-        { "year": 2001, "event": "Agile manifesto", "associatedContext": "Iterative development" }
+        {
+          "year": 1970,
+          "event": "Waterfall model formalized",
+          "associatedContext": "Software engineering"
+        },
+        {
+          "year": 2001,
+          "event": "Agile manifesto",
+          "associatedContext": "Iterative development"
+        }
       ]
     },
     "specific": {
@@ -402,10 +681,18 @@
       "decisionHeuristic": "Prioritize backlog by value"
     },
     "relationships": [
-      { "relationshipFamily": "StrategicAndContextual", "relationshipType": "ORCHESTRATED_BY", "targetNodeId": "process_001", "description": "Processes orchestrated by strategy" }
+      {
+        "relationshipFamily": "StrategicAndContextual",
+        "relationshipType": "ORCHESTRATED_BY",
+        "targetNodeId": "process_001",
+        "description": "Processes orchestrated by strategy"
+      }
     ],
     "metadata": {
-      "tags": ["strategy", "planning"],
+      "tags": [
+        "strategy",
+        "planning"
+      ],
       "confidenceScore": 0.94,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -419,12 +706,24 @@
     "layer": "Capability Space",
     "inheritanceLevel": 0,
     "description": "Overarching problem-structuring and solution-generation logic within which technical agents interpret requirements and synthesize artifacts.",
-    "functionalRoles": ["Problem structuring", "Methodology", "Integration"],
-    "realityDomains": ["Engineering design", "Systems engineering", "Innovation"],
+    "functionalRoles": [
+      "Problem structuring",
+      "Methodology",
+      "Integration"
+    ],
+    "realityDomains": [
+      "Engineering design",
+      "Systems engineering",
+      "Innovation"
+    ],
     "historicalContext": {
       "summary": "Formalized in systems engineering post-WWII; TRIZ developed in Soviet Union.",
       "chronology": [
-        { "year": 1956, "event": "TRIZ methodology first published", "associatedContext": "Inventive problem solving" }
+        {
+          "year": 1956,
+          "event": "TRIZ methodology first published",
+          "associatedContext": "Inventive problem solving"
+        }
       ]
     },
     "specific": {
@@ -433,10 +732,18 @@
       "integrationScope": "Conceptual design and failure analysis"
     },
     "relationships": [
-      { "relationshipFamily": "StrategicAndContextual", "relationshipType": "EMBEDDED_IN", "targetNodeId": "strategy_001", "description": "Framework embeds strategy" }
+      {
+        "relationshipFamily": "StrategicAndContextual",
+        "relationshipType": "EMBEDDED_IN",
+        "targetNodeId": "strategy_001",
+        "description": "Framework embeds strategy"
+      }
     ],
     "metadata": {
-      "tags": ["framework", "methodology"],
+      "tags": [
+        "framework",
+        "methodology"
+      ],
       "confidenceScore": 0.93,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -450,12 +757,24 @@
     "layer": "Execution Space",
     "inheritanceLevel": 0,
     "description": "Formal, procedural, or physical mechanism used to transform, assemble, verify, or maintain technical artifacts.",
-    "functionalRoles": ["Transformation", "Assembly", "Verification"],
-    "realityDomains": ["Manufacturing", "Software", "Maintenance"],
+    "functionalRoles": [
+      "Transformation",
+      "Assembly",
+      "Verification"
+    ],
+    "realityDomains": [
+      "Manufacturing",
+      "Software",
+      "Maintenance"
+    ],
     "historicalContext": {
       "summary": "Operators as verbs of technical practice; from manual tools to automated operations.",
       "chronology": [
-        { "year": 1955, "event": "First milling machine operation formalization", "associatedContext": "Numerical control" }
+        {
+          "year": 1955,
+          "event": "First milling machine operation formalization",
+          "associatedContext": "Numerical control"
+        }
       ]
     },
     "specific": {
@@ -464,10 +783,18 @@
       "operandType": "Solid block"
     },
     "relationships": [
-      { "relationshipFamily": "AgenticAndOperative", "relationshipType": "UTILIZES", "targetNodeId": "act_001", "description": "Operator utilized in technical act" }
+      {
+        "relationshipFamily": "AgenticAndOperative",
+        "relationshipType": "UTILIZES",
+        "targetNodeId": "act_001",
+        "description": "Operator utilized in technical act"
+      }
     ],
     "metadata": {
-      "tags": ["operator", "transformation"],
+      "tags": [
+        "operator",
+        "transformation"
+      ],
       "confidenceScore": 0.96,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -481,12 +808,24 @@
     "layer": "Artifact Space",
     "inheritanceLevel": 0,
     "description": "Final deployable artifact that fulfills ultimate technical purpose in its operational environment.",
-    "functionalRoles": ["Value delivery", "End use", "Service provision"],
-    "realityDomains": ["Consumer products", "Industrial systems", "Software services"],
+    "functionalRoles": [
+      "Value delivery",
+      "End use",
+      "Service provision"
+    ],
+    "realityDomains": [
+      "Consumer products",
+      "Industrial systems",
+      "Software services"
+    ],
     "historicalContext": {
       "summary": "Central to product engineering; distinction from components recognized in modular design.",
       "chronology": [
-        { "year": 1927, "event": "Ford Model A as integrated product", "associatedContext": "Consumer automobile" }
+        {
+          "year": 1927,
+          "event": "Ford Model A as integrated product",
+          "associatedContext": "Consumer automobile"
+        }
       ]
     },
     "specific": {
@@ -495,10 +834,18 @@
       "valueDelivery": "Personal transportation"
     },
     "relationships": [
-      { "relationshipFamily": "TeleologicalAndFunctional", "relationshipType": "SATISFIES", "targetNodeId": "technical_purpose_001", "description": "Satisfies purpose" }
+      {
+        "relationshipFamily": "TeleologicalAndFunctional",
+        "relationshipType": "SATISFIES",
+        "targetNodeId": "technical_purpose_001",
+        "description": "Satisfies purpose"
+      }
     ],
     "metadata": {
-      "tags": ["product", "deployed"],
+      "tags": [
+        "product",
+        "deployed"
+      ],
       "confidenceScore": 0.97,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -512,12 +859,24 @@
     "layer": "Artifact Space",
     "inheritanceLevel": 0,
     "description": "Intermediate artifact, component, or sub-assembly serving as building block within a larger production object.",
-    "functionalRoles": ["Localized function", "Integration", "Modularity"],
-    "realityDomains": ["Manufacturing", "Electronics", "Construction"],
+    "functionalRoles": [
+      "Localized function",
+      "Integration",
+      "Modularity"
+    ],
+    "realityDomains": [
+      "Manufacturing",
+      "Electronics",
+      "Construction"
+    ],
     "historicalContext": {
       "summary": "Distinguished from final product in complex systems; standardized components enable mass production.",
       "chronology": [
-        { "year": 1800, "event": "Interchangeable parts for muskets", "associatedContext": "American system of manufacturing" }
+        {
+          "year": 1800,
+          "event": "Interchangeable parts for muskets",
+          "associatedContext": "American system of manufacturing"
+        }
       ]
     },
     "specific": {
@@ -526,10 +885,18 @@
       "dependencyDepth": 1
     },
     "relationships": [
-      { "relationshipFamily": "ConstitutiveAndMereological", "relationshipType": "INTEGRATES_INTO", "targetNodeId": "production_object_001", "description": "Constitutes production object" }
+      {
+        "relationshipFamily": "ConstitutiveAndMereological",
+        "relationshipType": "INTEGRATES_INTO",
+        "targetNodeId": "production_object_001",
+        "description": "Constitutes production object"
+      }
     ],
     "metadata": {
-      "tags": ["component", "sub-assembly"],
+      "tags": [
+        "component",
+        "sub-assembly"
+      ],
       "confidenceScore": 0.96,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -543,12 +910,24 @@
     "layer": "Capability Space",
     "inheritanceLevel": 0,
     "description": "Generalized, culturally transmitted body of knowledge regarding how to achieve a specific type of technical effect.",
-    "functionalRoles": ["Knowledge transmission", "Standardization of practice", "Skill foundation"],
-    "realityDomains": ["Craft", "Engineering", "Software"],
+    "functionalRoles": [
+      "Knowledge transmission",
+      "Standardization of practice",
+      "Skill foundation"
+    ],
+    "realityDomains": [
+      "Craft",
+      "Engineering",
+      "Software"
+    ],
     "historicalContext": {
       "summary": "Guilds and apprenticeship transmitted techniques; modern codification in textbooks.",
       "chronology": [
-        { "year": 1400, "event": "Guild system formalizes technique transmission", "associatedContext": "Medieval craft" }
+        {
+          "year": 1400,
+          "event": "Guild system formalizes technique transmission",
+          "associatedContext": "Medieval craft"
+        }
       ]
     },
     "specific": {
@@ -557,10 +936,18 @@
       "transmissionMethod": "Apprenticeship + written standards"
     },
     "relationships": [
-      { "relationshipFamily": "GenerativeAndStructural", "relationshipType": "YIELDS_CONSTITUENT", "targetNodeId": "operative_technique_001", "description": "Technique yields operative techniques" }
+      {
+        "relationshipFamily": "GenerativeAndStructural",
+        "relationshipType": "YIELDS_CONSTITUENT",
+        "targetNodeId": "operative_technique_001",
+        "description": "Technique yields operative techniques"
+      }
     ],
     "metadata": {
-      "tags": ["technique", "know-how"],
+      "tags": [
+        "technique",
+        "know-how"
+      ],
       "confidenceScore": 0.98,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -574,12 +961,24 @@
     "layer": "Execution Space",
     "inheritanceLevel": 1,
     "description": "Context-specific, situated application of a generalized technique by a technical agent.",
-    "functionalRoles": ["Situated execution", "Adaptation", "Real-time tuning"],
-    "realityDomains": ["Manufacturing", "Surgery", "Field repair"],
+    "functionalRoles": [
+      "Situated execution",
+      "Adaptation",
+      "Real-time tuning"
+    ],
+    "realityDomains": [
+      "Manufacturing",
+      "Surgery",
+      "Field repair"
+    ],
     "historicalContext": {
       "summary": "Recognized in ergonomics and skill research as the moment of practice.",
       "chronology": [
-        { "year": 1960, "event": "Studies of craft skill as situated action", "associatedContext": "Cognitive ergonomics" }
+        {
+          "year": 1960,
+          "event": "Studies of craft skill as situated action",
+          "associatedContext": "Cognitive ergonomics"
+        }
       ]
     },
     "specific": {
@@ -588,10 +987,18 @@
       "situatedOutcome": "Root pass with proper penetration"
     },
     "relationships": [
-      { "relationshipFamily": "AgenticAndOperative", "relationshipType": "SPECIALIZES_TECHNIQUE", "targetNodeId": "technique_001", "description": "Specializes generalized technique" }
+      {
+        "relationshipFamily": "AgenticAndOperative",
+        "relationshipType": "SPECIALIZES_TECHNIQUE",
+        "targetNodeId": "technique_001",
+        "description": "Specializes generalized technique"
+      }
     ],
     "metadata": {
-      "tags": ["situated", "execution"],
+      "tags": [
+        "situated",
+        "execution"
+      ],
       "confidenceScore": 0.95,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -605,12 +1012,24 @@
     "layer": "Capability Space",
     "inheritanceLevel": 1,
     "description": "Specialized methods dedicated to creation, testing, and integration of constitutive technical objects.",
-    "functionalRoles": ["Component fabrication", "Testing", "Integration"],
-    "realityDomains": ["Semiconductor fab", "Mechanical parts", "Software modules"],
+    "functionalRoles": [
+      "Component fabrication",
+      "Testing",
+      "Integration"
+    ],
+    "realityDomains": [
+      "Semiconductor fab",
+      "Mechanical parts",
+      "Software modules"
+    ],
     "historicalContext": {
       "summary": "Rose with division of labor and complex assemblies.",
       "chronology": [
-        { "year": 1965, "event": "Photolithography for ICs", "associatedContext": "Microelectronics" }
+        {
+          "year": 1965,
+          "event": "Photolithography for ICs",
+          "associatedContext": "Microelectronics"
+        }
       ]
     },
     "specific": {
@@ -619,10 +1038,18 @@
       "qualityAssurance": "Wafer-level testing"
     },
     "relationships": [
-      { "relationshipFamily": "GenerativeAndStructural", "relationshipType": "YIELDS", "targetNodeId": "constitutive_object_001", "description": "Produces constitutive objects" }
+      {
+        "relationshipFamily": "GenerativeAndStructural",
+        "relationshipType": "YIELDS",
+        "targetNodeId": "constitutive_object_001",
+        "description": "Produces constitutive objects"
+      }
     ],
     "metadata": {
-      "tags": ["fabrication", "component"],
+      "tags": [
+        "fabrication",
+        "component"
+      ],
       "confidenceScore": 0.94,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -636,12 +1063,19 @@
     "layer": "Problem Space",
     "inheritanceLevel": 0,
     "description": "Teleological orientation of an artifact or process; intended ultimate impact on reality, human experience, or broader system.",
-    "functionalRoles": ["Goal setting", "Value definition", "Stakeholder alignment"],
-    "realityDomains": ["Product design", "Policy", "Human factors"],
+    "functionalRoles": [
+      "Goal setting",
+      "Value definition",
+      "Stakeholder alignment"
+    ],
+    "realityDomains": [
+      "Product design",
+      "Policy",
+      "Human factors"
+    ],
     "historicalContext": {
       "summary": "Discussed since Aristotle's four causes; formalized in requirements engineering.",
-      "chronology": [
-      ]
+      "chronology": []
     },
     "specific": {
       "teleologicalStatement": "Transport passengers safely and efficiently",
@@ -649,10 +1083,18 @@
       "successCriteria": "On-time arrival with zero injuries"
     },
     "relationships": [
-      { "relationshipFamily": "TeleologicalAndFunctional", "relationshipType": "REALIZES", "targetNodeId": "production_object_001", "description": "Purpose realized by artifact" }
+      {
+        "relationshipFamily": "TeleologicalAndFunctional",
+        "relationshipType": "REALIZES",
+        "targetNodeId": "production_object_001",
+        "description": "Purpose realized by artifact"
+      }
     ],
     "metadata": {
-      "tags": ["purpose", "teleology"],
+      "tags": [
+        "purpose",
+        "teleology"
+      ],
       "confidenceScore": 0.99,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -666,12 +1108,24 @@
     "layer": "Artifact Space",
     "inheritanceLevel": 0,
     "description": "Objective mechanistic input-output relationship of an artifact or system, abstracted from ultimate purpose.",
-    "functionalRoles": ["State transformation", "Abstraction", "Composition"],
-    "realityDomains": ["Mechanical", "Electrical", "Software"],
+    "functionalRoles": [
+      "State transformation",
+      "Abstraction",
+      "Composition"
+    ],
+    "realityDomains": [
+      "Mechanical",
+      "Electrical",
+      "Software"
+    ],
     "historicalContext": {
       "summary": "Central to functional decomposition in engineering design.",
       "chronology": [
-        { "year": 1960, "event": "Function structures in design methodology", "associatedContext": "Systematic design" }
+        {
+          "year": 1960,
+          "event": "Function structures in design methodology",
+          "associatedContext": "Systematic design"
+        }
       ]
     },
     "specific": {
@@ -680,10 +1134,18 @@
       "abstractionLevel": "Subsystem"
     },
     "relationships": [
-      { "relationshipFamily": "TeleologicalAndFunctional", "relationshipType": "EMBODIES", "targetNodeId": "technical_purpose_001", "description": "Function embodies purpose" }
+      {
+        "relationshipFamily": "TeleologicalAndFunctional",
+        "relationshipType": "EMBODIES",
+        "targetNodeId": "technical_purpose_001",
+        "description": "Function embodies purpose"
+      }
     ],
     "metadata": {
-      "tags": ["function", "mapping"],
+      "tags": [
+        "function",
+        "mapping"
+      ],
       "confidenceScore": 0.97,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -697,12 +1159,24 @@
     "layer": "Artifact Space",
     "inheritanceLevel": 0,
     "description": "Fundamental structural organization of a system, embodied in its components, their relationships, and design principles.",
-    "functionalRoles": ["Structural decomposition", "Interface management", "Evolution guidance"],
-    "realityDomains": ["Software", "Mechanical", "Systems"],
+    "functionalRoles": [
+      "Structural decomposition",
+      "Interface management",
+      "Evolution guidance"
+    ],
+    "realityDomains": [
+      "Software",
+      "Mechanical",
+      "Systems"
+    ],
     "historicalContext": {
       "summary": "Emerges with complex systems; formalized in system architecture discipline.",
       "chronology": [
-        { "year": 1960, "event": "OSI model proposed", "associatedContext": "Networking" }
+        {
+          "year": 1960,
+          "event": "OSI model proposed",
+          "associatedContext": "Networking"
+        }
       ]
     },
     "specific": {
@@ -711,10 +1185,18 @@
       "interfaceProtocol": "REST/HTTP"
     },
     "relationships": [
-      { "relationshipFamily": "GenerativeAndStructural", "relationshipType": "INTEGRATES", "targetNodeId": "constitutive_object_001", "description": "Architecture integrates components" }
+      {
+        "relationshipFamily": "GenerativeAndStructural",
+        "relationshipType": "INTEGRATES",
+        "targetNodeId": "constitutive_object_001",
+        "description": "Architecture integrates components"
+      }
     ],
     "metadata": {
-      "tags": ["architecture", "structure"],
+      "tags": [
+        "architecture",
+        "structure"
+      ],
       "confidenceScore": 0.96,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -728,12 +1210,24 @@
     "layer": "Governance Space",
     "inheritanceLevel": 0,
     "description": "Precise, quantitative statement of technical requirements, performance parameters, and interface conditions.",
-    "functionalRoles": ["Measurement", "Acceptance", "Contractual boundary"],
-    "realityDomains": ["Design", "Quality", "Procurement"],
+    "functionalRoles": [
+      "Measurement",
+      "Acceptance",
+      "Contractual boundary"
+    ],
+    "realityDomains": [
+      "Design",
+      "Quality",
+      "Procurement"
+    ],
     "historicalContext": {
       "summary": "Developed with interchangeable parts and mass production.",
       "chronology": [
-        { "year": 1800, "event": "Interchangeable parts require dimensional specs", "associatedContext": "Arsenal practice" }
+        {
+          "year": 1800,
+          "event": "Interchangeable parts require dimensional specs",
+          "associatedContext": "Arsenal practice"
+        }
       ]
     },
     "specific": {
@@ -742,10 +1236,18 @@
       "testMethod": "Load testing with simulated traffic"
     },
     "relationships": [
-      { "relationshipFamily": "NormativeAndRegulative", "relationshipType": "PRESCRIBES", "targetNodeId": "concrete_artifact_001", "description": "Specification prescribes artifact properties" }
+      {
+        "relationshipFamily": "NormativeAndRegulative",
+        "relationshipType": "PRESCRIBES",
+        "targetNodeId": "concrete_artifact_001",
+        "description": "Specification prescribes artifact properties"
+      }
     ],
     "metadata": {
-      "tags": ["specification", "requirement"],
+      "tags": [
+        "specification",
+        "requirement"
+      ],
       "confidenceScore": 0.98,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -759,24 +1261,49 @@
     "layer": "Evolutionary Space",
     "inheritanceLevel": 0,
     "description": "Cumulative historical trajectory of change in technical artifacts, processes, or knowledge over time.",
-    "functionalRoles": ["Innovation tracking", "Obsolescence driver", "Learning"],
-    "realityDomains": ["History of technology", "Innovation studies"],
+    "functionalRoles": [
+      "Innovation tracking",
+      "Obsolescence driver",
+      "Learning"
+    ],
+    "realityDomains": [
+      "History of technology",
+      "Innovation studies"
+    ],
     "historicalContext": {
       "summary": "Studied since 19th century; formalized in evolutionary economics.",
       "chronology": [
-        { "year": 1962, "event": "Kuhn's structure of scientific revolutions influences technology studies", "associatedContext": "Paradigm shifts" }
+        {
+          "year": 1962,
+          "event": "Kuhn's structure of scientific revolutions influences technology studies",
+          "associatedContext": "Paradigm shifts"
+        }
       ]
     },
     "specific": {
       "generation": "Third-generation semiconductors",
-      "drivingForces": ["Scaling demand", "Materials science advances"],
-      "keyInnovations": ["Wide-bandgap materials", "Vertical transistors"]
+      "drivingForces": [
+        "Scaling demand",
+        "Materials science advances"
+      ],
+      "keyInnovations": [
+        "Wide-bandgap materials",
+        "Vertical transistors"
+      ]
     },
     "relationships": [
-      { "relationshipFamily": "TemporalAndEvolutionary", "relationshipType": "EVOLVES_FROM", "targetNodeId": "concrete_artifact_001", "description": "Artifacts evolve from prior generations" }
+      {
+        "relationshipFamily": "TemporalAndEvolutionary",
+        "relationshipType": "EVOLVES_FROM",
+        "targetNodeId": "concrete_artifact_001",
+        "description": "Artifacts evolve from prior generations"
+      }
     ],
     "metadata": {
-      "tags": ["evolution", "history"],
+      "tags": [
+        "evolution",
+        "history"
+      ],
       "confidenceScore": 0.95,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -790,12 +1317,24 @@
     "layer": "Capability Space",
     "inheritanceLevel": 0,
     "description": "Purposive expenditure of human cognitive and physical effort applied to technical processes.",
-    "functionalRoles": ["Execution", "Skill application", "Value generation"],
-    "realityDomains": ["Human resources", "Work science", "Ergonomics"],
+    "functionalRoles": [
+      "Execution",
+      "Skill application",
+      "Value generation"
+    ],
+    "realityDomains": [
+      "Human resources",
+      "Work science",
+      "Ergonomics"
+    ],
     "historicalContext": {
       "summary": "Central to political economy; studied in industrial engineering and labor economics.",
       "chronology": [
-        { "year": 1776, "event": "Smith's pin factory example", "associatedContext": "Division of labor" }
+        {
+          "year": 1776,
+          "event": "Smith's pin factory example",
+          "associatedContext": "Division of labor"
+        }
       ]
     },
     "specific": {
@@ -804,10 +1343,18 @@
       "compensationModel": "Hourly wage"
     },
     "relationships": [
-      { "relationshipFamily": "AgenticAndOperative", "relationshipType": "PERFORMS", "targetNodeId": "operative_technique_001", "description": "Labor performs operative techniques" }
+      {
+        "relationshipFamily": "AgenticAndOperative",
+        "relationshipType": "PERFORMS",
+        "targetNodeId": "operative_technique_001",
+        "description": "Labor performs operative techniques"
+      }
     ],
     "metadata": {
-      "tags": ["labor", "work"],
+      "tags": [
+        "labor",
+        "work"
+      ],
       "confidenceScore": 0.96,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -821,12 +1368,24 @@
     "layer": "Governance Space",
     "inheritanceLevel": 0,
     "description": "Formalized, durable social structures that organize, govern, incentivize, and sustain technical practice.",
-    "functionalRoles": ["Standardization", "Certification", "Knowledge dissemination"],
-    "realityDomains": ["Regulatory", "Professional", "Educational"],
+    "functionalRoles": [
+      "Standardization",
+      "Certification",
+      "Knowledge dissemination"
+    ],
+    "realityDomains": [
+      "Regulatory",
+      "Professional",
+      "Educational"
+    ],
     "historicalContext": {
       "summary": "Guilds, later professional societies and regulatory agencies.",
       "chronology": [
-        { "year": 1880, "event": "ASME founded", "associatedContext": "Professional engineering" }
+        {
+          "year": 1880,
+          "event": "ASME founded",
+          "associatedContext": "Professional engineering"
+        }
       ]
     },
     "specific": {
@@ -835,10 +1394,18 @@
       "standardizationRole": "Publish codes and standards"
     },
     "relationships": [
-      { "relationshipFamily": "NormativeAndRegulative", "relationshipType": "GOVERNED_BY", "targetNodeId": "standard_001", "description": "Institutions govern standards" }
+      {
+        "relationshipFamily": "NormativeAndRegulative",
+        "relationshipType": "GOVERNED_BY",
+        "targetNodeId": "standard_001",
+        "description": "Institutions govern standards"
+      }
     ],
     "metadata": {
-      "tags": ["institution", "governance"],
+      "tags": [
+        "institution",
+        "governance"
+      ],
       "confidenceScore": 0.97,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -852,12 +1419,24 @@
     "layer": "Evolutionary Space",
     "inheritanceLevel": 0,
     "description": "Systematic investigation aimed at discovering new technical principles, materials, processes, or capabilities.",
-    "functionalRoles": ["Innovation", "Boundary expansion", "Knowledge creation"],
-    "realityDomains": ["R&D", "Academia", "Industrial labs"],
+    "functionalRoles": [
+      "Innovation",
+      "Boundary expansion",
+      "Knowledge creation"
+    ],
+    "realityDomains": [
+      "R&D",
+      "Academia",
+      "Industrial labs"
+    ],
     "historicalContext": {
       "summary": "Industrial research labs emerged late 19th century.",
       "chronology": [
-        { "year": 1876, "event": "Edison's Menlo Park lab", "associatedContext": "First industrial research lab" }
+        {
+          "year": 1876,
+          "event": "Edison's Menlo Park lab",
+          "associatedContext": "First industrial research lab"
+        }
       ]
     },
     "specific": {
@@ -866,10 +1445,18 @@
       "technologyReadinessLevel": 4
     },
     "relationships": [
-      { "relationshipFamily": "TemporalAndEvolutionary", "relationshipType": "GENERATES", "targetNodeId": "technique_001", "description": "Research generates new techniques" }
+      {
+        "relationshipFamily": "TemporalAndEvolutionary",
+        "relationshipType": "GENERATES",
+        "targetNodeId": "technique_001",
+        "description": "Research generates new techniques"
+      }
     ],
     "metadata": {
-      "tags": ["research", "innovation"],
+      "tags": [
+        "research",
+        "innovation"
+      ],
       "confidenceScore": 0.96,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -883,12 +1470,24 @@
     "layer": "Capability Space",
     "inheritanceLevel": 0,
     "description": "Embodied, acquired capacity of a technical agent to reliably execute technical processes and operative techniques.",
-    "functionalRoles": ["Skill assessment", "Training target", "Performance assurance"],
-    "realityDomains": ["Human resources", "Education", "Certification"],
+    "functionalRoles": [
+      "Skill assessment",
+      "Training target",
+      "Performance assurance"
+    ],
+    "realityDomains": [
+      "Human resources",
+      "Education",
+      "Certification"
+    ],
     "historicalContext": {
       "summary": "Formalized in vocational training and competency-based education.",
       "chronology": [
-        { "year": 1960, "event": "Competency movement in education", "associatedContext": "Outcome-based learning" }
+        {
+          "year": 1960,
+          "event": "Competency movement in education",
+          "associatedContext": "Outcome-based learning"
+        }
       ]
     },
     "specific": {
@@ -897,10 +1496,18 @@
       "assessmentMethod": "Practical weld test"
     },
     "relationships": [
-      { "relationshipFamily": "AgenticAndOperative", "relationshipType": "SUPPORTED_BY", "targetNodeId": "technical_labor_001", "description": "Competence supports labor" }
+      {
+        "relationshipFamily": "AgenticAndOperative",
+        "relationshipType": "SUPPORTED_BY",
+        "targetNodeId": "technical_labor_001",
+        "description": "Competence supports labor"
+      }
     ],
     "metadata": {
-      "tags": ["competence", "skill"],
+      "tags": [
+        "competence",
+        "skill"
+      ],
       "confidenceScore": 0.97,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -914,12 +1521,24 @@
     "layer": "EvaluativeAndCorrective",
     "inheritanceLevel": 0,
     "description": "State or event wherein an artifact or process deviates from its technical specification or required function.",
-    "functionalRoles": ["Feedback trigger", "Risk identification", "Root cause analysis"],
-    "realityDomains": ["Reliability engineering", "Safety", "Quality"],
+    "functionalRoles": [
+      "Feedback trigger",
+      "Risk identification",
+      "Root cause analysis"
+    ],
+    "realityDomains": [
+      "Reliability engineering",
+      "Safety",
+      "Quality"
+    ],
     "historicalContext": {
       "summary": "Systematic failure analysis grew after industrial accidents.",
       "chronology": [
-        { "year": 1975, "event": "Failure mode and effects analysis formalized", "associatedContext": "NASA and automotive" }
+        {
+          "year": 1975,
+          "event": "Failure mode and effects analysis formalized",
+          "associatedContext": "NASA and automotive"
+        }
       ]
     },
     "specific": {
@@ -928,10 +1547,18 @@
       "severityClass": "Critical"
     },
     "relationships": [
-      { "relationshipFamily": "EvaluativeAndCorrective", "relationshipType": "INDICATES", "targetNodeId": "feedback_001", "description": "Failure indicated by feedback" }
+      {
+        "relationshipFamily": "EvaluativeAndCorrective",
+        "relationshipType": "INDICATES",
+        "targetNodeId": "feedback_001",
+        "description": "Failure indicated by feedback"
+      }
     ],
     "metadata": {
-      "tags": ["failure", "error"],
+      "tags": [
+        "failure",
+        "error"
+      ],
       "confidenceScore": 0.98,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -945,12 +1572,23 @@
     "layer": "Problem Space",
     "inheritanceLevel": 0,
     "description": "Formalized desired state, need, or performance objective that initiates technical practice.",
-    "functionalRoles": ["Initiator", "Design driver", "Acceptance criteria"],
-    "realityDomains": ["Systems engineering", "Product management"],
+    "functionalRoles": [
+      "Initiator",
+      "Design driver",
+      "Acceptance criteria"
+    ],
+    "realityDomains": [
+      "Systems engineering",
+      "Product management"
+    ],
     "historicalContext": {
       "summary": "Formal requirements engineering emerged with complex systems (e.g., aerospace).",
       "chronology": [
-        { "year": 1960, "event": "NASA requirements practices", "associatedContext": "Apollo program" }
+        {
+          "year": 1960,
+          "event": "NASA requirements practices",
+          "associatedContext": "Apollo program"
+        }
       ]
     },
     "specific": {
@@ -959,10 +1597,18 @@
       "verificationMethod": "Test and demonstration"
     },
     "relationships": [
-      { "relationshipFamily": "NormativeAndRegulative", "relationshipType": "PRESCRIBES", "targetNodeId": "specification_001", "description": "Requirement prescribes specification" }
+      {
+        "relationshipFamily": "NormativeAndRegulative",
+        "relationshipType": "PRESCRIBES",
+        "targetNodeId": "specification_001",
+        "description": "Requirement prescribes specification"
+      }
     ],
     "metadata": {
-      "tags": ["requirement", "need"],
+      "tags": [
+        "requirement",
+        "need"
+      ],
       "confidenceScore": 0.98,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -976,12 +1622,24 @@
     "layer": "Governance Space",
     "inheritanceLevel": 0,
     "description": "Systematic process to evaluate whether an artifact fulfills its technical specification or blueprint.",
-    "functionalRoles": ["Conformance checking", "Quality gate", "Risk reduction"],
-    "realityDomains": ["Quality assurance", "Software testing", "Manufacturing"],
+    "functionalRoles": [
+      "Conformance checking",
+      "Quality gate",
+      "Risk reduction"
+    ],
+    "realityDomains": [
+      "Quality assurance",
+      "Software testing",
+      "Manufacturing"
+    ],
     "historicalContext": {
       "summary": "Grew with quality movement; formal testing methods in software.",
       "chronology": [
-        { "year": 1979, "event": "Software testing as formal discipline", "associatedContext": "Myers' The Art of Software Testing" }
+        {
+          "year": 1979,
+          "event": "Software testing as formal discipline",
+          "associatedContext": "Myers' The Art of Software Testing"
+        }
       ]
     },
     "specific": {
@@ -990,10 +1648,18 @@
       "acceptanceCriteria": "All tests pass, coverage >90%"
     },
     "relationships": [
-      { "relationshipFamily": "EvaluativeAndCorrective", "relationshipType": "VALIDATES_AGAINST", "targetNodeId": "specification_001", "description": "Verifies against specification" }
+      {
+        "relationshipFamily": "EvaluativeAndCorrective",
+        "relationshipType": "VALIDATES_AGAINST",
+        "targetNodeId": "specification_001",
+        "description": "Verifies against specification"
+      }
     ],
     "metadata": {
-      "tags": ["verification", "testing"],
+      "tags": [
+        "verification",
+        "testing"
+      ],
       "confidenceScore": 0.97,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -1007,24 +1673,48 @@
     "layer": "Execution Space",
     "inheritanceLevel": 0,
     "description": "Ordered set of technical acts performed to retain or restore an artifact to a state where it can reliably perform its function.",
-    "functionalRoles": ["Entropy counteraction", "Reliability", "Life extension"],
-    "realityDomains": ["Operations", "Facility management", "Software patches"],
+    "functionalRoles": [
+      "Entropy counteraction",
+      "Reliability",
+      "Life extension"
+    ],
+    "realityDomains": [
+      "Operations",
+      "Facility management",
+      "Software patches"
+    ],
     "historicalContext": {
       "summary": "Systematic maintenance arose with industrial machinery; preventive maintenance formalized in 20th century.",
       "chronology": [
-        { "year": 1950, "event": "Preventive maintenance programs", "associatedContext": "Manufacturing" }
+        {
+          "year": 1950,
+          "event": "Preventive maintenance programs",
+          "associatedContext": "Manufacturing"
+        }
       ]
     },
     "specific": {
       "maintenanceType": "preventive",
       "schedule": "Every 5000 operating hours",
-      "interventionActions": ["Lubrication", "Belt replacement", "Calibration"]
+      "interventionActions": [
+        "Lubrication",
+        "Belt replacement",
+        "Calibration"
+      ]
     },
     "relationships": [
-      { "relationshipFamily": "EvaluativeAndCorrective", "relationshipType": "MITIGATES", "targetNodeId": "technical_failure_001", "description": "Maintenance mitigates failure" }
+      {
+        "relationshipFamily": "EvaluativeAndCorrective",
+        "relationshipType": "MITIGATES",
+        "targetNodeId": "technical_failure_001",
+        "description": "Maintenance mitigates failure"
+      }
     ],
     "metadata": {
-      "tags": ["maintenance", "reliability"],
+      "tags": [
+        "maintenance",
+        "reliability"
+      ],
       "confidenceScore": 0.96,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -1038,12 +1728,24 @@
     "layer": "Governance Space",
     "inheritanceLevel": 0,
     "description": "Domain of principles, constraints, and processes protecting a system from unauthorized access, disruption, or destruction.",
-    "functionalRoles": ["Protection", "Access control", "Threat management"],
-    "realityDomains": ["Cybersecurity", "Physical security", "Information assurance"],
+    "functionalRoles": [
+      "Protection",
+      "Access control",
+      "Threat management"
+    ],
+    "realityDomains": [
+      "Cybersecurity",
+      "Physical security",
+      "Information assurance"
+    ],
     "historicalContext": {
       "summary": "Evolved from military secrecy to comprehensive cybersecurity framework.",
       "chronology": [
-        { "year": 1970, "event": "Multics security model", "associatedContext": "Academic computer security" }
+        {
+          "year": 1970,
+          "event": "Multics security model",
+          "associatedContext": "Academic computer security"
+        }
       ]
     },
     "specific": {
@@ -1052,10 +1754,18 @@
       "controlMechanism": "AES-256 encryption at rest"
     },
     "relationships": [
-      { "relationshipFamily": "NormativeAndRegulative", "relationshipType": "PROTECTS", "targetNodeId": "production_object_001", "description": "Security protects production object" }
+      {
+        "relationshipFamily": "NormativeAndRegulative",
+        "relationshipType": "PROTECTS",
+        "targetNodeId": "production_object_001",
+        "description": "Security protects production object"
+      }
     ],
     "metadata": {
-      "tags": ["security", "protection"],
+      "tags": [
+        "security",
+        "protection"
+      ],
       "confidenceScore": 0.95,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -1069,12 +1779,24 @@
     "layer": "Problem Space",
     "inheritanceLevel": 0,
     "description": "Consumable or non-consumable inputs—matter, energy, information, time, capital—required, transformed, or consumed by technical practice.",
-    "functionalRoles": ["Input provisioning", "Cost accounting", "Scaling factor"],
-    "realityDomains": ["Supply chain", "Energy", "Finance"],
+    "functionalRoles": [
+      "Input provisioning",
+      "Cost accounting",
+      "Scaling factor"
+    ],
+    "realityDomains": [
+      "Supply chain",
+      "Energy",
+      "Finance"
+    ],
     "historicalContext": {
       "summary": "Resource constraints have driven innovation throughout history.",
       "chronology": [
-        { "year": 1973, "event": "Oil crisis spurs energy efficiency", "associatedContext": "Resource scarcity" }
+        {
+          "year": 1973,
+          "event": "Oil crisis spurs energy efficiency",
+          "associatedContext": "Resource scarcity"
+        }
       ]
     },
     "specific": {
@@ -1083,10 +1805,18 @@
       "consumptionProfile": "Continuous variable load"
     },
     "relationships": [
-      { "relationshipFamily": "GenerativeAndStructural", "relationshipType": "CONSUMES", "targetNodeId": "process_001", "description": "Process consumes resources" }
+      {
+        "relationshipFamily": "GenerativeAndStructural",
+        "relationshipType": "CONSUMES",
+        "targetNodeId": "process_001",
+        "description": "Process consumes resources"
+      }
     ],
     "metadata": {
-      "tags": ["resource", "input"],
+      "tags": [
+        "resource",
+        "input"
+      ],
       "confidenceScore": 0.97,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
@@ -1100,12 +1830,23 @@
     "layer": "Evolutionary Space",
     "inheritanceLevel": 0,
     "description": "State wherein an artifact is no longer technically viable, economically justifiable, or socially supported compared to alternatives, regardless of functional state.",
-    "functionalRoles": ["Replacement trigger", "Innovation driver", "Lifecycle end"],
-    "realityDomains": ["Product lifecycle", "Technology management"],
+    "functionalRoles": [
+      "Replacement trigger",
+      "Innovation driver",
+      "Lifecycle end"
+    ],
+    "realityDomains": [
+      "Product lifecycle",
+      "Technology management"
+    ],
     "historicalContext": {
       "summary": "Planned obsolescence recognized in 1920s; accelerated by rapid tech change.",
       "chronology": [
-        { "year": 1932, "event": "Planned obsolescence concept", "associatedContext": "Bernard London's pamphlet" }
+        {
+          "year": 1932,
+          "event": "Planned obsolescence concept",
+          "associatedContext": "Bernard London's pamphlet"
+        }
       ]
     },
     "specific": {
@@ -1114,20 +1855,27 @@
       "replacementArtifact": "Solid-state drive replacing HDD"
     },
     "relationships": [
-      { "relationshipFamily": "TemporalAndEvolutionary", "relationshipType": "SUPERSEDES", "targetNodeId": "concrete_artifact_001", "description": "New artifact supersedes obsolete one" }
+      {
+        "relationshipFamily": "TemporalAndEvolutionary",
+        "relationshipType": "SUPERSEDES",
+        "targetNodeId": "concrete_artifact_001",
+        "description": "New artifact supersedes obsolete one"
+      }
     ],
     "metadata": {
-      "tags": ["obsolescence", "lifecycle"],
+      "tags": [
+        "obsolescence",
+        "lifecycle"
+      ],
       "confidenceScore": 0.94,
       "sourceReference": "Philosophia Artium Technicarum",
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     }
   },
-
   {
     "id": "data-systems-001",
-    "name": "Software Data Systems",
+    "name": "Data Management System (DMS)",
     "category": "TechnicalFramework",
     "layer": "Capability Space",
     "inheritanceLevel": 0,
@@ -1178,7 +1926,13 @@
     },
     "relationships": [],
     "metadata": {
-      "tags": ["data management", "information systems", "infrastructure", "storage", "processing"],
+      "tags": [
+        "data management",
+        "information systems",
+        "infrastructure",
+        "storage",
+        "processing"
+      ],
       "confidenceScore": 0.95,
       "sourceReference": "User request: Data Systems",
       "createdAt": "2026-05-03T12:00:00Z",
@@ -1187,7 +1941,7 @@
   },
   {
     "id": "database-systems-001",
-    "name": "Software Database Systems",
+    "name": "Relational Database Management System (RDBMS)",
     "category": "TechnicalFramework",
     "layer": "Artifact Space",
     "inheritanceLevel": 1,
@@ -1245,11 +1999,323 @@
       }
     ],
     "metadata": {
-      "tags": ["database", "DBMS", "SQL", "NoSQL", "transaction", "query processing"],
+      "tags": [
+        "database",
+        "DBMS",
+        "SQL",
+        "NoSQL",
+        "transaction",
+        "query processing"
+      ],
       "confidenceScore": 0.95,
       "sourceReference": "User request: Data Base Systems",
       "createdAt": "2026-05-03T12:00:00Z",
       "auditTrail": []
     }
+  },
+  {
+    "id": "technical-problem-concept",
+    "name": "Technical Problem",
+    "category": "TechnicalProblem",
+    "layer": "Problem Space",
+    "inheritanceLevel": 0,
+    "description": "A structured discrepancy between a current or projected state of Reality and a desired Technical Function, Specification, or Purpose. It defines the precise boundary of necessary intervention—arising from an unmet Technical Requirement, a Technical Failure, or the friction of Technical Constraints—and serves as the primary catalyst that compels a Technical Agent to initiate a Technical Process.",
+    "longDescription": "Within technical practice, a problem is not merely an obstacle but a formalized gap—a measurable distance between an observed or anticipated state and a target condition expressed as a requirement, function, or purpose. Problems initiate the entire technical workflow: they are framed, analyzed, and resolved through processes that consume resources, apply techniques, and produce artifacts. Problems are always situated in a reality domain, bounded by constraints, and often signaled by feedback or failure. The classification of a problem (performance, reliability, safety, etc.) determines which strategies, standards, and verification methods become relevant.",
+    "functionalRoles": [
+      "intervention_catalyst",
+      "requirements_gap_specifier",
+      "process_trigger",
+      "boundary_object_between_desired_and_actual"
+    ],
+    "realityDomains": [
+      "physical_systems",
+      "information_systems",
+      "social_technical_systems",
+      "biological_media",
+      "cyber_physical_environment"
+    ],
+    "historicalContext": {
+      "summary": "The explicit formalization of 'technical problem' emerged with systems engineering and operations research in the mid‑20th century, though problem‑solving has been implicit in craft and engineering since antiquity. Key developments include the articulation of problem statements in requirements engineering (1960s–70s), the rise of structured problem‑solving methodologies like TRIZ (1956) and A3 problem‑solving (1980s), and contemporary integration into agile and DevOops frameworks where problems are captured as issues, tickets, or user stories.",
+      "chronology": [
+        {
+          "year": 1956,
+          "event": "Genrich Altshuller begins developing TRIZ (Theory of Inventive Problem Solving), formalizing patterns of technical contradiction and ideal final result.",
+          "associatedContext": "Soviet patent office analysis revealed that technical problems repeat across industries."
+        },
+        {
+          "year": 1962,
+          "event": "RAND Corporation publishes 'A Framework for Systems Engineering Problem Definition'.",
+          "associatedContext": "Cold war defense projects demand rigorous gap analysis between requirements and fielded systems."
+        },
+        {
+          "year": 1988,
+          "event": "Toyota formalizes the A3 Problem Solving Report, embedding problem statements into lean manufacturing culture.",
+          "associatedContext": "Continuous improvement (Kaizen) requires a standard way to document current vs. target conditions."
+        },
+        {
+          "year": 2001,
+          "event": "Agile Manifesto elevates user stories and acceptance criteria as lightweight problem representations.",
+          "associatedContext": "Shift from heavyweight specification to iterative problem framing in software development."
+        }
+      ]
+    },
+    "specific": {
+      "problemClass": "other",
+      "problemOrigin": "knowledgeGap",
+      "affectedDimension": "technical_practice_definition",
+      "resolutionStatus": "underInvestigation"
+    },
+    "relationships": [
+      {
+        "relationshipFamily": "NORMATIVE_AND_REGULATIVE",
+        "relationshipType": "CONSTRAINED_BY",
+        "targetNodeId": "technical-constraint-concept",
+        "description": "Every technical problem is bounded by physical laws, resource limits, time, budget, or regulatory rules. These constraints define the feasible solution space."
+      },
+      {
+        "relationshipFamily": "EVALUATIVE_AND_CORRECTIVE",
+        "relationshipType": "INDICATES",
+        "targetNodeId": "technical-failure-concept",
+        "description": "A technical problem often manifests as or is revealed by a failure (e.g., performance degradation, crash, fracture). Conversely, a problem may be latent until a failure event signals it."
+      },
+      {
+        "relationshipFamily": "TELEOLOGICAL_AND_FUNCTIONAL",
+        "relationshipType": "SATISFIES",
+        "targetNodeId": "technical-requirement-concept",
+        "description": "A problem arises when a requirement is not met (unmet need, out‑of‑spec condition). The gap between desired (requirement) and actual is the problem."
+      },
+      {
+        "relationshipFamily": "TEMPORAL_AND_EVOLUTIONARY",
+        "relationshipType": "EVOLVES_FROM",
+        "targetNodeId": "prior-problem-concept",
+        "description": "Problems evolve as solutions create new constraints or as systems scale; today's resolved problem may become tomorrow's sub‑problem or a new problem in a different context."
+      },
+      {
+        "relationshipFamily": "AGENTIC_AND_OPERATIVE",
+        "relationshipType": "PERFORMS",
+        "targetNodeId": "technical-agent-concept",
+        "description": "Technical problems are not passive; they compel agents (human or machine) to perform diagnostic, analytical, or corrective acts. The problem is the 'why' behind the act."
+      }
+    ],
+    "metadata": {
+      "tags": [
+        "problem",
+        "discrepancy",
+        "catalyst",
+        "requirements",
+        "gap-analysis",
+        "systems-engineering",
+        "troubleshooting"
+      ],
+      "categoryAmbiguity": {
+        "isAmbiguous": false,
+        "primaryJustification": "The node cleanly fits the 'TechnicalProblem' category as a structured discrepancy that initiates technical processes. It does not overlap substantially with other categories because it explicitly defines a gap state rather than an artifact, act, constraint, or standard.",
+        "alternativeCategories": []
+      },
+      "confidenceScore": 0.95,
+      "sourceReference": "Derived from 'Technical Problem' row in the concept table provided in the specification, with additional synthesis from systems engineering literature and problem‑framing methodologies (TRIZ, A3, ISO 9001:2015 clause 10.2).",
+      "createdAt": "2025-03-15T10:30:00Z",
+      "auditTrail": [
+        {
+          "reviewDate": "2025-03-15",
+          "reviewNote": "Initial creation based on the specification. relationship types selected from controlled enum to align with CONSAT ontology. 'prior-problem-concept' is a placeholder for recursive problem evolution."
+        }
+      ]
+    }
+  },
+  {
+    "id": "technical-architecture-concurrent-hashmap-design-implementation",
+    "name": "Concurrent Hashmap Design & Implementation",
+    "category": "TechnicalArchitecture",
+    "layer": "Artifact Space",
+    "inheritanceLevel": 2,
+    "description": "A technical architecture and implementation strategy for enabling safe, scalable, and performant concurrent access to associative key-value data structures across multiple execution agents or threads.",
+    "longDescription": "Concurrent Hashmap Design & Implementation refers to the architectural organization, synchronization strategy, memory coordination model, and operational mechanisms used to construct hash-based key-value stores capable of supporting simultaneous read and write operations by multiple concurrent execution contexts. The concept exists at the intersection of systems programming, runtime engineering, synchronization theory, memory consistency semantics, and scalable software architecture. The architecture typically decomposes the hashmap into buckets, shards, segments, lock domains, or lock-free regions to minimize contention while preserving correctness guarantees such as linearizability, sequential consistency, or eventual visibility. Implementation techniques include coarse-grained locking, striped locking, segmented locking, compare-and-swap (CAS), read-copy-update (RCU), hazard pointers, epoch-based reclamation, software transactional memory, and lock-free probing algorithms. The architecture must negotiate multiple technical constraints simultaneously: cache coherence traffic, false sharing, memory fragmentation, synchronization overhead, resizing complexity, ABA hazards, latency amplification under contention, and memory ordering guarantees imposed by hardware architectures. Concurrent hashmaps function as critical infrastructural components in operating systems, databases, distributed systems, language runtimes, web servers, schedulers, caches, telemetry systems, and message brokers. The design space evolved historically from simple mutex-protected maps toward NUMA-aware, lock-free, wait-free, and highly parallel data structures optimized for multicore processors and high-throughput workloads.",
+    "functionalRoles": [
+      "Concurrent key-value storage",
+      "Synchronization of shared mutable state",
+      "Low-latency associative lookup under contention",
+      "Scalable concurrent data access",
+      "Thread-safe mutation coordination",
+      "Runtime caching infrastructure",
+      "Memory-efficient parallel indexing",
+      "State sharing across execution agents"
+    ],
+    "realityDomains": [
+      "Computer systems",
+      "Runtime environments",
+      "Operating systems",
+      "Multicore processor architectures",
+      "Distributed systems",
+      "Concurrent programming",
+      "Memory hierarchy systems",
+      "Network services infrastructure"
+    ],
+    "historicalContext": {
+      "summary": "Concurrent hashmap architectures evolved alongside multicore computing, synchronization theory, and scalable systems engineering. Early approaches relied on global locks, while later architectures introduced segmented locking, non-blocking synchronization, and cache-aware designs.",
+      "chronology": [
+        {
+          "year": 1970,
+          "event": "Introduction of shared-memory synchronization primitives in operating systems",
+          "associatedContext": "Early concurrent systems and multiprocessing research"
+        },
+        {
+          "year": 1986,
+          "event": "Formalization of lock-free and non-blocking synchronization concepts",
+          "associatedContext": "Concurrent algorithm research"
+        },
+        {
+          "year": 2003,
+          "event": "Segmented locking concurrent hashmap designs become mainstream in enterprise runtimes",
+          "associatedContext": "Java concurrent collections and server scalability"
+        },
+        {
+          "year": 2011,
+          "event": "Modern memory model standardization influences concurrent hashmap implementation semantics",
+          "associatedContext": "C++11 and Java Memory Model adoption"
+        },
+        {
+          "year": 2020,
+          "event": "NUMA-aware and lock-free hashmap implementations optimized for high-core-count processors",
+          "associatedContext": "Cloud-scale infrastructure and multicore scalability"
+        }
+      ]
+    },
+    "specific": {
+      "topology": "Partitioned hash bucket topology with synchronization domains distributed across buckets, shards, or lock-free regions",
+      "decompositionStyle": "Concurrent decomposition into hash computation, bucket management, synchronization control, memory reclamation, resizing coordination, and contention mitigation subsystems",
+      "interfaceProtocol": "Thread-safe associative operations including insert, lookup, update, remove, iteration, resize coordination, and atomic synchronization semantics"
+    },
+    "relationships": [
+      {
+        "relationshipFamily": "TELEOLOGICAL_AND_FUNCTIONAL",
+        "relationshipType": "REALIZES",
+        "targetNodeId": "technical-function-concurrent-key-value-access",
+        "description": "The architecture realizes scalable concurrent associative storage and retrieval functionality."
+      },
+      {
+        "relationshipFamily": "TELEOLOGICAL_AND_FUNCTIONAL",
+        "relationshipType": "SATISFIES",
+        "targetNodeId": "technical-requirement-thread-safe-shared-state-management",
+        "description": "The architecture satisfies the requirement for safe shared-state mutation across concurrent execution contexts."
+      },
+      {
+        "relationshipFamily": "NORMATIVE_AND_REGULATIVE",
+        "relationshipType": "CONSTRAINED_BY",
+        "targetNodeId": "technical-constraint-memory-consistency-model",
+        "description": "The implementation is constrained by processor and language-level memory ordering semantics."
+      },
+      {
+        "relationshipFamily": "NORMATIVE_AND_REGULATIVE",
+        "relationshipType": "CONSTRAINED_BY",
+        "targetNodeId": "technical-constraint-cache-coherence-overhead",
+        "description": "Scalability is bounded by cache coherence traffic and synchronization contention."
+      },
+      {
+        "relationshipFamily": "NORMATIVE_AND_REGULATIVE",
+        "relationshipType": "GOVERNED_BY",
+        "targetNodeId": "technical-principle-minimize-lock-contention",
+        "description": "The architecture follows the principle of reducing synchronization bottlenecks to improve throughput."
+      },
+      {
+        "relationshipFamily": "AGENTIC_AND_OPERATIVE",
+        "relationshipType": "UTILIZES",
+        "targetNodeId": "technical-operator-compare-and-swap",
+        "description": "Lock-free variants utilize atomic compare-and-swap operators for synchronization."
+      },
+      {
+        "relationshipFamily": "AGENTIC_AND_OPERATIVE",
+        "relationshipType": "UTILIZES",
+        "targetNodeId": "technical-operator-striped-locking",
+        "description": "Segmented implementations utilize striped locking operators to partition contention domains."
+      },
+      {
+        "relationshipFamily": "CONSTITUTIVE_AND_MEREOLOGICAL",
+        "relationshipType": "LOCALIZES_FUNCTION",
+        "targetNodeId": "technical-function-bucket-level-synchronization",
+        "description": "Individual bucket regions localize synchronization and collision-management responsibilities."
+      },
+      {
+        "relationshipFamily": "CONSTITUTIVE_AND_MEREOLOGICAL",
+        "relationshipType": "COMPOSED_BY_CONSTITUENT",
+        "targetNodeId": "constitutive-technique-lock-free-memory-reclamation",
+        "description": "The implementation architecture depends on constituent synchronization and memory reclamation techniques."
+      },
+      {
+        "relationshipFamily": "STRATEGIC_AND_CONTEXTUAL",
+        "relationshipType": "SUPPORTED_BY",
+        "targetNodeId": "technical-infrastructure-multicore-runtime-environment",
+        "description": "The architecture relies on multicore runtime infrastructure and thread scheduling systems."
+      },
+      {
+        "relationshipFamily": "TEMPORAL_AND_EVOLUTIONARY",
+        "relationshipType": "EVOLVES_FROM",
+        "targetNodeId": "technical-architecture-coarse-grained-locking-hashmap",
+        "description": "Modern concurrent hashmap designs evolved from globally locked hashmap architectures."
+      },
+      {
+        "relationshipFamily": "TEMPORAL_AND_EVOLUTIONARY",
+        "relationshipType": "EXPANDS",
+        "targetNodeId": "technical-constraint-parallel-throughput-limitations",
+        "description": "Advanced synchronization techniques expand the feasible scalability limits of parallel hashmap operations."
+      },
+      {
+        "relationshipFamily": "TAXONOMIC_AND_CLASSIFICATORY",
+        "relationshipType": "TYPE_OF",
+        "targetNodeId": "technical-architecture-concurrent-data-structure",
+        "description": "Concurrent hashmap design is a subtype of concurrent shared-memory data structure architecture."
+      }
+    ],
+    "metadata": {
+      "tags": [
+        "concurrency",
+        "hashmap",
+        "systems-programming",
+        "lock-free",
+        "multithreading",
+        "parallel-computing",
+        "synchronization",
+        "runtime-systems",
+        "memory-models",
+        "data-structures",
+        "cache-coherence",
+        "thread-safety"
+      ],
+      "categoryAmbiguity": {
+        "isAmbiguous": true,
+        "primaryJustification": "The concept is primarily architectural because it defines the structural organization and coordination topology of a concurrent data structure system.",
+        "alternativeCategories": [
+          {
+            "category": "TechnicalBlueprint",
+            "justification": "Implementation source code and synchronization layout can also function as a generative blueprint.",
+            "confidence": 0.76
+          },
+          {
+            "category": "Technique",
+            "justification": "Concurrent hashmap implementation also constitutes a reusable engineering technique for scalable synchronization.",
+            "confidence": 0.72
+          },
+          {
+            "category": "TechnicalFramework",
+            "justification": "Some implementations encode broader concurrency-management frameworks and synchronization paradigms.",
+            "confidence": 0.51
+          }
+        ]
+      },
+      "confidenceScore": 0.95,
+      "sourceReference": "User-provided technical ontology and systems formulation for technical practice modeling.",
+      "createdAt": "2026-05-15T03:00:00Z",
+      "auditTrail": [
+        {
+          "reviewDate": "2026-05-15",
+          "reviewNote": "Initial formalization aligned to TechnicalArchitecture classification and concurrent systems engineering domain semantics."
+        }
+      ]
+    }
+    ,"references": [{
+      "title": "Multithreaded HashMap Cache",
+      "link": "view/chmc.html",
+      "description": "A technique space exploration of concurrent in-memory caching—where hash buckets meet lock strips, where cache lines become battlegrounds, and where nanosecond decisions determine system-scale throughput."
+    }]
   }
 ]

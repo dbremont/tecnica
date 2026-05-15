@@ -1,103 +1,75 @@
 # Meta Tool Spec
 
-> An **epistemic tool** is any technique, method, or formal mechanism used by an observer to construct, represent, and validate descriptions of reality.
+> This spec will serve as a guide - to create web sites in order to explore `elements of the technique space`.
 
-> Take a **specific epistemic tool** `"(tool - note)"` and design a **web-based interactive notebook** whose purpose is to systematically support a human in **understanding, interrogating, and operationalizing** that tool.
+## Technique Space Elements
 
-> Our goal is to create a  **Interactive Epistemic Notebook**: a controlled experimental environment for epistemic tools, where understanding is achieved through structured interaction with the tool’s formal, computational, and behavioral structure.
+| **Category** | **Description** | **Instance(s)** |
+| --- | --- | --- |
+| **Reality** | The ontological substrate comprising the actual physical, chemical, biological, informational, and social structures that both constrain and respond to technical intervention. Reality is the medium of action: it offers affordances, resists actuation, degrades artifacts, and ultimately validates or negates technical outcomes. | Steel beam, fluid flow, electric grid, living tissue, user population, electromagnetic spectrum, geological formation, supply chain, software runtime environment, urban infrastructure. |
+| **Action Interface & Actuation** | The motoric and encoding boundary through which an agent imparts energy, information, or structure onto reality. Includes effector hardware, actuation transducers, formative tools, and the encoding of intent into executable commands. | CNC spindle + G‑code; robotic gripper + motion controller; keyboard + IDE + compilation pipeline; human hand + chisel; relay + SCADA signal. |
+| **Concrete Technical Artifact (Technical Object)** | A specific, fully‑specified object, system, or code module that has been produced or is being operated; the primary carrier of technical effect. **Zero free parameters** – every dimension, material, logic branch, and interface is fixed. Can be evaluated as functional/malfunctional, safe/unsafe, efficient/inefficient. | A particular bridge (with coordinates), a compiled binary `app.exe`, a fully‑configured Kubernetes cluster, a printed turbine blade, a patient‑specific surgical implant, installation‑ready circuit board. |
+| **Technical Blueprint** | The generative description that prescribes how to create, assemble, or configure an artifact. A formalized recipe that abstracts over material instances. | Engineering drawing, architect’s plan, source code listing, PCB Gerber files, Bill of Materials + assembly instructions, molecular synthesis route, infrastructure‑as‑code template. |
+| **Technical Agent** | Entity that executes technical operations by utilizing tools, energy, and instructions. | Engineer, artisan, construction crew, surgical robot, industrial control system, compiler, build pipeline, autonomous drone, automated fabrication system. |
+| **Technical Process (Activity)** | Ordered, temporally‑extended sequence of technical acts that transform inputs (materials, energy, information) into outputs (artifacts, services, changed states). Defines the dynamics of making, maintaining, and operating. | Assembly line sequence, software development lifecycle, continuous integration pipeline, construction project schedule, sterilization protocol, dynamic power‑up sequence. |
+| **Technical Standard** | Normative specification that governs form, fit, function, safety, interoperability, or performance of an artifact or process. | ISO dimension tolerance, UL safety code, API specification, HTTP protocol, electrical code, medical device sterility assurance level, coding style guide, materials grade. |
+| **Technical Constraint** | Any bound on achievable action imposed by physical law, material properties, resource availability, or social regulation. | Tensile strength limit, noise floor, power budget, time deadline, regulatory ban, scarce rare‑earth element, network latency floor, computational complexity, thermal hotspot, toxicity threshold, human ergonomic limit. |
+| **Technical Infrastructure** | The ambient capital—material, energetic, informational, institutional—that makes sustained technical practice possible. | Power grid, water supply, internet backbone, factory floor, tool chain, version control repository, laboratory bench, standards body, certification authority, supply chain. |
+| **Technical Feedback** | Signal that indicates the real‑world effect of a technical act, enabling adjustment, optimization, and error correction. | Stress‑strain gauge reading, build log error message, user complaint, wear debris in lubricant, temperature rise, latency spike, crash report, A/B test result, pass/fail quality inspection. |
+| **Technical Act** | Primitive, non‑decomposable operation that a technical agent performs on reality (or on an artifact). | Cutting, welding, bolting, writing a line of code, compiling, deploying, measuring torque, pressing a button, casting a vote in a control system, issuing an API call, flipping a switch. |
+| **Technical Principle** | Foundational design law, operating axiom, or reliability rule that governs how technical agents should structure interventions and artifacts to ensure safety, efficiency, robustness, and functionality. | Least privilege, defense in depth, fail‑safe, idempotency, separation of concerns, KISS, YAGNI, tolerance for use, design for manufacturability, loose coupling, energy‑minimization, ergonomic adjustability, redundancy, graceful degradation. |
+| **Technical Strategy** | Context‑sensitive, resource‑aware regime of planning and decision‑making that organizes the sequence, decomposition, and prioritization of technical work under real‑world constraints. | Waterfall, Agile, spiral, prototyping‑first, concurrent engineering, design‑build‑test‑iterate, modular incremental deployment, brownfield vs greenfield, security‑by‑design, lean production, just‑in‑time, preventive maintenance scheduling, blue‑green deployment. |
+| **Technical Framework** | The overarching problem‑structuring and solution‑generation logic within which technical agents interpret requirements, decompose complexity, and synthesize artifacts. | Systems engineering, design thinking, TRIZ, axiomatic design, root cause analysis, failure modes and effects analysis (FMEA), control theory, operations research, generative design, cyber‑physical systems, mechatronics. |
+| **Technical Operator** | Formal, procedural, or physical mechanism used to transform, assemble, verify, or maintain technical artifacts. Operators are the “verbs” of technical practice. | Milling (subtractive), injection moulding (formative), soldering (joining), refactoring (code transformation), integration testing, heat‑treating, etching, calibration, patching, container orchestration, concrete pouring. |
+| **Production Technical Object** | The final, deployable artifact that fulfills the ultimate technical purpose in its operational environment. It is the end-product of the technical process, ready to deliver value, effect, or service to a user or broader system. | A completed consumer smartphone, a commissioned nuclear reactor, a deployed SaaS platform, a delivered commercial aircraft, a released video game, an operational MRI machine. |
+| **Constitutive Technical Object** | An intermediate artifact, component, or sub-assembly that serves as a building block within a larger Production Technical Object. It possesses localized functions but derives its ultimate purpose from integration into the whole. | A lithium-ion battery cell, a microcontroller chip, a custom UI widget library, a milled chassis frame, a ball bearing, a normalized SQL database schema, a precast concrete pillar. |
+| **Technical Problem** | A structured discrepancy between a current or projected state of Reality and a desired Technical Function, Specification, or Purpose. It defines the precise boundary of necessary intervention—arising from an unmet Technical Requirement, a Technical Failure, or the friction of Technical Constraints—and serves as the primary catalyst that compels a Technical Agent to initiate a Technical Process. | "Achieving sub-200ms database query latency despite a projected 10x increase in concurrent load"; "Reducing the mass of a load-bearing drone arm by 20% without violating material yield strength limits"; "Preventing electromagnetic interference in a compact circuit layout where spatial separation of components is physically impossible"; "Rerouting a municipal water main around an unmapped geological fault zone without exceeding the allocated capital budget.” |
+| **Technical Requirement** | Formalized desired state, need, or performance objective that initiates technical practice | "The vehicle shall achieve 0-60 mph in under 5 seconds"; "The system must support 99.99% uptime"; "The device shall not exceed 50 decibels at 1 meter under load"; "User passwords must be salted and hashed.” |
+| **Technique** | The generalized, culturally or professionally transmitted body of knowledge regarding how to achieve a specific type of technical effect. A codified or tacit "way of doing" that transcends a singular execution. | Arc welding, precision machining, chromatography, forging, test-driven development, microservices design, cognitive walkthrough, statistical process control. |
+| **Operative Technique** | The context-specific, situated application of a generalized Technique by a Technical Agent to transform a specific material or informational state. The technique as actively performed in situ. | A welder executing a specific TIG pass on an aluminum pipe; a developer applying test-driven development to write an authentication module; a machinist setting specific feed rates for titanium. |
+| **Constitutive Technique** | The specialized methods, processes, and know-how dedicated specifically to the creation, testing, and integration of Constitutive Technical Objects. The "making of the parts." | Photolithography for semiconductors, die-casting for engine blocks, unit testing for software modules, powder metallurgy for gears, spectral analysis for raw material verification. |
+| **Technical Purpose** | The teleological orientation of an artifact or process; the intended ultimate impact on reality, human experience, or a broader system. The "why" of the technical endeavor, distinct from its mechanistic function. | Transporting passengers across the Atlantic; curing a bacterial infection; providing real-time financial data to traders; generating zero-carbon electricity; reducing cognitive load for air traffic controllers. |
+| **Technical Function** | The objective, mechanistic input-output relationship of an artifact or system, abstracted from its ultimate purpose. What a system *does* physically or logically to transform states. | Converting chemical energy to rotational kinetic energy; filtering particles larger than 5 microns; translating HTTP requests into SQL queries; amplifying voltage by a factor of 10; algorithmically smoothing signal noise. |
+| **Technical Architecture** | The fundamental structural organization of a system, embodied in its components, their relationships to each other and the environment, and the principles governing its design and evolution. | Client-server model, microservices topology, monocoque chassis design, layered network model (OSI), microkernel OS design, grid-tied solar array topology, hub-and-spoke logistics network. |
+| **Technical Specification** | A precise, quantitative, and unambiguous statement of the technical requirements, performance parameters, and interface conditions an artifact must satisfy. The contractual boundary between design and verification. | "API response time < 200ms at p99"; "Operational temperature range: -40°C to +85°C"; "Maximum axle load: 20 tons"; "Supports 10,000 concurrent WebSocket connections"; "Battery capacity retention > 80% after 1000 cycles." |
+| **Technical Evolution** | The cumulative, historical trajectory of change in technical artifacts, processes, or knowledge over time, driven by iterative problem-solving, standardization, market selection, and shifting constraints. | The transition from vacuum tubes to transistors to integrated circuits; the shift from water power to steam to electric motors; the progression from monolithic to serverless software design; the evolution of bicycle drivetrain mechanisms. |
+| **Technical Labor** | The purposive expenditure of human cognitive and physical effort applied to technical processes. The embodied execution of technique by human agents within a socio-economic framework. | A sysadmin diagnosing a network outage at 3 AM; an electrician pulling wire through conduit; a programmer refactoring a legacy codebase; a technician calibrating sensors on a factory floor. |
+| **Technical Institution** | The formalized, durable social structures—organizations, regulatory bodies, or professional communities—that organize, govern, incentivize, and sustain technical practice and knowledge transmission. | IEEE, ASME, FDA, FAA, a corporate R&D division, a university engineering department, a professional licensing board, an open-source software foundation (e.g., Linux Foundation). |
+| **Technical Research** | Systematic, methodological investigation aimed at discovering new technical principles, materials, processes, or capabilities, expanding the boundary of the technically possible. | Developing solid-state battery chemistry; testing a novel aerodynamic hull shape in a wind tunnel; training a new large language model architecture; synthesizing a new polymer blend; exploring quantum error correction algorithms. |
+| **Technical Competence** | The embodied, acquired capacity of a Technical Agent to reliably execute Technical Processes and Operative Techniques, yielding successful outcomes within accepted tolerances. | A senior surgeon’s ability to perform a laparoscopic procedure; a master machinist’s intuitive feel for cutting speeds; a principal engineer’s aptitude for system design; a pilot’s muscle memory for emergency procedures. |
+| **Technical Failure** | The state or event wherein an artifact or process deviates from its Technical Specification or required Technical Function under specified operating conditions, potentially leading to loss of purpose, safety hazards, or systemic degradation. | Stack overflow crash in production; fatigue-induced fracture of an aircraft fuselage; thermal runaway in a lithium battery; failure of a SCADA system to close a valve; bridge collapse under load; authentication bypass vulnerability. |
+| **Verification** | The systematic process of evaluating an artifact, process, or service to determine whether it accurately fulfills its Technical Specification or Blueprint. It answers the question of "Are we building the system right?" through objective evidence. | Code linting/static analysis, physical dimension inspection with calipers, unit testing, circuit continuity checking, code review against a style guide, automated regression testing, model checking against formal properties. |
+| **Maintenance** | The ordered set of technical acts and processes performed on an operational artifact to retain it in, or restore it to, a state in which it can reliably perform its Technical Function. It counteracts the entropic degradation imposed by Reality. | Replacing worn brake pads, applying a security patch to an OS, lubricating a bearing, clearing a blocked pipe, defragmenting a hard drive, recalibrating a sensor array, scraping and repainting a steel hull. |
+| **Security** | The domain of technical principles, constraints, and processes concerned with protecting an artifact or system from unauthorized access, use, disclosure, disruption, modification, or destruction. It manages adversarial constraints within the operational environment. | Role-based access control (RBAC), AES-256 encryption at rest, network firewall rule sets, code obfuscation, physical perimeter fencing, multi-factor authentication (MFA), input sanitization against SQLi, hardware security modules (HSMs). |
+| **Resource** | The consumable or non-consumable inputs—matter, energy, information, time, or capital—that are required, transformed, or consumed by a Technical Agent or Process to produce, operate, or maintain an artifact. | Gallium arsenide substrate, megawatt-hours of electricity, API rate limits, engineer labor-hours, venture capital funding, silicon wafers, gigabytes of RAM, clean water for industrial cooling, developer seat licenses. |
+| **Technical Obsolescence** | The state wherein an artifact is no longer technically viable, economically justifiable, or socially supported compared to available alternatives, regardless of its current functional state. | The state wherein an artifact is no longer technically viable, economically justifiable, or socially supported compared to available alternatives, regardless of its current functional state. |
 
-Non-Functional Requirements:
+## Objective
 
-* **Cognitive Clarity**
-  The interface must minimize ambiguity and reduce cognitive load while preserving formal precision.
+The **platform should** allow a user to:
 
-* **Progressive Disclosure**
-  Complexity should be revealed incrementally (from intuition → formalism → edge cases).
-
-* **Interactivity Latency**
-  All interactions (parameter changes, simulations) must respond in near real-time.
-
-* **Determinism & Reproducibility**
-  All outputs must be reproducible given the same inputs and parameters.
-
-* **Epistemic Transparency**
-  Assumptions, limitations, and transformation logic must be explicitly exposed.
-
-* **Modularity**
-  Components (visualizations, simulations, explanations) should be composable and independently testable.
-
-* **Observability**
-  Internal states (intermediate variables, transformations) should be inspectable.
-
-Functional Requirements:
-
-* **Conceptual Layer**
-
-  * Provide minimal and precise definitions of the tool
-  * Explicitly state the epistemic role and scope
-
-## Interaction Layer
-
-> ...
-
-* **Purpose**
-  The interaction layer defines how the user **engages with the epistemic structure** of the tool through controlled, observable manipulations.
-
-* **Core Principle**
-  Interaction is not for exploration alone, but for **structured epistemic intervention**: every action should reveal how the tool transforms inputs into outputs.
-
-* **Components**
-
-  * **Parameter Controls**
-    Sliders, inputs, and selectors to modify the tool’s defining variables
-  * **Execution Controls**
-    Step, run, pause, and reset mechanisms for procedural inspection
-  * **State Inspection**
-    Direct access to intermediate states and internal variables
-  * **Linked Views**
-    Synchronized visualizations (e.g., input space ↔ transformation ↔ output artifact)
-  * **Constraint Injection**
-    Ability to enforce or violate assumptions deliberately
-
-* **Design Constraints**
-
-  * All interactions must produce **immediate, interpretable changes**
-  * The mapping between action → transformation → artifact must be **explicit**
-  * Hidden state is minimized; internal dynamics are **externally visible**
-
-### Objective
-
-* Our main goal is to construct a **set of interactive tools** that enable a human to:
-
-  * **Interrogate** the epistemic tool
-    (What does it actually compute? Under what assumptions?)
-
-  * **Manipulate** its structure
-    (How do parameter changes alter the transformation?)
-
-  * **Observe** its behavior
-    (How does the output evolve under different inputs and conditions?)
-
-  * **Diagnose** its limits
-    (When does it fail, and why?)
-
-  * **Internalize** its mechanism
-    (Develop a correct mental model of its operational logic)
-
-### Outcome
-
-The interaction layer should transform passive understanding into **active epistemic control**:
-
-> The user should be able not only to *use* the tool, but to **predict its behavior, detect its failure modes, and reason about its outputs before execution**.
+- Category
+- Funcion
+- Description
+- Analyze: The study of the concept in itself.
+- Tradeoffs
+- Evaluation: How to evaluate the thing?
+- Comparison
+- Place & Integration: What is the place of the elements in the praxis flow.
+- Operationalization (Use)
+  - Exemplification
+  - Create concrete instances of abstractions.
+- Limits
+- References
 
 ## Technology Stack
 
-* HTML
-* CSS
-* JS
-* No Frameworks, Like React
-* Can Used Libraries - But Be Minimalistic.
+- HTML
+- CSS
+- JS
+- No Frameworks, Like React
+- Can Used Libraries - But Be Minimalistic.
 
 ## References
 
-* [Epistemic Tool Template](https://www.notion.so/Epistemic-Tool-Template-2e5c0f5171ec800fa9caf91bb16bcab9?source=copy_link)
+- [Philosophia Artium Technicarum et Operis](https://www.notion.so/Philosophia-Artium-Technicarum-et-Operis-355c0f5171ec808b82f8d7a85e8134cd?source=copy_link)

@@ -2,6 +2,8 @@
 
 > This spec will serve as a guide - to create web sites in order to explore `elements of the technique space`.
 
+>  Note: Used the structure the note of  `Bremontix Ars` - to create a re-presentation in `HTML`.
+
 ## Technique Space Elements
 
 | **Category** | **Description** | **Instance(s)** |

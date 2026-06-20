@@ -15,6 +15,10 @@
 
 - ...
 
+## TODO
+
+- [ ] Include the mechanism to save the dataset.json - similar to [sociogene](https://github.com/csiglab/Sociognosis).
+
 ## References
 
 - [Philosophia Artium Technicarum et Operis](https://www.notion.so/Philosophia-Artium-Technicarum-et-Operis-355c0f5171ec808b82f8d7a85e8134cd?source=copy_link)

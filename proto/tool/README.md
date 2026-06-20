@@ -72,6 +72,11 @@ The **platform should** allow a user to:
 - No Frameworks, Like React
 - Can Used Libraries - But Be Minimalistic.
 
+## TODO
+
+- LLM Technical System (Technology)
+- ...
+
 ## References
 
 - [Philosophia Artium Technicarum et Operis](https://www.notion.so/Philosophia-Artium-Technicarum-et-Operis-355c0f5171ec808b82f8d7a85e8134cd?source=copy_link)

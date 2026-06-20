@@ -13,19 +13,38 @@
 
     <style>
         :root {
-            --bg-void: #060710;
-            --bg-surface: #0c0d15;
-            --bg-card: #161822;
-            --bg-elevated: #1e2030;
-            --text-primary: #d8dce8;
-            --text-secondary: #8e93ab;
-            --text-muted: #5c6180;
-            --accent-gold: #c9a44e;
-            --accent-cyan: #48e8d8;
-            --accent-rose: #e06070;
-            --border-subtle: rgba(255, 255, 255, 0.06);
-            --border-medium: rgba(255, 255, 255, 0.1);
-            --glow-cyan: 0 0 20px rgba(72, 232, 216, 0.15);
+            /* Oxford Common Room — deep indigo-black canvas */
+            --bg-void: #0b0e14;
+            --bg-surface: #11151e;
+            --bg-card: #161b26;
+            --bg-elevated: #1d2330;
+            --bg-hover: rgba(255, 255, 255, 0.04);
+            --bg-active: rgba(255, 255, 255, 0.07);
+            --text-primary: #f4f3f1;
+            --text-secondary: #a8a5b0;
+            /* WCAG AA: raised for ≥4.5:1 contrast on dark surfaces */
+            --text-muted: #9290aa;
+            --text-ghost: #82809a;
+            --parchment: #D6D1C4;
+            /* Gilt edge for selection — fine bookbinding */
+            --gilt: #C4B998;
+            --thread: #4a4a4a;
+            /* Refined accent system */
+            --accent-gold: #d4a857;
+            --accent-copper: #c9956c;
+            --accent-copper-light: #dbb08a;
+            --accent-sage: #7ba388;
+            --accent-plum: #9b7eb0;
+            --accent-rose: #c47d8a;
+            --accent-amber: #d4a857;
+            --accent-steel: #6b8caa;
+            --accent-cyan: #4dd4c4;
+            --border-subtle: rgba(255, 255, 255, 0.05);
+            --border-medium: rgba(255, 255, 255, 0.08);
+            --border-strong: rgba(255, 255, 255, 0.12);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.25);
             --font-display: 'Cormorant Garamond', serif;
             --font-body: 'Inter', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
@@ -38,6 +57,86 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0
+        }
+
+        ::selection {
+            background: rgba(201, 149, 108, 0.28);
+            color: var(--parchment);
+            text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
+        }
+
+        ::-moz-selection {
+            background: rgba(201, 149, 108, 0.28);
+            color: var(--parchment);
+        }
+
+        *::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            transition: background 0.2s ease;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: rgba(201, 149, 108, 0.4);
+            background-clip: padding-box;
+        }
+
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+        }
+
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        textarea:-webkit-autofill,
+        textarea:-webkit-autofill:hover,
+        textarea:-webkit-autofill:focus,
+        select:-webkit-autofill {
+            -webkit-text-fill-color: var(--text-primary) !important;
+            -webkit-box-shadow: 0 0 0 1000px rgba(18, 20, 26, 0.95) inset !important;
+            caret-color: var(--text-primary);
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        .sidebar-toggle:focus-visible,
+        .qa-btn:focus-visible,
+        .ip-close:focus-visible,
+        .sb-reset:focus-visible,
+        .search-clear:focus-visible,
+        .search-selected-clear:focus-visible,
+        .chip:focus-visible,
+        .toggle-item:focus-within .checkmark {
+            outline: 2px solid var(--accent-copper);
+            outline-offset: 2px;
+            border-radius: var(--radius-sm);
+        }
+
+        .search-box:focus-visible {
+            outline: none;
+            border-color: var(--accent-copper);
+            box-shadow: 0 0 0 2px rgba(201, 149, 108, 0.18);
+        }
+
+        a:focus-visible,
+        button:focus-visible,
+        [tabindex]:focus-visible,
+        summary:focus-visible,
+        select:focus-visible {
+            outline: 2px solid var(--accent-copper);
+            outline-offset: 2px;
+            border-radius: var(--radius-sm);
         }
 
         body {
@@ -64,12 +163,7 @@
         main.canvas-area {
             position: relative;
             overflow: hidden;
-            background:
-                radial-gradient(circle at 50% 1px, rgba(255, 255, 255, 0.02) 0.5px, transparent 0.5px),
-                radial-gradient(ellipse at 50% 40%, #0e1020 0%, var(--bg-void) 75%),
-                radial-gradient(ellipse at 25% 65%, rgba(72, 232, 216, 0.018) 0%, transparent 55%),
-                radial-gradient(ellipse at 75% 25%, rgba(201, 164, 78, 0.012) 0%, transparent 55%);
-            background-size: 4px 4px, 100% 100%, 100% 100%, 100% 100%
+            background: var(--bg-void)
         }
 
         main.canvas-area::after {
@@ -77,7 +171,7 @@
             position: absolute;
             inset: 0;
             pointer-events: none;
-            background: radial-gradient(ellipse at 50% 50%, transparent 35%, rgba(6, 7, 16, 0.55) 100%);
+            background: radial-gradient(ellipse at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.55) 100%);
             z-index: 1
         }
 
@@ -122,9 +216,9 @@
         }
 
         .sidebar-toggle:hover {
-            color: var(--accent-cyan);
-            border-color: rgba(72, 232, 216, 0.25);
-            box-shadow: var(--glow-cyan), 0 4px 24px rgba(0, 0, 0, 0.5)
+            color: var(--accent-copper);
+            border-color: rgba(201, 149, 108, 0.3);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(201, 149, 108, 0.1)
         }
 
         body.sidebar-collapsed .sidebar-toggle {
@@ -139,66 +233,8 @@
             }
 
             50% {
-                border-color: rgba(72, 232, 216, 0.18)
+                border-color: rgba(201, 149, 108, 0.25)
             }
-        }
-
-        .projection-pill {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 15;
-            background: rgba(10, 11, 20, 0.82);
-            backdrop-filter: blur(24px) saturate(1.2);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: var(--radius-lg);
-            padding: 3px;
-            display: flex;
-            gap: 2px;
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.55);
-            --pill-left: 0px;
-            --pill-width: 0px
-        }
-
-        .projection-pill::before {
-            content: '';
-            position: absolute;
-            height: calc(100% - 6px);
-            top: 3px;
-            left: var(--pill-left);
-            width: var(--pill-width);
-            background: rgba(72, 232, 216, 0.07);
-            border: 1px solid rgba(72, 232, 216, 0.15);
-            border-radius: 7px;
-            transition: left .35s cubic-bezier(0.22, 1, 0.36, 1), width .35s cubic-bezier(0.22, 1, 0.36, 1);
-            pointer-events: none;
-            z-index: -1
-        }
-
-        .proj-chip {
-            font-family: var(--font-body);
-            font-size: .67rem;
-            font-weight: 500;
-            letter-spacing: .025em;
-            padding: 7px 15px;
-            background: transparent;
-            border: 1px solid transparent;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: color .25s ease, background .25s ease;
-            border-radius: var(--radius-md);
-            white-space: nowrap;
-            position: relative;
-            z-index: 1
-        }
-
-        .proj-chip:hover {
-            color: var(--text-secondary)
-        }
-
-        .proj-chip.active {
-            color: var(--accent-cyan)
         }
 
         .quick-actions {
@@ -215,25 +251,71 @@
             width: 36px;
             height: 36px;
             border-radius: var(--radius-md);
-            background: rgba(10, 11, 20, 0.82);
+            background: rgba(17, 21, 30, 0.92);
             backdrop-filter: blur(20px) saturate(1.2);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-medium);
             color: var(--text-muted);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 15px;
-            transition: all .3s cubic-bezier(.22, 1, .36, 1);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45)
+            transition: all .2s cubic-bezier(.22, 1, .36, 1);
+            box-shadow: var(--shadow-sm)
         }
 
         .qa-btn:hover {
-            color: var(--accent-cyan);
-            border-color: rgba(72, 232, 216, 0.25);
-            background: rgba(72, 232, 216, 0.04);
-            transform: scale(1.08);
-            box-shadow: var(--glow-cyan), 0 4px 20px rgba(0, 0, 0, 0.45)
+            color: var(--text-primary);
+            border-color: var(--border-strong);
+            background: var(--bg-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md)
+        }
+
+        .projection-chips {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 15;
+            display: flex;
+            gap: 2px;
+            padding: 4px;
+            background: rgba(17,21,30,0.92);
+            backdrop-filter: blur(20px) saturate(1.2);
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm)
+        }
+
+        .proj-chip {
+            position: relative;
+            z-index: 2;
+            padding: 6px 14px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: var(--font-body);
+            font-size: .64rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: color .25s ease;
+            letter-spacing: .02em
+        }
+
+        .proj-chip.active { color: var(--text-primary) }
+
+        .proj-pill {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            left: var(--pill-left,4px);
+            width: var(--pill-width,60px);
+            background: rgba(201,149,108,0.1);
+            border: 1px solid rgba(201,149,108,0.22);
+            border-radius: 5px;
+            transition: all .3s cubic-bezier(.22,1,.36,1);
+            z-index: 1
         }
 
         .minimap-wrap {
@@ -243,19 +325,19 @@
             z-index: 15;
             width: 180px;
             height: 125px;
-            background: rgba(10, 11, 20, 0.82);
+            background: rgba(17, 21, 30, 0.92);
             backdrop-filter: blur(20px) saturate(1.2);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-medium);
             border-radius: var(--radius-lg);
             overflow: hidden;
-            box-shadow: 0 8px 36px rgba(0, 0, 0, 0.55);
+            box-shadow: var(--shadow-md);
             cursor: pointer;
             transition: all .3s
         }
 
         .minimap-wrap:hover {
-            border-color: rgba(72, 232, 216, 0.15);
-            box-shadow: 0 8px 36px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(72, 232, 216, 0.08)
+            border-color: rgba(201, 149, 108, 0.2);
+            box-shadow: var(--shadow-md), 0 0 0 1px rgba(201, 149, 108, 0.08)
         }
 
         .minimap-wrap::after {
@@ -263,7 +345,7 @@
             position: absolute;
             inset: 0;
             border-radius: var(--radius-lg);
-            box-shadow: inset 0 0 24px rgba(6, 7, 16, 0.7);
+            box-shadow: inset 0 0 24px rgba(11, 14, 20, 0.7);
             pointer-events: none;
             z-index: 2
         }
@@ -347,10 +429,8 @@
         }
 
         aside.toolbox {
-            background:
-                radial-gradient(ellipse 60% 30% at 50% 0%, rgba(201, 164, 78, 0.02) 0%, transparent 100%),
-                linear-gradient(180deg, #0c0b09 0%, #0a0908 100%);
-            border-right: 1px solid rgba(201, 164, 78, 0.06);
+            background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-void) 100%);
+            border-right: 1px solid var(--border-medium);
             padding: 32px 24px 28px;
             overflow-y: auto;
             display: flex;
@@ -368,7 +448,7 @@
         }
 
         aside.toolbox::-webkit-scrollbar {
-            width: 3px
+            width: 5px
         }
 
         aside.toolbox::-webkit-scrollbar-track {
@@ -376,8 +456,12 @@
         }
 
         aside.toolbox::-webkit-scrollbar-thumb {
-            background: rgba(201, 164, 78, 0.08);
+            background: rgba(201, 149, 108, 0.16);
             border-radius: 3px
+        }
+
+        aside.toolbox::-webkit-scrollbar-thumb:hover {
+            background: rgba(201, 149, 108, 0.4)
         }
 
         aside.toolbox::before {
@@ -387,7 +471,7 @@
             left: 0;
             right: 0;
             height: 1px;
-            background: linear-gradient(90deg, transparent 8%, rgba(201, 164, 78, 0.25) 50%, transparent 92%);
+            background: linear-gradient(90deg, transparent 8%, rgba(201, 149, 108, 0.25) 50%, transparent 92%);
             z-index: 2
         }
 
@@ -402,7 +486,7 @@
             font-size: .72rem;
             font-weight: 400;
             font-style: italic;
-            color: rgba(201, 164, 78, 0.4);
+            color: rgba(201, 149, 108, 0.55);
             letter-spacing: .06em;
             margin-bottom: 12px;
             display: block
@@ -416,7 +500,9 @@
             margin-bottom: 8px;
             font-weight: 300;
             line-height: 1.08;
-            letter-spacing: .005em
+            letter-spacing: .005em;
+            background: linear-gradient(90deg, var(--accent-copper), transparent) bottom left / 50% 1px no-repeat;
+            padding-bottom: 6px
         }
 
         .sb-title::after {
@@ -426,8 +512,8 @@
             height: 1px;
             margin-top: 14px;
             border-radius: 1px;
-            background: var(--accent-gold);
-            opacity: .4
+            background: var(--accent-copper);
+            opacity: .5
         }
 
         .sb-subtitle {
@@ -453,27 +539,28 @@
 
         .search-box {
             width: 100%;
-            background: rgba(0, 0, 0, 0.22);
-            border: 1px solid rgba(201, 164, 78, 0.06);
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border-subtle);
             color: var(--text-primary);
             font-family: var(--font-body);
             font-size: .76rem;
             padding: 10px 32px 10px 36px;
             outline: 0;
-            transition: border-color .3s ease, box-shadow .3s ease;
+            transition: border-color .2s ease, box-shadow .2s ease;
             border-radius: 7px;
-            letter-spacing: .005em
+            letter-spacing: .005em;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.22)
         }
 
         .search-box::placeholder {
-            color: rgba(255, 255, 255, 0.18);
+            color: var(--text-ghost);
             font-weight: 300;
             font-style: italic
         }
 
         .search-box:focus {
-            border-color: rgba(201, 164, 78, 0.18);
-            box-shadow: 0 0 0 3px rgba(201, 164, 78, 0.02)
+            border-color: var(--accent-copper);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.22), 0 0 0 2px rgba(201, 149, 108, 0.14)
         }
 
         .search-icon {
@@ -513,7 +600,7 @@
 
         .search-clear:hover {
             opacity: .8;
-            color: var(--accent-gold)
+            color: var(--accent-copper)
         }
 
         .search-selected {
@@ -522,8 +609,8 @@
             gap: 8px;
             margin-top: 8px;
             padding: 8px 12px;
-            background: rgba(201, 164, 78, 0.025);
-            border: 1px solid rgba(201, 164, 78, 0.08);
+            background: rgba(201, 149, 108, 0.04);
+            border: 1px solid rgba(201, 149, 108, 0.12);
             border-radius: 7px;
             animation: ssIn .25s cubic-bezier(.22, 1, .36, 1)
         }
@@ -579,13 +666,13 @@
 
         .search-selected-clear:hover {
             opacity: .8;
-            color: var(--accent-gold)
+            color: var(--accent-copper)
         }
 
         .sb-gold-line {
             height: 1px;
             margin: 8px 0 0;
-            background: linear-gradient(90deg, transparent, rgba(201, 164, 78, 0.1), transparent);
+            background: linear-gradient(90deg, transparent, rgba(201, 149, 108, 0.15), transparent);
             position: relative;
             z-index: 1
         }
@@ -609,7 +696,7 @@
             font-size: .7rem;
             font-weight: 400;
             font-style: italic;
-            color: rgba(201, 164, 78, 0.32);
+            color: rgba(201, 149, 108, 0.55);
             letter-spacing: .04em;
             display: block;
             margin-bottom: 0
@@ -622,7 +709,7 @@
             font-family: var(--font-display);
             font-size: .64rem;
             font-style: italic;
-            color: rgba(255, 255, 255, 0.18);
+            color: rgba(255, 255, 255, 0.28);
             background: none;
             border: none;
             cursor: pointer;
@@ -640,7 +727,7 @@
 
         .sb-reset:hover {
             opacity: 1;
-            color: rgba(201, 164, 78, 0.65)
+            color: var(--accent-copper)
         }
 
         .sb-reset:hover svg {
@@ -658,7 +745,7 @@
         .sb-group+.sb-group {
             padding-top: 16px;
             margin-top: 16px;
-            border-top: 1px solid rgba(201, 164, 78, 0.04)
+            border-top: 1px solid var(--border-subtle)
         }
 
         .sb-group-label {
@@ -666,10 +753,15 @@
             font-size: .7rem;
             font-weight: 400;
             font-style: italic;
-            color: rgba(201, 164, 78, 0.32);
+            color: rgba(201, 149, 108, 0.55);
             letter-spacing: .04em;
             margin-bottom: 9px;
-            display: block
+            display: block;
+            background-image: linear-gradient(90deg, var(--border-medium), transparent);
+            background-repeat: no-repeat;
+            background-position: bottom left;
+            background-size: 100% 1px;
+            padding-bottom: 4px
         }
 
         .sb-layer-header {
@@ -701,8 +793,8 @@
         }
 
         .time-section {
-            background: linear-gradient(180deg, rgba(201, 164, 78, 0.015) 0%, transparent 100%);
-            border: 1px solid rgba(201, 164, 78, 0.04);
+            background: linear-gradient(180deg, rgba(201, 149, 108, 0.02) 0%, transparent 100%);
+            border: 1px solid var(--border-subtle);
             border-radius: 8px;
             padding: 13px 15px;
             position: relative;
@@ -716,7 +808,7 @@
             left: 0;
             right: 0;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(201, 164, 78, 0.08), transparent)
+            background: linear-gradient(90deg, transparent, rgba(201, 149, 108, 0.12), transparent)
         }
 
         .time-range {
@@ -724,7 +816,7 @@
             justify-content: space-between;
             font-family: var(--font-mono);
             font-size: .7rem;
-            color: rgba(201, 164, 78, 0.6);
+            color: var(--accent-copper);
             font-weight: 400;
             margin-bottom: 8px;
             font-variant-numeric: tabular-nums;
@@ -752,7 +844,7 @@
             position: absolute;
             top: 50%;
             height: 1px;
-            background: var(--accent-gold);
+            background: var(--accent-copper);
             transform: translateY(-50%);
             border-radius: 1px;
             pointer-events: none;
@@ -762,7 +854,7 @@
 
         .time-fill.active {
             opacity: .75;
-            box-shadow: 0 0 10px rgba(201, 164, 78, 0.15)
+            box-shadow: 0 0 10px rgba(201, 149, 108, 0.2)
         }
 
         .time-slider-wrap input[type=range] {
@@ -786,15 +878,15 @@
             width: 11px;
             height: 11px;
             border-radius: 50%;
-            background: var(--accent-gold);
+            background: var(--accent-copper);
             border: none;
             cursor: ew-resize;
-            box-shadow: 0 0 8px rgba(201, 164, 78, 0.25);
+            box-shadow: 0 0 8px rgba(201, 149, 108, 0.3);
             transition: box-shadow .2s, transform .15s
         }
 
         .time-slider-wrap input[type=range]::-webkit-slider-thumb:hover {
-            box-shadow: 0 0 14px rgba(201, 164, 78, 0.4);
+            box-shadow: 0 0 14px rgba(201, 149, 108, 0.45);
             transform: scale(1.15)
         }
 
@@ -803,10 +895,10 @@
             width: 11px;
             height: 11px;
             border-radius: 50%;
-            background: var(--accent-gold);
+            background: var(--accent-copper);
             border: none;
             cursor: ew-resize;
-            box-shadow: 0 0 8px rgba(201, 164, 78, 0.25)
+            box-shadow: 0 0 8px rgba(201, 149, 108, 0.3)
         }
 
         .time-slider-wrap input[type=range]::-moz-range-track {
@@ -826,7 +918,7 @@
         }
 
         .time-stats .ts-count {
-            color: rgba(201, 164, 78, 0.6);
+            color: var(--accent-copper);
             font-weight: 500;
             font-size: .62rem
         }
@@ -835,7 +927,7 @@
             width: 2px;
             height: 2px;
             border-radius: 50%;
-            background: rgba(201, 164, 78, 0.3)
+            background: rgba(201, 149, 108, 0.4)
         }
 
         .toggle-group {
@@ -859,8 +951,8 @@
         }
 
         .toggle-item:hover {
-            color: rgba(255, 255, 255, 0.65);
-            background: rgba(201, 164, 78, 0.015)
+            color: var(--text-primary);
+            background: var(--bg-hover)
         }
 
         .toggle-item input {
@@ -880,8 +972,8 @@
         }
 
         .toggle-item input:checked~.checkmark {
-            border-color: rgba(201, 164, 78, 0.4);
-            background: rgba(201, 164, 78, 0.06)
+            border-color: rgba(201, 149, 108, 0.45);
+            background: rgba(201, 149, 108, 0.08)
         }
 
         .toggle-item input:checked~.checkmark::after {
@@ -889,8 +981,8 @@
             width: 4px;
             height: 4px;
             border-radius: 50%;
-            background: var(--accent-gold);
-            opacity: .75
+            background: var(--accent-copper);
+            opacity: .85
         }
 
         .toggle-item.disabled {
@@ -956,24 +1048,24 @@
         }
 
         .chip:hover {
-            color: rgba(255, 255, 255, 0.4);
-            background: rgba(201, 164, 78, 0.015)
+            color: var(--text-secondary);
+            background: var(--bg-hover)
         }
 
         .chip.active {
-            color: rgba(255, 255, 255, 0.6);
-            background: rgba(201, 164, 78, 0.025);
-            border-color: rgba(201, 164, 78, 0.08)
+            color: var(--text-secondary);
+            background: rgba(201, 149, 108, 0.04);
+            border-color: rgba(201, 149, 108, 0.12)
         }
 
         .search-dropdown {
             position: fixed;
             z-index: 500;
-            background: rgba(10, 9, 7, 0.96);
+            background: rgba(17, 21, 30, 0.98);
             backdrop-filter: blur(36px) saturate(1.15);
-            border: 1px solid rgba(201, 164, 78, 0.06);
-            border-radius: 10px;
-            box-shadow: 0 24px 72px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(201, 164, 78, 0.015) inset;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg), 0 0 0 1px var(--border-subtle) inset;
             max-height: 0;
             opacity: 0;
             overflow: hidden;
@@ -993,14 +1085,14 @@
             display: flex;
             justify-content: space-between;
             align-items: baseline;
-            border-bottom: 1px solid rgba(201, 164, 78, 0.04)
+            border-bottom: 1px solid var(--border-subtle)
         }
 
         .search-dropdown-label {
             font-family: var(--font-display);
             font-size: .58rem;
             font-style: italic;
-            color: rgba(201, 164, 78, 0.22);
+            color: rgba(201, 149, 108, 0.55);
             letter-spacing: .04em
         }
 
@@ -1016,12 +1108,12 @@
             overflow-y: auto;
             padding: 4px 5px;
             scrollbar-width: thin;
-            scrollbar-color: rgba(201, 164, 78, 0.04) transparent
+            scrollbar-color: rgba(201, 149, 108, 0.08) transparent
         }
 
         .search-dropdown-inner::-webkit-scrollbar { width: 3px }
         .search-dropdown-inner::-webkit-scrollbar-track { background: transparent }
-        .search-dropdown-inner::-webkit-scrollbar-thumb { background: rgba(201, 164, 78, 0.04); border-radius: 3px }
+        .search-dropdown-inner::-webkit-scrollbar-thumb { background: rgba(201, 149, 108, 0.16); border-radius: 3px }
 
         .search-result {
             display: flex;
@@ -1038,21 +1130,21 @@
 
         .search-result:hover,
         .search-result.kb-focus {
-            background: rgba(201, 164, 78, 0.015);
-            border-color: rgba(201, 164, 78, 0.04)
+            background: var(--bg-hover);
+            border-color: var(--border-subtle)
         }
 
         .search-result.kb-focus {
-            background: rgba(201, 164, 78, 0.02);
-            border-color: rgba(201, 164, 78, 0.06)
+            background: rgba(201, 149, 108, 0.04);
+            border-color: rgba(201, 149, 108, 0.1)
         }
 
         .search-result.active {
-            background: rgba(201, 164, 78, 0.03);
-            border-color: rgba(201, 164, 78, 0.08)
+            background: rgba(201, 149, 108, 0.06);
+            border-color: rgba(201, 149, 108, 0.14)
         }
 
-        .search-result.active .sr-name { color: var(--accent-gold) }
+        .search-result.active .sr-name { color: var(--accent-copper) }
 
         .sr-cat-line {
             width: 1px;
@@ -1092,8 +1184,8 @@
         }
 
         .sr-name mark {
-            background: rgba(201, 164, 78, 0.12);
-            color: var(--accent-gold);
+            background: rgba(201, 149, 108, 0.18);
+            color: var(--accent-copper-light);
             border-radius: 1px;
             padding: 0 1px;
             font-style: italic
@@ -1159,17 +1251,16 @@
         #tooltip {
             position: absolute;
             display: none;
-            background: rgba(10, 11, 20, 0.94);
+            background: rgba(17, 21, 30, 0.98);
             backdrop-filter: blur(20px) saturate(1.1);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-left: 2px solid transparent;
-            border-image: linear-gradient(180deg, var(--accent-cyan), transparent) 1;
-            padding: 14px 16px;
+            border: 1px solid var(--border-medium);
+            border-left: 2px solid var(--accent-copper);
+            padding: 14px 18px;
             width: 270px;
             pointer-events: none;
             z-index: 100;
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65);
-            border-radius: var(--radius-md) 0 var(--radius-md) var(--radius-md);
+            box-shadow: var(--shadow-lg), -12px 0 32px -16px rgba(201, 149, 108, 0.45);
+            border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
             animation: ttIn .15s ease-out
         }
 
@@ -1217,9 +1308,9 @@
         .tt-year {
             font-family: var(--font-mono);
             font-size: .54rem;
-            color: var(--accent-cyan);
+            color: var(--accent-copper);
             margin-top: 5px;
-            opacity: .55;
+            opacity: .65;
             font-variant-numeric: tabular-nums
         }
 
@@ -1393,8 +1484,8 @@
         .ip-diamond {
             width: 5px;
             height: 5px;
-            background: var(--accent-cyan);
-            opacity: .3;
+            background: var(--accent-copper);
+            opacity: .4;
             transform: rotate(45deg);
             flex-shrink: 0
         }
@@ -1428,8 +1519,8 @@
             width: 2px;
             height: 10px;
             border-radius: 1px;
-            background: var(--accent-cyan);
-            opacity: .4
+            background: var(--accent-copper);
+            opacity: .5
         }
 
         .ip-tags { display: flex; flex-wrap: wrap; gap: 5px }
@@ -1447,7 +1538,7 @@
         }
 
         .ip-tag:hover {
-            border-color: rgba(72, 232, 216, 0.15);
+            border-color: rgba(201, 149, 108, 0.2);
             color: var(--text-primary)
         }
 
@@ -1547,8 +1638,8 @@
         .ip-audit-date {
             font-family: var(--font-mono);
             font-size: .52rem;
-            color: var(--accent-cyan);
-            opacity: .55;
+            color: var(--accent-copper);
+            opacity: .6;
             margin-bottom: 1px;
             font-variant-numeric: tabular-nums
         }
@@ -1570,8 +1661,8 @@
         .ip-chron-year {
             font-family: var(--font-mono);
             font-size: .52rem;
-            color: var(--accent-gold);
-            opacity: .65;
+            color: var(--accent-copper);
+            opacity: .7;
             margin-bottom: 1px;
             font-variant-numeric: tabular-nums
         }
@@ -1615,7 +1706,7 @@
             font-size: .64rem;
             font-weight: 400;
             font-style: italic;
-            color: rgba(201, 164, 78, 0.65);
+            color: var(--accent-copper);
             cursor: pointer;
             background: none;
             border: none;
@@ -1626,7 +1717,7 @@
             opacity: .75
         }
 
-        .ip-long-desc-toggle:hover { opacity: 1; color: rgba(201, 164, 78, 0.9) }
+        .ip-long-desc-toggle:hover { opacity: 1; color: var(--accent-copper-light) }
 
         .ip-long-desc-toggle svg {
             width: 10px;
@@ -1669,8 +1760,8 @@
             border-radius: 3px;
             margin-bottom: 10px;
             font-weight: 500;
-            background: rgba(224, 96, 112, 0.06);
-            border: 1px solid rgba(224, 96, 112, 0.14);
+            background: rgba(196, 125, 138, 0.08);
+            border: 1px solid rgba(196, 125, 138, 0.2);
             color: var(--accent-rose)
         }
 
@@ -1695,7 +1786,7 @@
             font-weight: 300;
             padding: 10px 14px;
             background: rgba(0, 0, 0, 0.2);
-            border-left: 2px solid rgba(224, 96, 112, 0.22);
+            border-left: 2px solid rgba(196, 125, 138, 0.22);
             border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
             margin-bottom: 14px;
             letter-spacing: .005em
@@ -1775,23 +1866,6 @@
             text-align: right
         }
 
-        #chord-tooltip {
-            position: absolute;
-            display: none;
-            background: rgba(10, 11, 20, 0.94);
-            backdrop-filter: blur(14px);
-            border: 1px solid rgba(201, 164, 78, 0.18);
-            padding: 8px 12px;
-            pointer-events: none;
-            z-index: 50;
-            font-family: var(--font-mono);
-            font-size: .64rem;
-            color: var(--text-primary);
-            border-radius: var(--radius-sm);
-            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
-            font-variant-numeric: tabular-nums
-        }
-
         #loading-overlay {
             position: fixed;
             inset: 0;
@@ -1812,7 +1886,7 @@
             width: 5px;
             height: 5px;
             border-radius: 50%;
-            background: var(--accent-cyan);
+            background: var(--accent-copper);
             opacity: .15;
             animation: dotPulse 1.4s ease-in-out infinite
         }
@@ -1885,8 +1959,8 @@
             width: 30px;
             height: 30px;
             border-radius: 6px;
-            background: rgba(72, 232, 216, 0.08);
-            color: #48e8d8;
+            background: rgba(201, 149, 108, 0.08);
+            color: var(--accent-copper);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1931,7 +2005,7 @@
             transition: color 0.2s, transform 0.2s;
         }
         .ip-ref-card:hover .ip-ref-arrow {
-            color: #48e8d8;
+            color: var(--accent-copper-light);
             transform: translate(2px, -2px);
         }
 
@@ -1951,6 +2025,486 @@
         @keyframes ipFadeSlideIn {
             from { opacity: 0; transform: translateY(6px); }
             to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ═══════ EPISTEMIC OVERLAY ═══════ */
+        .epistemic-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 180;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .4s cubic-bezier(.22,1,.36,1);
+        }
+        .epistemic-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .eo-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(6,7,16,0.72);
+            backdrop-filter: blur(8px) saturate(1.1);
+        }
+        .eo-panel {
+            position: relative;
+            width: min(760px, 92vw);
+            max-height: 84vh;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: translateY(12px) scale(0.98);
+            transition: transform .4s cubic-bezier(.22,1,.36,1);
+        }
+        .epistemic-overlay.open .eo-panel {
+            transform: translateY(0) scale(1);
+        }
+        .eo-header {
+            padding: 26px 30px 18px;
+            position: relative;
+            background: linear-gradient(180deg, rgba(201,149,108,0.04) 0%, transparent 100%);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .eo-eyebrow {
+            font-family: var(--font-display);
+            font-size: .72rem;
+            font-style: italic;
+            color: rgba(201,149,108,0.6);
+            letter-spacing: .05em;
+            margin-bottom: 4px;
+        }
+        .eo-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-style: italic;
+            font-weight: 300;
+            color: var(--text-primary);
+            letter-spacing: .005em;
+            line-height: 1.2;
+            padding-right: 40px;
+        }
+        .eo-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            transition: all .2s;
+        }
+        .eo-close:hover {
+            color: var(--text-primary);
+            border-color: var(--border-medium);
+            background: rgba(255,255,255,0.06);
+        }
+        .eo-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 30px 20px;
+        }
+        .eo-body::-webkit-scrollbar { width: 5px; }
+        .eo-body::-webkit-scrollbar-track { background: transparent; }
+        .eo-body::-webkit-scrollbar-thumb { background: rgba(201,149,108,0.16); border-radius: 3px; }
+
+        .eo-section {
+            margin-top: 22px;
+            animation: eoSecIn .35s ease-out backwards;
+        }
+        .eo-section:nth-child(1) { animation-delay: .04s; }
+        .eo-section:nth-child(2) { animation-delay: .08s; }
+        .eo-section:nth-child(3) { animation-delay: .12s; }
+        .eo-section:nth-child(4) { animation-delay: .16s; }
+        .eo-section:nth-child(5) { animation-delay: .20s; }
+        .eo-section:nth-child(6) { animation-delay: .24s; }
+        @keyframes eoSecIn {
+            from { opacity: 0; transform: translateX(8px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        .eo-section-title {
+            font-family: var(--font-body);
+            font-size: .62rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .eo-section-title::before {
+            content: '§';
+            font-family: var(--font-display);
+            font-style: italic;
+            color: var(--accent-copper);
+            opacity: .55;
+            font-size: .85rem;
+            font-weight: 400;
+        }
+        .eo-section-title .eo-section-num {
+            font-family: var(--font-mono);
+            color: var(--accent-copper);
+            opacity: .45;
+            font-size: .55rem;
+        }
+        .eo-section-subtitle {
+            font-family: var(--font-display);
+            font-size: .76rem;
+            font-style: italic;
+            color: var(--text-ghost);
+            margin-bottom: 12px;
+            line-height: 1.5;
+            font-weight: 300;
+        }
+
+        /* Metric grid */
+        .eo-metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1px;
+            background: var(--border-subtle);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+        .eo-metric {
+            background: var(--bg-card);
+            padding: 14px 16px;
+        }
+        .eo-metric-label {
+            font-family: var(--font-mono);
+            font-size: .46rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            margin-bottom: 5px;
+        }
+        .eo-metric-value {
+            font-family: var(--font-mono);
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: .02em;
+        }
+        .eo-metric-value .eo-metric-unit {
+            font-size: .6rem;
+            color: var(--text-muted);
+            margin-left: 3px;
+            font-weight: 400;
+        }
+        .eo-metric-hint {
+            font-family: var(--font-mono);
+            font-size: .42rem;
+            color: var(--text-ghost);
+            margin-top: 3px;
+            line-height: 1.4;
+        }
+
+        /* Data tables */
+        .eo-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .68rem;
+        }
+        .eo-table th {
+            font-family: var(--font-mono);
+            font-size: .44rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            text-align: left;
+            padding: 7px 10px;
+            border-bottom: 1px solid var(--border-subtle);
+            font-weight: 500;
+        }
+        .eo-table td {
+            padding: 7px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.025);
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+        .eo-table tr:last-child td { border-bottom: none; }
+        .eo-table tr:hover td { background: rgba(255,255,255,0.015); }
+        .eo-table .eo-num {
+            font-family: var(--font-mono);
+            font-variant-numeric: tabular-nums;
+            color: var(--accent-copper-light);
+            text-align: right;
+        }
+        .eo-table .eo-bar-cell { width: 40%; }
+        .eo-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .eo-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width .5s cubic-bezier(.22,1,.36,1);
+        }
+        .eo-tag {
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: .5rem;
+            padding: 1px 6px;
+            border-radius: 2px;
+            border: 1px solid;
+            letter-spacing: .02em;
+        }
+        .eo-flag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-family: var(--font-mono);
+            font-size: .52rem;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+        .eo-flag-warn {
+            background: rgba(196,125,138,0.1);
+            border: 1px solid rgba(196,125,138,0.25);
+            color: var(--accent-rose);
+        }
+        .eo-flag-ok {
+            background: rgba(123,163,136,0.1);
+            border: 1px solid rgba(123,163,136,0.25);
+            color: var(--accent-sage);
+        }
+        .eo-flag-info {
+            background: rgba(107,140,170,0.1);
+            border: 1px solid rgba(107,140,170,0.25);
+            color: var(--accent-steel);
+        }
+
+        /* Entity list */
+        .eo-entity {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.025);
+        }
+        .eo-entity:last-child { border-bottom: none; }
+        .eo-entity-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .eo-entity-name {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: .74rem;
+            color: var(--text-primary);
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .eo-entity-meta {
+            font-family: var(--font-mono);
+            font-size: .46rem;
+            color: var(--text-muted);
+            font-variant-numeric: tabular-nums;
+            flex-shrink: 0;
+        }
+
+        .eo-empty {
+            padding: 24px 0;
+            text-align: center;
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: .78rem;
+            color: var(--text-ghost);
+            opacity: .5;
+        }
+
+        /* Degree distribution histogram */
+        .eo-histogram {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            overflow-x: auto;
+        }
+        .eo-histogram svg {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+        }
+        .eo-footer {
+            padding: 12px 30px;
+            border-top: 1px solid var(--border-subtle);
+            background: var(--bg-void);
+        }
+        .eo-footer-meta {
+            font-family: var(--font-mono);
+            font-size: .46rem;
+            color: var(--text-ghost);
+            letter-spacing: .03em;
+        }
+        @media(prefers-reduced-motion:reduce) {
+            .eo-section { animation: none; }
+        }
+
+        /* ═══════ KEYBOARD SHORTCUTS HELP OVERLAY ═══════ */
+        .kb-help-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 190;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .35s cubic-bezier(.22,1,.36,1);
+        }
+        .kb-help-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .kb-help-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(6,7,16,0.72);
+            backdrop-filter: blur(8px) saturate(1.1);
+        }
+        .kb-help-panel {
+            position: relative;
+            width: min(440px, 90vw);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            transform: translateY(10px) scale(0.97);
+            transition: transform .35s cubic-bezier(.22,1,.36,1);
+        }
+        .kb-help-overlay.open .kb-help-panel {
+            transform: translateY(0) scale(1);
+        }
+        .kb-help-header {
+            padding: 22px 26px 14px;
+            border-bottom: 1px solid var(--border-subtle);
+            background: linear-gradient(180deg, rgba(201,149,108,0.04) 0%, transparent 100%);
+            position: relative;
+        }
+        .kb-help-eyebrow {
+            font-family: var(--font-display);
+            font-size: .72rem;
+            font-style: italic;
+            color: rgba(201,149,108,0.6);
+            letter-spacing: .05em;
+            margin-bottom: 4px;
+        }
+        .kb-help-title {
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            font-style: italic;
+            font-weight: 300;
+            color: var(--text-primary);
+            letter-spacing: .005em;
+            padding-right: 36px;
+        }
+        .kb-help-close {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            transition: all .2s;
+        }
+        .kb-help-close:hover {
+            color: var(--text-primary);
+            border-color: var(--border-medium);
+            background: rgba(255,255,255,0.06);
+        }
+        .kb-help-body {
+            padding: 14px 26px 20px;
+        }
+        .kb-help-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .kb-help-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 9px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .kb-help-row:last-child { border-bottom: none; }
+        .kb-help-desc {
+            font-size: .76rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            letter-spacing: .005em;
+        }
+        .kb-help-keys {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .kb-key {
+            font-family: var(--font-mono);
+            font-size: .62rem;
+            font-weight: 500;
+            padding: 3px 8px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-medium);
+            border-radius: 4px;
+            color: var(--accent-copper-light);
+            min-width: 22px;
+            text-align: center;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 1px 2px rgba(0,0,0,0.2);
+            line-height: 1.4;
+        }
+        .kb-help-footer {
+            padding: 12px 26px;
+            border-top: 1px solid var(--border-subtle);
+            background: var(--bg-void);
+        }
+        .kb-help-footer-meta {
+            font-family: var(--font-mono);
+            font-size: .5rem;
+            color: var(--text-ghost);
+            letter-spacing: .03em;
         }
 
     </style>
@@ -2007,36 +2561,30 @@
             </div>
             <div class="sb-group"><span class="sb-group-label">Visual Lenses</span>
                 <div class="toggle-group" id="lens-controls"><label class="toggle-item"
-                        data-conflict="chord,confidence,radial,umap,spectral,bipartite"><input type="checkbox" id="lens-hulls" checked><span
+                        data-conflict="umap"><input type="checkbox" id="lens-hulls" checked><span
                             class="checkmark"></span>Category Hulls</label><label class="toggle-item"
-                        data-conflict="chord,confidence,umap,spectral,bipartite"><input type="checkbox" id="lens-heatmap"><span
+                        data-conflict="umap"><input type="checkbox" id="lens-heatmap"><span
                             class="checkmark"></span>Constraint Heatmap</label><label class="toggle-item"
-                        data-conflict="chord,umap,spectral,bipartite"><input type="checkbox" id="lens-centrality"><span
+                        data-conflict="umap"><input type="checkbox" id="lens-centrality"><span
                             class="checkmark"></span>Centrality Sizing</label><label class="toggle-item"
-                        data-conflict="chord,umap,spectral,bipartite"><input type="checkbox" id="lens-confidence-color"><span
+                        data-conflict="umap"><input type="checkbox" id="lens-confidence-color"><span
                             class="checkmark"></span>Confidence Gradient</label><label class="toggle-item"
-                        data-conflict="chord,umap,spectral,bipartite"><input type="checkbox" id="lens-flow" checked><span
+                        data-conflict="umap"><input type="checkbox" id="lens-flow" checked><span
                             class="checkmark"></span>Luminous Flow</label><label class="toggle-item"
-                        data-conflict="chord,umap,spectral,bipartite"><input type="checkbox" id="lens-observability"><span
+                        data-conflict="umap"><input type="checkbox" id="lens-observability"><span
                             class="checkmark"></span>Observability Ghosting</label></div>
             </div>
         </div>
     </aside>
     <main class="canvas-area">
         <button class="sidebar-toggle" id="sidebar-toggle-btn">&#9776;</button>
-        <div class="projection-pill" id="projection-chips">
-            <div class="proj-chip active" data-proj="default">Force</div>
-            <div class="proj-chip" data-proj="category">Clusters</div>
-            <div class="proj-chip" data-proj="layer">Layers</div>
-            <div class="proj-chip" data-proj="confidence">Confidence</div>
-            <div class="proj-chip" data-proj="radial">Radial</div>
-            <div class="proj-chip" data-proj="chord">Chord</div>
-            <div class="proj-chip" data-proj="umap">UMAP Embedding</div>
-            <div class="proj-chip" data-proj="spectral">Spectral</div>
-            <div class="proj-chip" data-proj="bipartite">Bipartite</div>
-        </div>
         <canvas id="graph-canvas"></canvas>
-        <div class="quick-actions"><button class="qa-btn" id="qa-fit" title="Fit View (F)">&#8862;</button></div>
+        <div class="quick-actions"><button class="qa-btn" id="qa-fit" title="Fit View (F)">&#8862;</button><button class="qa-btn" id="qa-epistemic" title="Epistemic Artifacts (E)">&#931;</button></div>
+        <div class="projection-chips" id="projection-chips">
+            <button class="proj-chip active" data-proj="default">Force</button>
+            <button class="proj-chip" data-proj="umap">UMAP</button>
+            <div class="proj-pill"></div>
+        </div>
         <div class="minimap-wrap" id="minimap-wrap"><canvas id="minimap-canvas"></canvas></div>
         <div class="empty-state" id="empty-state">
             <div class="empty-state-icon">&#9675;</div>
@@ -2044,8 +2592,7 @@
             <div class="empty-state-hint">Adjust temporal scope, layers, categories, or families</div>
         </div>
         <footer class="status-bar"><span>Nodes <span id="hud-v">0</span></span><span>Edges <span
-                    id="hud-e">0</span></span><span>View <span id="hud-proj">Force</span></span><span id="hud-proj-info"></span><span id="fps-counter">0
-                FPS</span></footer>
+                    id="hud-e">0</span></span><span id="hud-proj">Force</span><span id="fps-counter">0 FPS</span></footer>
         <div id="tooltip">
             <div class="tt-cat" id="tt-cat"></div>
             <div class="tt-layer" id="tt-layer"></div>
@@ -2054,7 +2601,6 @@
             <div class="tt-year" id="tt-year"></div>
             <div class="tt-meta" id="tt-meta"></div>
         </div>
-        <div id="chord-tooltip"></div>
         <div id="inspect-panel">
             <div class="ip-accent-bar" id="ip-accent-bar"></div>
             <div class="ip-header"><button class="ip-close" id="ip-close-btn">&times;</button>
@@ -2068,6 +2614,43 @@
             <div class="ip-stats-grid" id="ip-stats-grid"></div>
             <div class="ip-divider"><span class="ip-diamond"></span></div>
             <div id="ip-dynamic-sections"></div>
+        </div>
+        <div id="epistemic-overlay" class="epistemic-overlay">
+            <div class="eo-backdrop"></div>
+            <div class="eo-panel">
+                <div class="eo-header">
+                    <div class="eo-eyebrow">Epistemic Artifacts</div>
+                    <div class="eo-title">A Guide Connecting Reality & Representation</div>
+                    <button class="eo-close" id="eo-close-btn">&times;</button>
+                </div>
+                <div class="eo-body" id="eo-body"></div>
+                <div class="eo-footer">
+                    <span class="eo-footer-meta" id="eo-footer-meta"></span>
+                </div>
+            </div>
+        </div>
+        <div id="kb-help-overlay" class="kb-help-overlay">
+            <div class="kb-help-backdrop"></div>
+            <div class="kb-help-panel">
+                <div class="kb-help-header">
+                    <div class="kb-help-eyebrow">Keyboard</div>
+                    <div class="kb-help-title">Shortcuts</div>
+                    <button class="kb-help-close" id="kb-help-close-btn">&times;</button>
+                </div>
+                <div class="kb-help-body">
+                    <ul class="kb-help-list">
+                        <li class="kb-help-row"><span class="kb-help-desc">Fit graph to view</span><span class="kb-help-keys"><span class="kb-key">F</span></span></li>
+                        <li class="kb-help-row"><span class="kb-help-desc">Toggle epistemic artifacts</span><span class="kb-help-keys"><span class="kb-key">E</span></span></li>
+                        <li class="kb-help-row"><span class="kb-help-desc">Focus search</span><span class="kb-help-keys"><span class="kb-key">/</span></span></li>
+                        <li class="kb-help-row"><span class="kb-help-desc">Toggle sidebar</span><span class="kb-help-keys"><span class="kb-key">S</span></span></li>
+                        <li class="kb-help-row"><span class="kb-help-desc">Show this help</span><span class="kb-help-keys"><span class="kb-key">?</span></span></li>
+                        <li class="kb-help-row"><span class="kb-help-desc">Close panel / overlay</span><span class="kb-help-keys"><span class="kb-key">Esc</span></span></li>
+                    </ul>
+                </div>
+                <div class="kb-help-footer">
+                    <span class="kb-help-footer-meta">Press Esc to dismiss</span>
+                </div>
+            </div>
         </div>
     </main>
     <div class="search-dropdown" id="search-dropdown">
@@ -2092,37 +2675,52 @@
         /* Canvas round-rect helper */
         function drawRoundRect(c,x,y,w,h,r){r=Math.max(0,Math.min(r,Math.min(w,h)/2));c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath()}
 
-        var CP=['#FF9F43','#48e8d8','#7EC8E8','#3CC0A0','#80C090','#5DE8C8','#70E0B8','#E8E8E8','#C0A060','#C03050','#45D4A0','#F070B0','#7BE0A0','#5090D0','#45B7D1','#40C880','#FF6B6B','#C0785A','#D04050','#FFE066','#A0D0A0','#60A8E0','#7898C0','#90A8C0','#C8A070','#909090','#F0C070','#C9A44e','#4ECDC4','#D4A050','#50D8E0','#E0A040','#88B8E0','#E06070','#B0A8F0','#6090D0'];
-        var FP=['#48e8d8','#C9A44e','#7BE0A0','#E06070','#FFE066','#8B7BF0','#C0785A','#45B7D1'];
-        var FLM={'TeleologicalAndFunctional':'Teleological','GenerativeAndStructural':'Generative','AgenticAndOperative':'Agentic','NormativeAndRegulative':'Normative','EvaluativeAndCorrective':'Evaluative','StrategicAndContextual':'Strategic','TemporalAndEvolutionary':'Temporal','ConstitutiveAndMereological':'Constitutive'};
+        /* Oxford Common Room — muted scholarly community palette */
+        var CP=['#3D5A5C','#704E4A','#4A4B5C','#5C5A3D','#4E4A60','#5C4E3D','#3D4E5C','#4E5C4A','#4A4A4E','#5C574E','#3D5C57','#5C4E54','#6b8caa','#c9956c','#7ba388','#9b7eb0','#c47d8a','#d4a857','#4569a0','#8a6b4a','#5a7a6c','#7a5c8a','#4a6b5c','#8a6b5c','#5a6b8a','#6b5a4a','#4a8a6b','#6b8c5a','#8a5a6b','#5a8a6b','#6b4a8a','#8a7c5a','#4a5a8a','#7a8a4a','#5a4a8a','#8a5a4a','#4a7a8a'];
+        var FP=['#c9956c','#6b8caa','#7ba388','#c47d8a','#d4a857','#9b7eb0','#8a6b4a','#4E5C4A'];
+        var FLM={'TeleologicalAndFunctional':'Teleological','GenerativeAndStructural':'Generative','AgenticAndOperative':'Agentic','NormativeAndRegulative':'Normative','EvaluativeAndCorrective':'Evaluative','StrategicAndContextual':'Strategic','TemporalAndEvolutionary':'Temporal','ConstitutiveAndMereological':'Constitutive','TaxonomicAndClassificatory':'Taxonomic'};
+        /* Normalize a relationship-family string to canonical CamelCase.
+           The dataset mixes CamelCase and UPPERCASE_SNAKE_CASE values; this
+           unifies them so coloring/labeling/maps resolve correctly. */
+        function normFam(f){
+            if(!f)return 'unknown';
+            if(f.indexOf('_')>=0){
+                return f.toLowerCase().replace(/_([a-z])/g,function(m,c){return c.toUpperCase()}).replace(/^([a-z])/,function(c){return c.toUpperCase()});
+            }
+            return f;
+        }
         var SC=['circle','triangle','square','diamond','hexagon'];
-        var LPC={'Problem Space':'#C9A44e','Capability Space':'#48e8d8','Execution Space':'#7BE0A0','Artifact Space':'#45B7D1','Governance Space':'#E06070','Evolutionary Space':'#8B7BF0'};
+        var LPC={'Problem Space':'#d4a857','Capability Space':'#6b8caa','Execution Space':'#7ba388','Artifact Space':'#c9956c','Governance Space':'#c47d8a','Evolutionary Space':'#9b7eb0'};
         var CLL={'Reality':'Problem Space','TechnicalPurpose':'Problem Space','TechnicalRequirement':'Problem Space','TechnicalConstraint':'Problem Space','ActionInterfaceAndActuation':'Capability Space','TechnicalAgent':'Capability Space','TechnicalCompetence':'Capability Space','Technique':'Capability Space','OperativeTechnique':'Capability Space','ConstitutiveTechnique':'Capability Space','Resource':'Capability Space','TechnicalInfrastructure':'Capability Space','TechnicalAct':'Execution Space','TechnicalOperator':'Execution Space','TechnicalProcess':'Execution Space','TechnicalFeedback':'Execution Space','ConcreteTechnicalArtifact':'Execution Space','TechnicalBlueprint':'Artifact Space','TechnicalSpecification':'Artifact Space','TechnicalArchitecture':'Artifact Space','ProductionTechnicalObject':'Artifact Space','ConstitutiveTechnicalObject':'Artifact Space','TechnicalFunction':'Artifact Space','TechnicalStandard':'Governance Space','TechnicalPrinciple':'Governance Space','TechnicalStrategy':'Governance Space','TechnicalFramework':'Governance Space','Security':'Governance Space','Verification':'Governance Space','Maintenance':'Governance Space','TechnicalInstitution':'Governance Space','TechnicalEvolution':'Evolutionary Space','TechnicalResearch':'Evolutionary Space','TechnicalLabor':'Evolutionary Space','TechnicalFailure':'Evolutionary Space','TechnicalObsolescence':'Evolutionary Space'};
 
         var CL=[],CLB={},CC={},CS={};
         var LL=[],LLB={},LC={};
         var FL=[],FC={},FLB={},TFM={};
-        var PL={default:'Force',category:'Clusters',layer:'Layers',confidence:'Confidence',radial:'Radial',chord:'Chord',umap:'UMAP',spectral:'Spectral',bipartite:'Bipartite'};
-        var SP=['confidence','radial','umap','spectral','bipartite'];
-
+        var PL={default:'Force',umap:'UMAP'};
+        var SP=['umap'];
         var aCats=new Set(),aFams=new Set(),aLayers=new Set();
 
+        var VALID_LAYERS=['Problem Space','Capability Space','Execution Space','Artifact Space','Governance Space','Evolutionary Space'];
+        function resolveLayer(r){
+            if(r.layer&&VALID_LAYERS.indexOf(r.layer)>=0)return r.layer;
+            return CLL[r.category]||r.layer||'Unknown'
+        }
         function deriveSchema(data){
             var cs=new Set(),fs=new Set(),ls=new Set(),unknownFamUsed=false;
             data.forEach(function(r){
                 if(r.category)cs.add(r.category);
-                if(r.layer)ls.add(r.layer);
+                var l=resolveLayer(r);
+                if(l&&l!=='Unknown')ls.add(l);
                 (r.relationships||[]).forEach(function(rel){
-                    var fam=rel.relationshipFamily;
-                    if(fam){fs.add(fam)}else{unknownFamUsed=true}
+                    var fam=normFam(rel.relationshipFamily);
+                    if(rel.relationshipFamily){fs.add(fam)}else{unknownFamUsed=true}
                 })
             });
             CL=Array.from(cs).sort();FL=Array.from(fs).sort();LL=Array.from(ls).sort();
             if(unknownFamUsed&&FL.indexOf('unknown')===-1){FL.push('unknown')}
             CL.forEach(function(c,i){CC[c]=CP[i%CP.length];CS[c]=SC[i%SC.length];CLB[c]=friendlyLabel(c)});
             FL.forEach(function(f,i){FC[f]=FP[i%FP.length];FLB[f]=FLM[f]||friendlyLabel(f)});
-            LL.forEach(function(l,i){LC[l]=LPC[l]||'#888';LLB[l]=l});
-            TFM={};data.forEach(function(r){(r.relationships||[]).forEach(function(rel){if(rel.relationshipType&&rel.relationshipFamily)TFM[rel.relationshipType]=rel.relationshipFamily})});
+            TFM={};data.forEach(function(r){(r.relationships||[]).forEach(function(rel){if(rel.relationshipType&&rel.relationshipFamily)TFM[rel.relationshipType]=normFam(rel.relationshipFamily)})});
             aCats=new Set(CL);aFams=new Set(FL);aLayers=new Set(LL)
         }
 
@@ -2133,10 +2731,11 @@
         var cam={x:0,y:0,z:1},camTgt=null;
         var hovN=null,pinN=null,dragN=null,selN=null;
         var isPan=false,panS={x:0,y:0};
+        var mdS={x:-9999,y:-9999};
         var mS={x:-9999,y:-9999},wM={x:-9999,y:-9999};
         var catC={};var fc=0,lt=performance.now(),fps=0;
         var minY=Infinity,maxY=-Infinity,maxIL=1;
-        var chordHC=null;var cNC={};
+        var cNC={};
         var tR={min:-Infinity,max:Infinity};var tRF={min:0,max:0};
         var pCache={};var dLoaded=false;
         var ddOpen=false,kbFI=-1,fRes=[];
@@ -2144,8 +2743,6 @@
         var mmC=document.getElementById('minimap-canvas'),mmX=mmC.getContext('2d');
         var W=0,H=0;
         var umapK=0;
-        var bipG={left:[],right:[],mid:[]};
-        var wasChord=false;
 
         /* ═══════ CANVAS TOAST STATE ═══════ */
         var toastNode=null,toastStart=0;
@@ -2166,7 +2763,7 @@
             opacity=Math.max(0,Math.min(1,opacity));
             var sp=w2s(toastNode.x,toastNode.y);
             var name=toastNode.name;
-            var col=CC[toastNode.category]||'#48e8d8';
+            var col=CC[toastNode.category]||'#c9956c';
             ctx.save();
             ctx.globalAlpha=opacity;
             ctx.font='600 11.5px Inter';
@@ -2182,43 +2779,36 @@
             var by=sp.y-baseR-16-bh-arrowH;
             bx=clamp(bx,10,W-bw-10);
             by=clamp(by,10,H-bh-arrowH-10);
-            /* Shadow */
             ctx.shadowColor='rgba(0,0,0,0.5)';
             ctx.shadowBlur=20;
             ctx.shadowOffsetY=4;
-            /* Background pill */
             drawRoundRect(ctx,bx,by,bw,bh,8);
-            ctx.fillStyle='rgba(12,13,22,0.92)';
+            ctx.fillStyle='rgba(17,21,30,0.95)';
             ctx.fill();
             ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;
-            /* Border */
             ctx.strokeStyle=hexToRGBA(col,0.5);
             ctx.lineWidth=1;
             ctx.stroke();
-            /* Category dot */
             ctx.beginPath();
             ctx.arc(bx+padX,by+bh/2,3.5,0,Math.PI*2);
             ctx.fillStyle=col;
             ctx.fill();
-            /* Dot glow */
             var dGrd=ctx.createRadialGradient(bx+padX,by+bh/2,1,bx+padX,by+bh/2,10);
             dGrd.addColorStop(0,hexToRGBA(col,0.25));
             dGrd.addColorStop(1,hexToRGBA(col,0));
             ctx.fillStyle=dGrd;
             ctx.beginPath();ctx.arc(bx+padX,by+bh/2,10,0,Math.PI*2);ctx.fill();
-            /* Text */
-            ctx.fillStyle='#e8eaf2';
+            ctx.fillStyle='#D6D1C4';
             ctx.textAlign='left';
             ctx.textBaseline='middle';
             ctx.fillText(name,bx+padX+dotSpace,by+bh/2+0.5);
-            /* Arrow */
             var arrowX=clamp(sp.x,bx+10,bx+bw-10);
             ctx.beginPath();
             ctx.moveTo(arrowX-6,by+bh);
             ctx.lineTo(arrowX,by+bh+arrowH);
             ctx.lineTo(arrowX+6,by+bh);
             ctx.closePath();
-            ctx.fillStyle='rgba(12,13,22,0.92)';
+            ctx.fillStyle='rgba(17,21,30,0.95)';
             ctx.fill();
             ctx.strokeStyle=hexToRGBA(col,0.5);
             ctx.lineWidth=1;
@@ -2227,7 +2817,6 @@
             ctx.lineTo(arrowX,by+bh+arrowH);
             ctx.lineTo(arrowX+6,by+bh);
             ctx.stroke();
-            /* Connecting line from arrow tip to node */
             ctx.beginPath();
             ctx.setLineDash([2,3]);
             ctx.moveTo(arrowX,by+bh+arrowH);
@@ -2244,7 +2833,7 @@
         var ambBlobs=[];
         function initAmbBlobs(){
             ambBlobs=[];
-            var cols=['#48e8d8','#C9A44e','#7BE0A0','#8B7BF0','#45B7D1'];
+            var cols=['#c9956c','#6b8caa','#7ba388','#9b7eb0','#d4a857'];
             for(var i=0;i<5;i++){
                 ambBlobs.push({
                     x:Math.random()*2000,y:Math.random()*2000,
@@ -2290,7 +2879,7 @@
                 if(p.x<-10)p.x=W+10;if(p.x>W+10)p.x=-10;
                 if(p.y<-10)p.y=H+10;if(p.y>H+10)p.y=-10;
                 ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
-                ctx.fillStyle=hexToRGBA('#8892b0',p.opacity);
+                ctx.fillStyle=hexToRGBA('#82809a',p.opacity);
                 ctx.fill()
             })
         }
@@ -2300,11 +2889,10 @@
         function sPC(pj){pCache[pj]=nodes.map(function(n){return{id:n.id,x:n.x,y:n.y}})}
         function rPC(pj){var c=pCache[pj];if(!c)return false;var m={};c.forEach(function(v){m[v.id]=v});nodes.forEach(function(n){if(m[n.id]){n.x=m[n.id].x;n.y=m[n.id].y}});return true}
         function sCV(){var r=canvas.parentElement.getBoundingClientRect();W=r.width;H=r.height;canvas.width=W*devicePixelRatio;canvas.height=H*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
-        function resize(){sCV();if(dLoaded){rCC();rLC();if(curProj!=='chord')fCam()}uPS()}
+        function resize(){sCV();if(dLoaded){rCC();rLC();fCam()}uPS()}
 
-        function fCam(){var v=nodes.filter(function(n){return n.visible});if(!v.length)return;var x1=Infinity,x2=-Infinity,y1=Infinity,y2=-Infinity;var ut=curProj!=='default'&&curProj!=='chord';v.forEach(function(n){var px=ut&&n.targetX!==undefined?n.targetX:n.x;var py=ut&&n.targetY!==undefined?n.targetY:n.y;if(px<x1)x1=px;if(px>x2)x2=px;if(py<y1)y1=py;if(py>y2)y2=py});if(x1===Infinity)return;var p=120,gw=x2-x1+p*2,gh=y2-y1+p*2,z=Math.min(W/gw,H/gh,1.2);cam.z=z;cam.x=W/2-((x1+x2)/2)*z;cam.y=H/2-((y1+y2)/2)*z;camTgt=null}
+        function fCam(){var v=nodes.filter(function(n){return n.visible});if(!v.length)return;var x1=Infinity,x2=-Infinity,y1=Infinity,y2=-Infinity;var ut=curProj!=='default';v.forEach(function(n){var px=ut&&n.targetX!==undefined?n.targetX:n.x;var py=ut&&n.targetY!==undefined?n.targetY:n.y;if(px<x1)x1=px;if(px>x2)x2=px;if(py<y1)y1=py;if(py>y2)y2=py});if(x1===Infinity)return;var p=120,gw=x2-x1+p*2,gh=y2-y1+p*2,z=Math.min(W/gw,H/gh,1.2);cam.z=z;cam.x=W/2-((x1+x2)/2)*z;cam.y=H/2-((y1+y2)/2)*z;camTgt=null}
 
-        /* Improved: zoom to at least 1.2 for clear identification */
         function pTN(nd){if(!nd)return;var tz=Math.max(cam.z,1.2);camTgt={x:W/2-nd.x*tz,y:H/2-nd.y*tz,z:tz}}
         function uCP(){if(!camTgt)return;var dx=camTgt.x-cam.x,dy=camTgt.y-cam.y,dz=camTgt.z-cam.z;if(Math.abs(dx)<.3&&Math.abs(dy)<.3&&Math.abs(dz)<.001){cam.x=camTgt.x;cam.y=camTgt.y;cam.z=camTgt.z;camTgt=null;return}cam.x+=dx*.09;cam.y+=dy*.09;cam.z+=dz*.09}
         function reheatAlpha(){alpha=1}
@@ -2371,98 +2959,25 @@
             vis.forEach(function(nd,i){nd.targetX=cx2+emb[i][0]*scl+Math.cos(i*golden)*8;nd.targetY=cy2+emb[i][1]*scl+Math.sin(i*golden)*8})
         }
 
-        /* ═══════ SPECTRAL LAYOUT ═══════ */
-        function computeSpectral(){
-            var vis=nodes.filter(function(n){return n.visible});var n=vis.length;
-            if(n<3){vis.forEach(function(nd){nd.targetX=W/2;nd.targetY=H/2});return}
-            var idx={};vis.forEach(function(nd,i){idx[nd.id]=i});
-            var deg=new Array(n).fill(0);var nb=[];for(var i=0;i<n;i++)nb[i]=[];
-            gE.forEach(function(e){var si=idx[e.source],ti=idx[e.target];if(si===undefined||ti===undefined||si===ti)return;if(nb[si].indexOf(ti)===-1){nb[si].push(ti);deg[si]++}if(nb[ti].indexOf(si)===-1){nb[ti].push(si);deg[ti]++}});
-            var maxD=Math.max.apply(null,deg.concat([1]))+1;
-            var eigs=[];
-            for(var ev=0;ev<2;ev++){
-                var v=new Array(n);for(var i=0;i<n;i++)v[i]=Math.random()-.5;
-                var vn=Math.sqrt(v.reduce(function(a,b){return a+b*b},0));if(vn<1e-12)vn=1e-12;for(var i=0;i<n;i++)v[i]/=vn;
-                for(var it=0;it<500;it++){
-                    var nv=new Array(n).fill(0);
-                    for(var i=0;i<n;i++){nv[i]=(maxD-deg[i])*v[i];for(var j=0;j<nb[i].length;j++)nv[i]+=v[nb[i][j]]}
-                    if(ev===0){var mean=0;for(var i=0;i<n;i++)mean+=nv[i];mean/=n;for(var i=0;i<n;i++)nv[i]-=mean}
-                    else{var dot=0;for(var i=0;i<n;i++)dot+=nv[i]*eigs[0][i];for(var i=0;i<n;i++)nv[i]-=dot*eigs[0][i]}
-                    var nvn=Math.sqrt(nv.reduce(function(a,b){return a+b*b},0));if(nvn<1e-12)break;for(var i=0;i<n;i++)v[i]=nv[i]/nvn
-                }
-                eigs.push(v.slice())
-            }
-            var xs=eigs[0],ys=eigs[1];
-            var xMin=Math.min.apply(null,xs),xMax=Math.max.apply(null,xs);
-            var yMin=Math.min.apply(null,ys),yMax=Math.max.apply(null,ys);
-            var xR=Math.max(.001,xMax-xMin),yR=Math.max(.001,yMax-yMin);
-            var pad=160,scl=Math.min((W-2*pad)/xR,(H-2*pad)/yR);
-            var cx2=W/2-(xMin+xMax)/2*scl,cy2=H/2-(yMin+yMax)/2*scl;
-            vis.forEach(function(nd,i){nd.targetX=cx2+xs[i]*scl;nd.targetY=cy2+ys[i]*scl})
-        }
-
-        /* ═══════ BIPARTITE PROJECTION ═══════ */
-        function computeBipartite(){
-            var vis=nodes.filter(function(n){return n.visible});
-            bipG={left:[],right:[],mid:[]};
-            var operativeLayers=['Execution Space','Capability Space'];
-            var artifactLayers=['Artifact Space','Governance Space'];
-            vis.forEach(function(nd){var l=nd.layer;if(operativeLayers.indexOf(l)>=0)bipG.left.push(nd);else if(artifactLayers.indexOf(l)>=0)bipG.right.push(nd);else bipG.mid.push(nd)});
-            bipG.left.sort(function(a,b){return shortLabel(a.category).localeCompare(shortLabel(b.category))});
-            bipG.right.sort(function(a,b){return shortLabel(b.category).localeCompare(shortLabel(a.category))});
-            bipG.mid.sort(function(a,b){return a.y-b.y});
-            var padY=80;
-            var leftX=W*0.22,rightX=W*0.78;
-            var availH=H-padY*2;
-            bipG.left.forEach(function(nd,i){nd.targetX=leftX+(Math.random()-.5)*30;nd.targetY=padY+(i+.5)*(availH/Math.max(1,bipG.left.length))});
-            bipG.right.forEach(function(nd,i){nd.targetX=rightX+(Math.random()-.5)*30;nd.targetY=padY+(i+.5)*(availH/Math.max(1,bipG.right.length))});
-            bipG.mid.forEach(function(nd,i){nd.targetX=W/2+(Math.random()-.5)*40;nd.targetY=padY+(i+.5)*(availH/Math.max(1,bipG.mid.length))})
-        }
-
         /* ═══════ PROJECTION DISPATCH ═══════ */
         function applyProjection(pj){
             var vis=nodes.filter(function(n){return n.visible});if(!vis.length)return;
             try{switch(pj){
-                case'category':projCategory(vis);break;case'layer':projLayer(vis);break;
-                case'confidence':projConfidence(vis);break;case'radial':projRadial(vis);break;
-                case'umap':computeUMAP();break;case'spectral':computeSpectral();break;
-                case'bipartite':computeBipartite();break;default:break
+                case'umap':computeUMAP();break;default:break
             }}catch(err){console.warn('Projection error:',err)}
         }
-        function projCategory(vis){
-            var cats={};vis.forEach(function(n){if(!cats[n.category])cats[n.category]=[];cats[n.category].push(n)});
-            var keys=Object.keys(cats),nk=keys.length;if(!nk)return;
-            var cx=W/2,cy=H/2,rad=Math.min(W,H)*0.32;
-            keys.forEach(function(k,i){var ang=(i/nk)*Math.PI*2-Math.PI/2;var ccx=cx+Math.cos(ang)*rad,ccy=cy+Math.sin(ang)*rad;var arr=cats[k];var sr=Math.max(22,Math.min(90,14*Math.sqrt(arr.length)));arr.forEach(function(nd,j){var a2=(j/arr.length)*Math.PI*2;var r2=sr*(.35+.65*((j%3)+1)/3);nd.targetX=ccx+Math.cos(a2)*r2;nd.targetY=ccy+Math.sin(a2)*r2})})
-        }
-        function projLayer(vis){
-            var layers={};vis.forEach(function(n){var l=n.layer||'Unknown';if(!layers[l])layers[l]=[];layers[l].push(n)});
-            var keys=Object.keys(layers).sort(),nk=keys.length;if(!nk)return;
-            var padX=180,padY=100,gap=(H-2*padY)/Math.max(1,nk);
-            keys.forEach(function(k,i){var arr=layers[k],cy=padY+gap*(i+.5);var totalW=Math.min(W-2*padX,arr.length*55);arr.forEach(function(nd,j){nd.targetX=padX+(j+.5)*(totalW/arr.length);nd.targetY=cy+(Math.random()-.5)*gap*0.25})})
-        }
 
-        function projConfidence(vis){
-            var pad=160;
-            var sorted=vis.slice().sort(function(a,b){return(a.confidence||0.5)-(b.confidence||0.5)});
-            var golden=2.399963;
-            sorted.forEach(function(nd,i){
-                nd.targetX=pad+(nd.confidence||0.5)*(W-2*pad);
-                nd.targetY=H/2+Math.sin(i*golden)*H*0.35
-            })
-        }
-
-
-
-        function projRadial(vis){
-            var cx=W/2,cy=H/2,rad=Math.min(W,H)*0.35;
-            var maxDeg=Math.max(1,nodes.reduce(function(a,n){return Math.max(a,n.degree)},0));
-            var sorted=vis.slice().sort(function(a,b){return a.degree-b.degree});
-            sorted.forEach(function(nd,i){
-                var ang=(i/sorted.length)*Math.PI*2;
-                var r2=rad*(0.2+0.8*(nd.degree/maxDeg));
-                nd.targetX=cx+Math.cos(ang)*r2;
-                nd.targetY=cy+Math.sin(ang)*r2
+        /* ═══════ STRUCTURED PROJECTION INTERPOLATION ═══════ */
+        function interpTick(){
+            if(curProj==='default')return;
+            var vis=nodes.filter(function(n){return n.visible});
+            var rate=0.1;
+            vis.forEach(function(nd){
+                if(nd===dragN)return;
+                if(nd.targetX===undefined||nd.targetY===undefined)return;
+                nd.x+=(nd.targetX-nd.x)*rate;nd.y+=(nd.targetY-nd.y)*rate;
+                if(!isFiniteNum(nd.x))nd.x=nd.targetX;
+                if(!isFiniteNum(nd.y))nd.y=nd.targetY
             })
         }
 
@@ -2488,9 +3003,10 @@
             document.getElementById('hud-v').textContent=vc;
             var ec=gE.filter(function(e){return e.visible}).length;
             document.getElementById('hud-e').textContent=ec;
-            if(curProj!=='default'&&curProj!=='chord'){applyProjection(curProj)}
+            if(curProj!=='default'){applyProjection(curProj)}
             rCC();
-            if(curProj==='default')reheatAlpha()
+            if(curProj==='default')reheatAlpha();
+            eoRefreshIfOpen()
         }
         function rCC(){CL.forEach(function(c){var el=document.getElementById('ctog-'+c);if(el){var cnt=cNC[c]||0;el.querySelector('.node-count').textContent=cnt;el.classList.toggle('disabled',cnt===0)}})}
         function rLC(){
@@ -2553,20 +3069,6 @@
             })
         }
 
-        /* ═══════ STRUCTURED PROJECTION INTERPOLATION ═══════ */
-        function interpTick(){
-            if(curProj==='default'||curProj==='chord')return;
-            var vis=nodes.filter(function(n){return n.visible});
-            var rate=0.1;
-            vis.forEach(function(nd){
-                if(nd===dragN)return;
-                if(nd.targetX===undefined||nd.targetY===undefined)return;
-                nd.x+=(nd.targetX-nd.x)*rate;nd.y+=(nd.targetY-nd.y)*rate;
-                if(!isFiniteNum(nd.x))nd.x=nd.targetX;
-                if(!isFiniteNum(nd.y))nd.y=nd.targetY
-            })
-        }
-
         /* ═══════ DRAWING ═══════ */
         function w2s(wx,wy){return{x:wx*cam.z+cam.x,y:wy*cam.z+cam.y}}
         function s2w(sx,sy){return{x:(sx-cam.x)/cam.z,y:(sy-cam.y)/cam.z}}
@@ -2585,7 +3087,6 @@
         function drawEdges(){
             var showFlow=document.getElementById('lens-flow').checked;
             var showHeat=document.getElementById('lens-heatmap').checked;
-            var isBip=curProj==='bipartite';
             gE.forEach(function(e){
                 if(!e.visible)return;
                 var s=nM[e.source],t=nM[e.target];if(!s||!t)return;
@@ -2595,40 +3096,36 @@
                 var isHov=hovN&&(hovN.id===e.source||hovN.id===e.target);
                 var isSel=selN&&(selN.id===e.source||selN.id===e.target);
                 var isPin=pinN&&(pinN.id===e.source||pinN.id===e.target);
-                var famC=FC[e.family]||'#48e8d8';
+                var famC=FC[e.family]||'#6b8caa';
                 var highlight=isHov||isSel||isPin;
                 var baseA=highlight?0.3:0.07;
                 ctx.strokeStyle=hexToRGBA(famC,baseA);
                 ctx.lineWidth=highlight?1.4:0.6;
-                if(isBip){
-                    ctx.beginPath();ctx.moveTo(sp.x,sp.y);var mx=(sp.x+tp.x)/2,my=(sp.y+tp.y)/2;ctx.quadraticCurveTo(mx,my,tp.x,tp.y);ctx.stroke()
-                }else{
-                    if(showFlow&&curProj!=='chord'){
-                        var dx=tp.x-sp.x,dy=tp.y-sp.y,d=Math.sqrt(dx*dx+dy*dy);
-                        if(d>10){
-                            var nx=-dy/d,ny=dx/d;
-                            var cpx=(sp.x+tp.x)/2+nx*d*0.08,cpy=(sp.y+tp.y)/2+ny*d*0.08;
-                            ctx.beginPath();ctx.moveTo(sp.x,sp.y);ctx.quadraticCurveTo(cpx,cpy,tp.x,tp.y);ctx.stroke();
-                            if(highlight){
-                                var gt=0.4+0.3*Math.sin(performance.now()*0.003);
-                                var grd=ctx.createLinearGradient(sp.x,sp.y,tp.x,tp.y);
-                                grd.addColorStop(0,hexToRGBA(famC,0));
-                                grd.addColorStop(0.5,hexToRGBA(famC,gt));
-                                grd.addColorStop(1,hexToRGBA(famC,0));
-                                ctx.strokeStyle=grd;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(sp.x,sp.y);ctx.quadraticCurveTo(cpx,cpy,tp.x,tp.y);ctx.stroke()
-                            }
-                        }else{ctx.beginPath();ctx.moveTo(sp.x,sp.y);ctx.lineTo(tp.x,tp.y);ctx.stroke()}
+                if(showFlow){
+                    var dx=tp.x-sp.x,dy=tp.y-sp.y,d=Math.sqrt(dx*dx+dy*dy);
+                    if(d>10){
+                        var nx=-dy/d,ny=dx/d;
+                        var cpx=(sp.x+tp.x)/2+nx*d*0.08,cpy=(sp.y+tp.y)/2+ny*d*0.08;
+                        ctx.beginPath();ctx.moveTo(sp.x,sp.y);ctx.quadraticCurveTo(cpx,cpy,tp.x,tp.y);ctx.stroke();
+                        if(highlight){
+                            var gt=0.4+0.3*Math.sin(performance.now()*0.003);
+                            var grd=ctx.createLinearGradient(sp.x,sp.y,tp.x,tp.y);
+                            grd.addColorStop(0,hexToRGBA(famC,0));
+                            grd.addColorStop(0.5,hexToRGBA(famC,gt));
+                            grd.addColorStop(1,hexToRGBA(famC,0));
+                            ctx.strokeStyle=grd;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(sp.x,sp.y);ctx.quadraticCurveTo(cpx,cpy,tp.x,tp.y);ctx.stroke()
+                        }
                     }else{ctx.beginPath();ctx.moveTo(sp.x,sp.y);ctx.lineTo(tp.x,tp.y);ctx.stroke()}
-                }
+                }else{ctx.beginPath();ctx.moveTo(sp.x,sp.y);ctx.lineTo(tp.x,tp.y);ctx.stroke()}
                 if(showHeat&&e.family==='NormativeAndRegulative'){
-                    ctx.strokeStyle=hexToRGBA('#E06070',0.09);ctx.lineWidth=3.5;ctx.beginPath();ctx.moveTo(sp.x,sp.y);ctx.lineTo(tp.x,tp.y);ctx.stroke()
+                    ctx.strokeStyle=hexToRGBA('#c47d8a',0.09);ctx.lineWidth=3.5;ctx.beginPath();ctx.moveTo(sp.x,sp.y);ctx.lineTo(tp.x,tp.y);ctx.stroke()
                 }
             })
         }
 
         function drawHulls(){
             if(!document.getElementById('lens-hulls').checked)return;
-            if(SP.indexOf(curProj)>=0)return;if(curProj==='chord')return;
+            if(SP.indexOf(curProj)>=0)return;
             Object.keys(catC).forEach(function(cat){
                 var pts=catC[cat];if(pts.length<3)return;
                 var sPts=pts.map(function(p){return w2s(p.x,p.y)});
@@ -2638,7 +3135,6 @@
                 for(var i=1;i<sPts.length;i++)ctx.lineTo(sPts[i].x,sPts[i].y);
                 ctx.closePath();
                 var hullCol=CC[cat]||'#888';
-                /* Gradient fill for richer hull appearance */
                 var hgrd=ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(100,Math.sqrt((cx-sPts[0].x)**2+(cy-sPts[0].y)**2)));
                 hgrd.addColorStop(0,hexToRGBA(hullCol,0.025));
                 hgrd.addColorStop(1,hexToRGBA(hullCol,0.005));
@@ -2667,9 +3163,8 @@
                 if(showObs){if(nd.observability==='latent')alpha2=0.18;else if(nd.observability==='partiallyObservable')alpha2=0.5}
                 if(isHov||isSel||isPin)alpha2=1;
                 ctx.globalAlpha=alpha2;
-                /* Outer glow for hovered/selected/pinned nodes */
                 if(isHov||isSel||isPin){
-                    var glowCol=isSel?'#48e8d8':isPin?'#C9A44e':'#ffffff';
+                    var glowCol=isSel?'#4dd4c4':isPin?'#C4B998':'#ffffff';
                     var glowR=r+8;
                     var gGrd=ctx.createRadialGradient(sp.x,sp.y,r*0.5,sp.x,sp.y,glowR);
                     gGrd.addColorStop(0,hexToRGBA(glowCol,0.18));
@@ -2677,104 +3172,37 @@
                     ctx.fillStyle=gGrd;
                     ctx.beginPath();ctx.arc(sp.x,sp.y,glowR,0,Math.PI*2);ctx.fill()
                 }
-                /* Subtle ambient glow on all visible nodes for depth */
                 var ambGrd=ctx.createRadialGradient(sp.x,sp.y,r*0.2,sp.x,sp.y,r+3);
                 ambGrd.addColorStop(0,hexToRGBA(col,0.12));
                 ambGrd.addColorStop(1,hexToRGBA(col,0));
                 ctx.fillStyle=ambGrd;
                 ctx.beginPath();ctx.arc(sp.x,sp.y,r+3,0,Math.PI*2);ctx.fill();
 
-                /* Main node fill with inner gradient for dimensionality */
                 var nGrd=ctx.createRadialGradient(sp.x-r*0.25,sp.y-r*0.25,0,sp.x,sp.y,r);
                 nGrd.addColorStop(0,hexToRGBA(col,1));
                 nGrd.addColorStop(1,hexToRGBA(col,0.75));
                 ctx.fillStyle=nGrd;
                 drawShape(sp.x,sp.y,r,CS[nd.category]||'circle');ctx.fill();
 
-                /* Inner highlight for 3D feel */
                 ctx.fillStyle=hexToRGBA('#ffffff',0.15);
                 ctx.beginPath();ctx.arc(sp.x-r*0.2,sp.y-r*0.2,r*0.35,0,Math.PI*2);ctx.fill();
 
                 if(isHov){ctx.strokeStyle=hexToRGBA('#ffffff',0.35);ctx.lineWidth=1.2;drawShape(sp.x,sp.y,r+2.5,CS[nd.category]||'circle');ctx.stroke()}
-                if(isSel){ctx.strokeStyle=hexToRGBA('#48e8d8',0.5);ctx.lineWidth=1.2;drawShape(sp.x,sp.y,r+3,CS[nd.category]||'circle');ctx.stroke()}
-                if(isPin){ctx.strokeStyle=hexToRGBA('#C9A44e',0.4);ctx.lineWidth=1;ctx.setLineDash([3,3]);drawShape(sp.x,sp.y,r+4,CS[nd.category]||'circle');ctx.stroke();ctx.setLineDash([])}
+                if(isSel){ctx.strokeStyle=hexToRGBA('#4dd4c4',0.5);ctx.lineWidth=1.2;drawShape(sp.x,sp.y,r+3,CS[nd.category]||'circle');ctx.stroke()}
+                if(isPin){ctx.strokeStyle=hexToRGBA('#C4B998',0.4);ctx.lineWidth=1;ctx.setLineDash([3,3]);drawShape(sp.x,sp.y,r+4,CS[nd.category]||'circle');ctx.stroke();ctx.setLineDash([])}
                 ctx.shadowColor='transparent';ctx.shadowBlur=0;
                 if(cam.z>0.55&&r>3.5){
                     var fontSize=Math.max(8.5,Math.min(11.5,r*1.1));
                     ctx.font='500 '+fontSize+'px Inter';
                     ctx.textAlign='center';ctx.textBaseline='top';
-                    /* Text shadow for readability */
                     ctx.fillStyle=hexToRGBA('#060710',alpha2*0.7);
                     var lbl=nd.name||'';if(lbl.length>18)lbl=lbl.substring(0,16)+'…';
                     ctx.fillText(lbl,sp.x+0.5,sp.y+r+5.5);
-                    ctx.fillStyle=hexToRGBA('#e0e4f0',alpha2*(isHov?0.92:0.6));
+                    ctx.fillStyle=hexToRGBA('#D6D1C4',alpha2*(isHov?0.92:0.6));
                     ctx.fillText(lbl,sp.x,sp.y+r+5)
                 }
                 ctx.globalAlpha=1
             })
-        }
-
-        function drawBipartiteLabels(){
-            if(curProj!=='bipartite')return;
-            ctx.save();ctx.font='600 9.5px "JetBrains Mono"';ctx.textAlign='center';ctx.letterSpacing='0.15em';
-            ctx.fillStyle=hexToRGBA('#7BE0A0',0.4);ctx.fillText('OPERATIVE',W*0.22,50);
-            ctx.fillStyle=hexToRGBA('#45B7D1',0.4);ctx.fillText('ARTIFACT',W*0.78,50);
-            if(bipG.mid.length){ctx.fillStyle=hexToRGBA('#C9A44e',0.3);ctx.fillText('CONTEXT',W/2,50)}
-            ctx.restore()
-        }
-
-        function drawUMAPInfo(){
-            if(curProj!=='umap')return;
-            ctx.save();ctx.font='400 9px "JetBrains Mono"';ctx.textAlign='left';
-            ctx.fillStyle=hexToRGBA('#48e8d8',0.35);
-            ctx.fillText('UMAP \u00B7 k='+umapK+' \u00B7 min_dist=0.1',16,H-38);
-            ctx.fillText('n_neighbors='+umapK+' \u00B7 euclidean metric',16,H-24);ctx.restore()
-        }
-
-        function drawSpectralInfo(){
-            if(curProj!=='spectral')return;
-            ctx.save();ctx.font='400 9px "JetBrains Mono"';ctx.textAlign='left';
-            ctx.fillStyle=hexToRGBA('#8B7BF0',0.35);ctx.fillText('Eigenvector 1 \u2192 X',16,H-38);ctx.fillText('Eigenvector 2 \u2192 Y',16,H-24);ctx.restore()
-        }
-
-        function drawChord(){
-            if(curProj!=='chord')return;
-            var vis=nodes.filter(function(n){return n.visible});
-            var cats=Object.keys(cNC);if(cats.length<2)return;
-            var cx=W/2,cy=H/2,R=Math.min(W,H)*0.36;
-            var total=vis.length;var gap=0.03;
-            var catArcs=[];var startA=-Math.PI/2;
-            cats.forEach(function(c){var cnt=cNC[c]||0;var arc=2*Math.PI*(cnt/total)-gap;catArcs.push({cat:c,start:startA,end:startA+arc,cnt:cnt,color:CC[c]});startA+=arc+gap});
-            var nodeArcs={};var ai={};catArcs.forEach(function(ca){ai[ca.cat]=0});
-            vis.forEach(function(nd){
-                var ca=catArcs.find(function(a){return a.cat===nd.category});if(!ca)return;
-                var idx2=ai[nd.category]++;var slice=ca.end-ca.start;var na=slice/ca.cnt;
-                var s=ca.start+idx2*na,e=s+na*0.9;nodeArcs[nd.id]={start:s,end:e,cat:nd.category}
-            });
-            ctx.lineCap='round';
-            gE.forEach(function(e){
-                if(!e.visible)return;var sa=nodeArcs[e.source],ta=nodeArcs[e.target];if(!sa||!ta)return;
-                var x1=cx+Math.cos(sa.start)*R,y1=cy+Math.sin(sa.start)*R;
-                var x2=cx+Math.cos(ta.start)*R,y2=cy+Math.sin(ta.start)*R;
-                var isHov=chordHC&&(chordHC.source===e.source||chordHC.target===e.source||chordHC.source===e.target||chordHC.target===e.target);
-                ctx.strokeStyle=hexToRGBA(FC[e.family]||'#48e8d8',isHov?0.28:0.04);
-                ctx.lineWidth=isHov?1.5:0.6;ctx.beginPath();ctx.moveTo(x1,y1);ctx.quadraticCurveTo(cx,cy,x2,y2);ctx.stroke()
-            });
-            catArcs.forEach(function(ca){
-                /* Glowing arc background */
-                ctx.beginPath();ctx.arc(cx,cy,R-1,ca.start,ca.end);
-                ctx.strokeStyle=hexToRGBA(ca.color,0.06);ctx.lineWidth=6;ctx.stroke();
-                /* Main arc */
-                ctx.beginPath();ctx.arc(cx,cy,R,ca.start,ca.end);ctx.strokeStyle=hexToRGBA(ca.color,0.3);ctx.lineWidth=2.5;ctx.stroke();
-                var ma=(ca.start+ca.end)/2;var lx=cx+Math.cos(ma)*(R+20),ly=cy+Math.sin(ma)*(R+20);
-                ctx.font='500 8.5px "JetBrains Mono"';ctx.textAlign=Math.cos(ma)>0?'left':'right';ctx.textBaseline='middle';
-                ctx.fillStyle=hexToRGBA(ca.color,0.55);ctx.fillText(shortLabel(ca.cat),lx,ly)
-            });
-            if(chordHC){
-                var sa=nodeArcs[chordHC.source]||nodeArcs[chordHC.target];
-                if(sa){ctx.beginPath();ctx.arc(cx,cy,R,sa.start,sa.end);ctx.strokeStyle=hexToRGBA('#ffffff',0.35);ctx.lineWidth=4;ctx.stroke()}
-            }
-            ctx.lineCap='butt'
         }
 
         function drawMinimap(){
@@ -2786,15 +3214,22 @@
             if(x1===Infinity)return;
             var p=10,gw=x2-x1+p*2,gh=y2-y1+p*2,s=Math.min(mw/gw,mh/gh);
             var ox=mw/2-((x1+x2)/2)*s,oy=mh/2-((y1+y2)/2)*s;
-            /* Minimap background subtle vignette */
             var mGrd=mmX.createRadialGradient(mw/2,mh/2,0,mw/2,mh/2,mw/2);
-            mGrd.addColorStop(0,'rgba(12,13,22,0)');
-            mGrd.addColorStop(1,'rgba(6,7,16,0.4)');
+            mGrd.addColorStop(0,'rgba(17,21,30,0)');
+            mGrd.addColorStop(1,'rgba(11,14,20,0.4)');
             mmX.fillStyle=mGrd;mmX.fillRect(0,0,mw,mh);
-            vis.forEach(function(n){var mx=n.x*s+ox,my=n.y*s+oy;mmX.fillStyle=hexToRGBA(CC[n.category]||'#888',0.55);mmX.fillRect(mx-1,my-1,2,2)});
+            vis.forEach(function(n){var mx=n.x*s+ox,my=n.y*s+oy;mmX.fillStyle=hexToRGBA(CC[n.category]||'#888',0.6);mmX.fillRect(mx-1,my-1,2,2)});
             var vx1=-cam.x/cam.z,vy1=-cam.y/cam.z;var vx2=(W-cam.x)/cam.z,vy2=(H-cam.y)/cam.z;
             var rx=vx1*s+ox,ry=vy1*s+oy,rw=(vx2-vx1)*s,rh=(vy2-vy1)*s;
-            mmX.strokeStyle=hexToRGBA('#48e8d8',0.3);mmX.lineWidth=1;mmX.strokeRect(rx,ry,rw,rh)
+            mmX.strokeStyle=hexToRGBA('#c9956c',0.3);mmX.lineWidth=1;mmX.strokeRect(rx,ry,rw,rh)
+        }
+
+        function drawUMAPInfo(){
+            if(curProj!=='umap')return;
+            ctx.save();ctx.font='400 9px "JetBrains Mono"';ctx.textAlign='left';
+            ctx.fillStyle=hexToRGBA('#6b8caa',0.35);
+            ctx.fillText('UMAP \u00B7 k='+umapK+' \u00B7 min_dist=0.1',16,H-38);
+            ctx.fillText('n_neighbors='+umapK+' \u00B7 euclidean metric',16,H-24);ctx.restore()
         }
 
         /* ═══════ MAIN LOOP ═══════ */
@@ -2807,46 +3242,28 @@
             interpTick();
             catC={};nodes.forEach(function(n){if(n.visible){if(!catC[n.category])catC[n.category]=[];catC[n.category].push(n)}});
             ctx.clearRect(0,0,W,H);
-            /* Ambient background layers */
             drawAmbBlobs();
             drawDust();
-            if(curProj==='chord'){
-                drawChord()
-            }else{
-                drawHulls();drawEdges();drawNodes();
-                drawBipartiteLabels();drawUMAPInfo();drawSpectralInfo()
-            }
-            /* Canvas toast on top of everything except UI overlays */
+            drawHulls();drawEdges();drawNodes();
+            drawUMAPInfo();
             drawToast();
             drawMinimap()
         }
 
         /* ═══════ HIT TESTING ═══════ */
         function hitNode(sx,sy){
-            var wp=s2w(sx,sy);var best=null,bestD=Infinity;
-            nodes.forEach(function(n){if(!n.visible)return;var dx=n.x-wp.x,dy=n.y-wp.y,d2=dx*dx+dy*dy;var r=(4.5+n.degree*0.55)*1.8;if(d2<r*r&&d2<bestD){bestD=d2;best=n}});
+            var best=null,bestD=Infinity;
+            nodes.forEach(function(n){
+                if(!n.visible)return;
+                var sp=w2s(n.x,n.y);
+                var dx=sp.x-sx,dy=sp.y-sy,d2=dx*dx+dy*dy;
+                var baseR=4.5+n.degree*0.55;
+                var visR=Math.max(2.5,baseR)*cam.z;visR=Math.max(2,Math.min(visR,24));
+                var hitR=Math.max(visR*2.2,14);
+                if(d2<hitR*hitR&&d2<bestD){bestD=d2;best=n}
+            });
             return best
         }
-        function hitChord(sx,sy){
-            if(curProj!=='chord')return null;
-            var cx2=W/2,cy2=H/2,R=Math.min(W,H)*0.36;
-            var dx=sx-cx2,dy=sy-cy2,d=Math.sqrt(dx*dx+dy*dy);
-            if(Math.abs(d-R)>15)return null;
-            var ang=Math.atan2(dy,dx);
-            var vis=nodes.filter(function(n){return n.visible});
-            var cats=Object.keys(cNC);var total=vis.length;var gap=0.03;var startA=-Math.PI/2;
-            for(var ci=0;ci<cats.length;ci++){
-                var cnt=cNC[cats[ci]]||0;var arc=2*Math.PI*(cnt/total)-gap;
-                if(ang>=startA&&ang<=startA+arc){
-                    var idx2=Math.floor((ang-startA)/arc*cnt);idx2=clamp(idx2,0,cnt-1);
-                    var catNodes=vis.filter(function(n){return n.category===cats[ci]});
-                    return catNodes[idx2]||null
-                }
-                startA+=arc+gap
-            }
-            return null
-        }
-
         /* ═══════ TOOLTIP ═══════ */
         function showTT(nd,sx,sy){
             var tt=document.getElementById('tooltip');
@@ -2887,18 +3304,46 @@
             sg.innerHTML='<div class="ip-stat"><div class="ip-stat-value" style="color:'+confidenceColor(nd.confidence)+'">'+((nd.confidence||0)*100).toFixed(0)+'%</div><div class="ip-stat-label">Confidence</div></div><div class="ip-stat"><div class="ip-stat-value">'+nd.degree+'</div><div class="ip-stat-label">Degree</div></div><div class="ip-stat"><div class="ip-stat-value">'+(nd.inheritanceLevel||0)+'</div><div class="ip-stat-label">Inheritance</div></div><div class="ip-stat"><div class="ip-stat-value">'+(nd.year||'\u2014')+'</div><div class="ip-stat-label">Origin</div></div>';
             var dyn=document.getElementById('ip-dynamic-sections');
             dyn.innerHTML='';
-            var rels=(nd._raw&&nd._raw.relationships)||[];
+            var raw=nd._raw||{};
+            var rels=raw.relationships||[];
             if(rels.length){
                 var h='<div class="ip-section" style="animation-delay:.05s"><div class="ip-section-title">Relationships</div><ul class="ip-edge-list">';
                 rels.forEach(function(rel){
-                    var fam=TFM[rel.relationshipType]||'';
-                    var famC2=FC[fam]||FC['unknown']||'#48e8d8';
-                    var tgtNd=nM[(rel.target||'').replace(/\s+/g,'_')];
-                    var tgt=tgtNd?tgtNd.name:(rel.target||'Unknown');
-                    h+='<li class="ip-edge-item"><div class="ip-edge-connector"><div class="ip-edge-dot" style="background:'+famC2+'"></div></div><div class="ip-edge-content"><span class="ip-edge-type" style="background:'+hexToRGBA(famC2,0.1)+';color:'+famC2+'">'+(FLB[fam]||fam||'Related')+'</span><span class="ip-edge-target">'+tgt+'</span>'+(rel.description?'<span class="ip-edge-desc">'+rel.description+'</span>':'')+'</div></li>'
+                    var fam=TFM[rel.relationshipType]||normFam(rel.relationshipFamily)||'';
+                    var famC2=FC[fam]||FC['unknown']||'#6b8caa';
+                    var tidRaw=rel.targetNodeId||rel.target||'';
+                    var tgtNd=nM[tidRaw.replace(/\s+/g,'_')];
+                    var tgt=tgtNd?tgtNd.name:(tidRaw||'Unknown');
+                    var typeLbl=(rel.relationshipType||'').toLowerCase().replace(/_/g,' ');
+                    h+='<li class="ip-edge-item"><div class="ip-edge-connector"><div class="ip-edge-dot" style="background:'+famC2+'"></div></div><div class="ip-edge-content"><span class="ip-edge-type" style="background:'+hexToRGBA(famC2,0.1)+';color:'+famC2+'">'+(FLB[fam]||fam||'Related')+'</span><span class="ip-edge-target">'+tgt+'</span>'+(typeLbl?'<span class="ip-edge-desc">'+typeLbl+'</span>':'')+(rel.description?'<span class="ip-edge-desc">'+rel.description+'</span>':'')+'</div></li>'
                 });
                 h+='</ul></div>';dyn.innerHTML+=h
             }
+
+            /* Category ambiguity block (if present). */
+            var amb=(raw.metadata&&raw.metadata.categoryAmbiguity)||null;
+            if(amb&&amb.isAmbiguous){
+                var ah='<div class="ip-section" style="animation-delay:.08s">'
+                     + '<div class="ip-ambiguity-badge"><span class="ip-ambiguity-badge-dot"></span>Ambiguous Classification</div>'
+                     + '<div class="ip-ambiguity-justification"><span class="ip-ambiguity-justification-label">Primary Justification</span>'+(amb.primaryJustification||'')+'</div>';
+                if(amb.alternativeCategories&&amb.alternativeCategories.length){
+                    ah+='<div class="ip-alt-cat-list">';
+                    amb.alternativeCategories.forEach(function(ac){
+                        var c=ac.category||'';var col=CC[c]||'#888';
+                        ah+='<div class="ip-alt-cat-item" style="border-left-color:'+hexToRGBA(col,0.4)+'">'
+                           + '<div class="ip-alt-cat-marker"><div class="ip-alt-cat-dot" style="background:'+col+'"></div></div>'
+                           + '<div class="ip-alt-cat-body">'
+                           + '<div class="ip-alt-cat-name">'+shortLabel(c)+'</div>'
+                           + (ac.justification?'<div class="ip-alt-cat-justification">'+ac.justification+'</div>':'')
+                           + '<div class="ip-alt-cat-confidence"><div class="ip-alt-cat-confidence-bar"><div class="ip-alt-cat-confidence-fill" style="width:'+(((ac.confidence||0)*100)|0)+'%;background:'+col+'"></div></div><div class="ip-alt-cat-confidence-val">'+((ac.confidence||0)*100).toFixed(0)+'%</div></div>'
+                           + '</div></div>';
+                    });
+                    ah+='</div>';
+                }
+                ah+='</div>';
+                dyn.innerHTML+=ah;
+            }
+
             var props=['observability','layer'];
             var ph='<div class="ip-section" style="animation-delay:.1s"><div class="ip-section-title">Properties</div><div class="ip-prop-list">';
             props.forEach(function(k){
@@ -2907,14 +3352,55 @@
                 ph+='<div class="ip-prop-row"><span class="ip-prop-key">'+k+'</span><span class="ip-prop-val">'+v+'</span></div>'
             });
             ph+='</div></div>';dyn.innerHTML+=ph;
-            if(nd._raw&&nd._raw.longDescription){
-                var ld=nd._raw.longDescription;
+
+            /* Tags, functional roles, reality domains. */
+            var tags=((raw.metadata||{}).tags)||[];
+            var roles=raw.functionalRoles||[];
+            var domains=raw.realityDomains||[];
+            if(tags.length){
+                var th='<div class="ip-section" style="animation-delay:.12s"><div class="ip-section-title">Tags</div><div class="ip-tags">';
+                tags.forEach(function(t){th+='<span class="ip-tag">'+t+'</span>'});
+                th+='</div></div>';dyn.innerHTML+=th;
+            }
+            if(roles.length){
+                var rh2='<div class="ip-section" style="animation-delay:.13s"><div class="ip-section-title">Functional Roles</div><div class="ip-tags">';
+                roles.forEach(function(t){rh2+='<span class="ip-tag">'+t+'</span>'});
+                rh2+='</div></div>';dyn.innerHTML+=rh2;
+            }
+            if(domains.length){
+                var dh='<div class="ip-section" style="animation-delay:.14s"><div class="ip-section-title">Reality Domains</div><div class="ip-tags">';
+                domains.forEach(function(t){dh+='<span class="ip-tag">'+t+'</span>'});
+                dh+='</div></div>';dyn.innerHTML+=dh;
+            }
+
+            /* Chronology timeline. */
+            var chron=((raw.historicalContext||{}).chronology)||[];
+            if(chron.length){
+                var ch='<div class="ip-section" style="animation-delay:.16s"><div class="ip-section-title">Chronology</div>';
+                chron.forEach(function(c){
+                    ch+='<div class="ip-chron-item"><div class="ip-chron-year">'+(c.year||'\u2014')+'</div><div class="ip-chron-event">'+(c.event||'')+'</div>'+(c.associatedContext?'<div class="ip-chron-ctx">'+c.associatedContext+'</div>':'')+'</div>';
+                });
+                ch+='</div>';dyn.innerHTML+=ch;
+            }
+
+            if(raw.longDescription){
+                var ld=raw.longDescription;
                 var preview=ld.substring(0,200);
                 dyn.innerHTML+='<div class="ip-long-desc-block" style="animation-delay:.15s"><div class="ip-long-desc-preview">'+preview+(ld.length>200?'\u2026':'')+'</div>'+(ld.length>200?'<button class="ip-long-desc-toggle" onclick="this.classList.toggle(\'expanded\');this.nextElementSibling.classList.toggle(\'expanded\')"><span>Read more</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button><div class="ip-long-desc-content"><div class="ip-long-desc-text">'+ld+'</div></div>':'')+'</div>'
             }
 
-            /* ── References section ── */
-            var refs = (nd._raw && nd._raw.references) || [];
+            /* Audit trail. */
+            var audit=((raw.metadata||{}).auditTrail)||[];
+            if(audit.length){
+                var au='<div class="ip-section" style="animation-delay:.18s"><div class="ip-section-title">Audit Trail</div>';
+                audit.forEach(function(a){
+                    au+='<div class="ip-audit-item"><div class="ip-audit-date">'+(a.reviewDate||'')+'</div><div class="ip-audit-note">'+(a.reviewNote||'')+'</div></div>';
+                });
+                au+='</div>';dyn.innerHTML+=au;
+            }
+
+            /* References section */
+            var refs = raw.references || [];
             if (refs.length) {
                 var rh = '<div class="ip-section" style="animation-delay:.2s">'
                        + '<div class="ip-section-title">References</div>'
@@ -2923,7 +3409,6 @@
                     var title   = ref.title       || 'Untitled';
                     var desc    = ref.description || '';
                     var url     = ref.link         || '#';
-                    var safeUrl = url.replace(/"/g, '&quot;');
                     var domain  = '';
                     try { domain = new URL(url).hostname.replace(/^www\./, ''); } catch(e) { domain = url; }
 
@@ -2988,11 +3473,8 @@
             document.getElementById('search-selected-name').textContent=nd.name;
             document.getElementById('search-dropdown').classList.remove('open');ddOpen=false;
             document.getElementById('search-input').value='';document.getElementById('search-clear').classList.remove('visible');
-            /* Pan camera onto the selected node */
             pTN(nd);
-            /* Trigger the canvas toast for identification */
             triggerToast(nd);
-            /* Open inspect panel */
             openInspect(nd)
         }
         function clearSearchSel(){pinN=null;document.getElementById('search-selected').classList.remove('visible')}
@@ -3000,7 +3482,7 @@
         /* ═══════ EVENT HANDLERS ═══════ */
         canvas.addEventListener('mousedown',function(e){
             var r=canvas.getBoundingClientRect();var sx=e.clientX-r.left,sy=e.clientY-r.top;
-            if(curProj==='chord'){var nd=hitChord(sx,sy);if(nd){openInspect(nd);pTN(nd)}return}
+            mdS={x:sx,y:sy};
             var nd=hitNode(sx,sy);
             if(nd){dragN=nd;canvas.classList.add('locked')}else{isPan=true;panS={x:e.clientX-cam.x,y:e.clientY-cam.y};canvas.classList.add('locked')}
         });
@@ -3009,17 +3491,17 @@
             mS={x:e.clientX,y:e.clientY};wM={x:sx,y:sy};
             if(dragN){var wp=s2w(sx,sy);dragN.x=wp.x;dragN.y=wp.y;dragN.vx=0;dragN.vy=0;if(SP.indexOf(curProj)>=0){dragN.targetX=wp.x;dragN.targetY=wp.y}return}
             if(isPan){cam.x=e.clientX-panS.x;cam.y=e.clientY-panS.y;camTgt=null;return}
-            if(curProj==='chord'){var nd=hitChord(sx,sy);if(nd){chordHC=nd;showTT(nd,sx,sy)}else{chordHC=null;hideTT()}return}
             var nd=hitNode(sx,sy);
             if(nd!==hovN){hovN=nd;if(nd)showTT(nd,sx,sy);else hideTT()}
             else if(nd)showTT(nd,sx,sy)
         });
         canvas.addEventListener('mouseup',function(e){
             var r=canvas.getBoundingClientRect();var sx=e.clientX-r.left,sy=e.clientY-r.top;
-            if(dragN&&!isPan){var wp0=s2w(sx,sy),dx=dragN.x-wp0.x,dy=dragN.y-wp0.y;if(Math.sqrt(dx*dx+dy*dy)<3)openInspect(dragN)}
+            var dx=sx-mdS.x,dy=sy-mdS.y;
+            if(dragN&&!isPan){if(Math.sqrt(dx*dx+dy*dy)<6)openInspect(dragN)}
             dragN=null;isPan=false;canvas.classList.remove('locked')
         });
-        canvas.addEventListener('mouseleave',function(){hovN=null;chordHC=null;hideTT();if(!dragN){isPan=false;canvas.classList.remove('locked')}});
+        canvas.addEventListener('mouseleave',function(){hovN=null;hideTT();if(!dragN){isPan=false;canvas.classList.remove('locked')}});
         canvas.addEventListener('wheel',function(e){
             e.preventDefault();var r=canvas.getBoundingClientRect();var sx=e.clientX-r.left,sy=e.clientY-r.top;
             var wp=s2w(sx,sy);var f=e.deltaY>0?0.9:1.1;var nz=clamp(cam.z*f,0.05,8);
@@ -3036,14 +3518,49 @@
             var wx=(sx-ox)/s,wy=(sy-oy)/s;cam.x=W/2-wx*cam.z;cam.y=H/2-wy*cam.z;camTgt=null
         });
 
+        /* ═══════ CONSOLIDATED KEYBOARD SHORTCUTS ═══════ */
+        /* Single handler for all keyboard shortcuts. Priority:
+           Esc › search-nav › shortcuts (disabled in input fields). */
         document.addEventListener('keydown',function(e){
-            if(e.key==='Escape'){closeInspect();clearSearchSel();document.getElementById('search-dropdown').classList.remove('open');ddOpen=false;document.getElementById('search-input').blur();toastNode=null}
-            if(e.key==='f'&&!e.ctrlKey&&!e.metaKey&&document.activeElement.tagName!=='INPUT'){e.preventDefault();fCam()}
-            if(ddOpen){
-                if(e.key==='ArrowDown'){e.preventDefault();kbFI=Math.min(kbFI+1,fRes.length-1);uKBF();var el=document.querySelector('.search-result.kb-focus');if(el)el.scrollIntoView({block:'nearest'})}
-                if(e.key==='ArrowUp'){e.preventDefault();kbFI=Math.max(kbFI-1,0);uKBF();var el2=document.querySelector('.search-result.kb-focus');if(el2)el2.scrollIntoView({block:'nearest'})}
-                if(e.key==='Enter'){e.preventDefault();if(kbFI>=0&&kbFI<fRes.length)selectSearchResult(kbFI)}
+            var ae=document.activeElement;
+            var inField=ae&&(ae.tagName==='INPUT'||ae.tagName==='TEXTAREA'||ae.isContentEditable);
+            var modKey=e.ctrlKey||e.metaKey||e.altKey;
+            var key=e.key;
+
+            /* Escape — always active; closes in priority order */
+            if(key==='Escape'){
+                if(kbHelpOpen){kbHelpClose()}
+                else if(eoOpen){eoCloseOverlay()}
+                else{
+                    var dd=document.getElementById('search-dropdown');
+                    if(ddOpen){dd.classList.remove('open');ddOpen=false}
+                    else{closeInspect();clearSearchSel();document.getElementById('search-input').blur();toastNode=null}
+                }
+                return;
             }
+
+            /* Search dropdown keyboard navigation (when open) */
+            if(ddOpen){
+                if(key==='ArrowDown'){e.preventDefault();kbFI=Math.min(kbFI+1,fRes.length-1);uKBF();var el=document.querySelector('.search-result.kb-focus');if(el)el.scrollIntoView({block:'nearest'});return}
+                if(key==='ArrowUp'){e.preventDefault();kbFI=Math.max(kbFI-1,0);uKBF();var el2=document.querySelector('.search-result.kb-focus');if(el2)el2.scrollIntoView({block:'nearest'});return}
+                if(key==='Enter'){e.preventDefault();if(kbFI>=0&&kbFI<fRes.length)selectSearchResult(kbFI);return}
+            }
+
+            /* Below: shortcuts disabled while typing or with modifier keys */
+            if(inField||modKey)return;
+
+            var lk=key.toLowerCase();
+
+            /* F — fit graph to view */
+            if(lk==='f'){e.preventDefault();fCam();return}
+            /* E — toggle epistemic artifacts overlay */
+            if(lk==='e'){e.preventDefault();eoOpen?eoCloseOverlay():eoOpenOverlay();return}
+            /* S — toggle sidebar */
+            if(lk==='s'){e.preventDefault();document.body.classList.toggle('sidebar-collapsed');setTimeout(resize,550);return}
+            /* / — focus search input */
+            if(key==='/'){e.preventDefault();document.getElementById('search-input').focus();return}
+            /* ? — toggle keyboard shortcuts help */
+            if(key==='F1'){e.preventDefault();kbHelpOpen?kbHelpClose():kbHelpOpenOverlay();return}
         });
 
         document.getElementById('sidebar-toggle-btn').addEventListener('click',function(){document.body.classList.toggle('sidebar-collapsed');setTimeout(resize,550)});
@@ -3060,21 +3577,13 @@
             var pj=chip.dataset.proj;if(pj===curProj)return;
             this.querySelectorAll('.proj-chip').forEach(function(c){c.classList.remove('active')});
             chip.classList.add('active');uPS();
-            if(curProj!=='chord'){sPC(curProj);wasChord=false}else{wasChord=true}
+            sPC(curProj);
             curProj=pj;
             document.getElementById('hud-proj').textContent=PL[pj]||pj;
-            var infoEl=document.getElementById('hud-proj-info');
-            if(pj==='umap')infoEl.textContent='k='+umapK+' \u00B7 min_dist=0.1';
-            else if(pj==='spectral')infoEl.textContent='Laplacian eigenvectors';
-            else if(pj==='bipartite')infoEl.textContent='Operative \u27F7 Artifact';
-            else infoEl.textContent='';
             toastNode=null;
-            if(pj==='chord'){cam={x:0,y:0,z:1};camTgt=null}
-            else{
-                if(SP.indexOf(pj)>=0){applyProjection(pj);fCam()}
-                else if(!wasChord&&rPC(pj)){fCam()}
-                else{reheatAlpha();fCam()}
-            }
+            if(SP.indexOf(pj)>=0){applyProjection(pj);fCam()}
+            else if(rPC(pj)){fCam()}
+            else{reheatAlpha();fCam()}
         });
 
         document.querySelectorAll('#lens-controls .toggle-item').forEach(function(el){
@@ -3092,11 +3601,11 @@
             document.getElementById('lens-hulls').checked=true;document.getElementById('lens-heatmap').checked=false;
             document.getElementById('lens-centrality').checked=false;document.getElementById('lens-confidence-color').checked=false;
             document.getElementById('lens-flow').checked=true;document.getElementById('lens-observability').checked=false;
-            clearSearchSel();closeInspect();toastNode=null;curProj='default';wasChord=false;
+            clearSearchSel();closeInspect();toastNode=null;curProj='default';pCache={};
             document.querySelectorAll('.proj-chip').forEach(function(c){c.classList.remove('active')});
             document.querySelector('.proj-chip[data-proj="default"]').classList.add('active');uPS();
-            document.getElementById('hud-proj').textContent='Force';document.getElementById('hud-proj-info').textContent='';
-            reheatAlpha();pCache={};cam={x:0,y:0,z:1};camTgt=null;fCam()
+            document.getElementById('hud-proj').textContent='Force';
+            reheatAlpha();cam={x:0,y:0,z:1};camTgt=null;fCam()
         });
 
         /* ═══════ TIME SLIDER ═══════ */
@@ -3149,7 +3658,163 @@
             })
         }
 
+        /* ═══════ EPISTEMIC OVERLAY LOGIC ═══════ */
+        var eoOpen=false;
+        function eoOpenOverlay(){
+            eoOpen=true;
+            document.getElementById('epistemic-overlay').classList.add('open');
+            eoCompute();
+        }
+        function eoCloseOverlay(){
+            eoOpen=false;
+            document.getElementById('epistemic-overlay').classList.remove('open');
+        }
+        function eoRefreshIfOpen(){ if(eoOpen) eoCompute(); }
+
+        function eoEsc(s){return s!=null?s:''}
+        function eoNum(n,d){d=d==null?3:d;return n==null||!isFinite(n)?'—':n.toFixed(d)}
+        function eoPct(n,d){d=d==null?1:d;return n==null||!isFinite(n)?'—':(n*100).toFixed(d)+'%'}
+        function eoBar(pct,color){
+            var c=color||'#c9956c';
+            return '<div class="eo-bar"><div class="eo-bar-fill" style="width:'+Math.max(0,Math.min(100,pct))+'%;background:'+c+'"></div></div>';
+        }
+        function eoTable(headers,rows){
+            var h='<table class="eo-table"><thead><tr>';
+            headers.forEach(function(hd){h+='<th>'+hd+'</th>'});
+            h+='</tr></thead><tbody>';
+            rows.forEach(function(r){h+='<tr>';r.forEach(function(c){h+='<td>'+c+'</td>'});h+='</tr>'});
+            h+='</tbody></table>';
+            return h;
+        }
+
+        /* Compute epistemic artifact sections from visible nodes/edges */
+        function eoDegreeHistogram(vn){
+            var degs=vn.map(function(nd){return nd.degree||0});
+            var maxDeg=Math.max.apply(null,degs);if(maxDeg<0)maxDeg=0;
+            var degCount={};degs.forEach(function(d){degCount[d]=(degCount[d]||0)+1});
+            /* If range is large, bin it; else individual bars */
+            var bars=[];
+            if(maxDeg<=20){for(var k=0;k<=maxDeg;k++){bars.push({label:k,count:degCount[k]||0})}}
+            else{var binSize=Math.ceil(maxDeg/15);for(var b=0;b<15;b++){var lo=b*binSize,hi=(b+1)*binSize-1;var cnt=0;for(var d=lo;d<=hi;d++){cnt+=(degCount[d]||0)}if(cnt>0||b===0)bars.push({label:lo===hi?lo:lo+'–'+hi,count:cnt})}}
+            var maxCount=Math.max.apply(null,bars.map(function(b2){return b2.count}));if(maxCount<1)maxCount=1;
+            var W=420,H=150,padL=32,padR=12,padT=14,padB=28;
+            var plotW=W-padL-padR,plotH=H-padT-padB;
+            var bw=plotW/bars.length;
+            var svg='<div class="eo-histogram"><svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">';
+            /* y-axis gridlines */
+            for(var g=0;g<=4;g++){
+                var gy=padT+plotH-(g/4)*plotH;var gv=Math.round((g/4)*maxCount);
+                svg+='<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+gy.toFixed(1)+'" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>';
+                svg+='<text x="'+(padL-5)+'" y="'+(gy+3).toFixed(1)+'" text-anchor="end" fill="rgba(255,255,255,0.2)" font-family="JetBrains Mono,monospace" font-size="7">'+gv+'</text>';
+            }
+            /* bars */
+            bars.forEach(function(b,i){
+                var bh=(b.count/maxCount)*plotH;var bx=padL+i*bw;var by=padT+plotH-bh;
+                svg+='<rect x="'+(bx+1).toFixed(1)+'" y="'+by.toFixed(1)+'" width="'+Math.max(1,bw-2).toFixed(1)+'" height="'+bh.toFixed(1)+'" fill="rgba(201,149,108,0.6)" rx="1.5"/>';
+                if(bars.length<=15||i%2===0){
+                    svg+='<text x="'+(bx+bw/2).toFixed(1)+'" y="'+(H-12)+'" text-anchor="middle" fill="rgba(255,255,255,0.25)" font-family="JetBrains Mono,monospace" font-size="7">'+b.label+'</text>';
+                }
+            });
+            /* axis titles */
+            svg+='<text x="'+(padL+plotW/2)+'" y="'+(H-1)+'" text-anchor="middle" fill="rgba(255,255,255,0.18)" font-family="JetBrains Mono,monospace" font-size="7" letter-spacing="1.5">DEGREE</text>';
+            svg+='<text x="8" y="'+(padT+plotH/2)+'" text-anchor="middle" fill="rgba(255,255,255,0.18)" font-family="JetBrains Mono,monospace" font-size="7" letter-spacing="1.5" transform="rotate(-90 8 '+(padT+plotH/2)+')">COUNT</text>';
+            svg+='</svg></div>';
+            return svg;
+        }
+
+        function eoCompute(){
+            if(!nodes.length){document.getElementById('eo-body').innerHTML='<div class="eo-empty">No graph loaded.</div>';return}
+            var vn=nodes.filter(function(n){return n.visible});
+            var ve=gE.filter(function(e){return e.visible});
+            var n=vn.length,e=ve.length;
+            if(!n){document.getElementById('eo-body').innerHTML='<div class="eo-empty">No nodes visible under current filters.</div>';return}
+
+            var html='';
+
+            /* §1 STRUCTURAL ARTIFACTS */
+            var density=n>1?(2*e)/(n*(n-1)):0;
+            var avgDeg=n>0?(2*e)/n:0;
+            /* in-degree + out-degree */
+            var inDeg={},outDeg={};
+            vn.forEach(function(nd){inDeg[nd.id]=0;outDeg[nd.id]=0});
+            ve.forEach(function(ed){if(inDeg[ed.target]!=null)inDeg[ed.target]++;if(outDeg[ed.source]!=null)outDeg[ed.source]++});
+            /* reciprocity */
+            var pairSet={},recip=0;
+            ve.forEach(function(ed){var k=ed.source+'>'+ed.target;var rk=ed.target+'>'+ed.source;if(pairSet[rk])recip++;pairSet[k]=true});
+            var recipRate=e>0?recip/e:0;
+            /* connected components via union-find */
+            var parent={};
+            vn.forEach(function(nd){parent[nd.id]=nd.id});
+            function find(x){while(parent[x]!==x){parent[x]=parent[parent[x]];x=parent[x]}return x}
+            ve.forEach(function(ed){var ra=find(ed.source),rb=find(ed.target);if(ra!==rb)parent[ra]=rb});
+            var comp={};vn.forEach(function(nd){var r=find(nd.id);comp[r]=(comp[r]||0)+1});
+            var compSizes=Object.values(comp).sort(function(a,b){return b-a});
+            var compCount=compSizes.length;
+            var largestComp=compSizes[0]||0;
+            var largestCompPct=n>0?(largestComp/n)*100:0;
+
+            html+='<div class="eo-section">'
+               +'<div class="eo-section-title"><span class="eo-section-num">§1</span>Structural Artifacts</div>'
+               +'<div class="eo-section-subtitle">Topology of the graph-as-representation: cardinalities, density, connectivity.</div>'
+               +'<div class="eo-metric-grid">'
+               +'<div class="eo-metric"><div class="eo-metric-label">Nodes</div><div class="eo-metric-value">'+n+'</div></div>'
+               +'<div class="eo-metric"><div class="eo-metric-label">Edges</div><div class="eo-metric-value">'+e+'</div></div>'
+               +'<div class="eo-metric"><div class="eo-metric-label">Density</div><div class="eo-metric-value">'+eoNum(density,4)+'</div><div class="eo-metric-hint">2E / N(N−1)</div></div>'
+               +'<div class="eo-metric"><div class="eo-metric-label">Avg Degree</div><div class="eo-metric-value">'+eoNum(avgDeg,2)+'</div><div class="eo-metric-hint">2E / N</div></div>'
+               +'<div class="eo-metric"><div class="eo-metric-label">Reciprocity</div><div class="eo-metric-value">'+eoPct(recipRate,1)+'</div><div class="eo-metric-hint">mutual / total</div></div>'
+               +'<div class="eo-metric"><div class="eo-metric-label">Components</div><div class="eo-metric-value">'+compCount+'</div></div>'
+               +'<div class="eo-metric"><div class="eo-metric-label">Largest Comp</div><div class="eo-metric-value">'+eoPct(largestCompPct/100,0)+'</div><div class="eo-metric-hint">'+largestComp+' of '+n+' nodes</div></div>'
+               +'</div></div>';
+
+            /* §3 DEGREE DISTRIBUTION */
+            html+='<div class="eo-section">'
+               +'<div class="eo-section-title"><span class="eo-section-num">§3</span>Degree Distribution</div>'
+               +'<div class="eo-section-subtitle">Node count at each degree — the structural signature of the graph.</div>';
+            html+=eoDegreeHistogram(vn);
+            html+='</div>';
+
+            document.getElementById('eo-body').innerHTML=html;
+            document.getElementById('eo-footer-meta').textContent='Computed over '+n+' visible nodes / '+e+' visible edges · '+new Date().toLocaleTimeString();
+        }
+
+        /* ═══════ KEYBOARD SHORTCUTS HELP OVERLAY STATE ═══════ */
+        var kbHelpOpen=false;
+        function kbHelpOpenOverlay(){
+            kbHelpOpen=true;
+            document.getElementById('kb-help-overlay').classList.add('open');
+        }
+        function kbHelpClose(){
+            kbHelpOpen=false;
+            document.getElementById('kb-help-overlay').classList.remove('open');
+        }
+
+        /* ═══════ WIRE OVERLAY EVENTS ═══════ */
+        /* Esc / E are handled centrally in the consolidated keydown handler above. */
+        document.addEventListener('DOMContentLoaded',function(){
+            /* Epistemic overlay buttons */
+            var btn=document.getElementById('qa-epistemic');
+            var closeBtn=document.getElementById('eo-close-btn');
+            var backdrop=document.querySelector('.eo-backdrop');
+            if(btn)btn.addEventListener('click',function(){eoOpen?eoCloseOverlay():eoOpenOverlay()});
+            if(closeBtn)closeBtn.addEventListener('click',eoCloseOverlay);
+            if(backdrop)backdrop.addEventListener('click',eoCloseOverlay);
+
+            /* Keyboard help overlay buttons */
+            var kbClose=document.getElementById('kb-help-close-btn');
+            var kbBackdrop=document.querySelector('.kb-help-backdrop');
+            if(kbClose)kbClose.addEventListener('click',kbHelpClose);
+            if(kbBackdrop)kbBackdrop.addEventListener('click',kbHelpClose);
+        });
+
         /* ═══════ DATA INIT ═══════ */
+        /* Derive a representative origin year from the schema's
+           historicalContext.chronology (earliest chronology entry). */
+        function resolveYear(r){
+            var chron=((r.historicalContext||{}).chronology)||[];
+            var best=null;
+            chron.forEach(function(c){var y=parseInt(c.year);if(!isNaN(y)&&(best===null||y<best))best=y});
+            return best;
+        }
         function initGraph(data){
             deriveSchema(data);
             nM={};nodes=[];gE=[];
@@ -3158,15 +3823,15 @@
             data.forEach(function(r){
                 if(!r.id)return;
                 var id=r.id.replace(/\s+/g,'_');
-                var yr=null;
-                if(r.originPeriod){var p=parseInt(r.originPeriod);if(!isNaN(p))yr=p}
+                var yr=resolveYear(r);
                 if(yr!==null&&yr<minY)minY=yr;if(yr!==null&&yr>maxY)maxY=yr;
                 var il=r.inheritanceLevel||0;if(il>maxIL)maxIL=il;
                 var initSpread=Math.max(800,Math.sqrt(data.length)*60);
+                var md=r.metadata||{},sp=r.specific||{};
                 var nd={
-                    id:id,name:r.name||r.id,category:r.category,layer:CLL[r.category]||r.layer||'Unknown',
-                    description:r.description||'',confidence:r.classificationConfidence||0.7,
-                    degree:0,inheritanceLevel:il,observability:r.observability||'observable',
+                    id:id,name:r.name||r.id,category:r.category,layer:resolveLayer(r),
+                    description:r.description||'',confidence:md.confidenceScore!=null?md.confidenceScore:0.7,
+                    degree:0,inheritanceLevel:il,observability:sp.observability||'observable',
                     year:yr,x:(Math.random()-.5)*initSpread,y:(Math.random()-.5)*initSpread,
                     vx:0,vy:0,visible:true,_raw:r
                 };
@@ -3176,9 +3841,9 @@
                 if(!r.relationships)return;
                 r.relationships.forEach(function(rel){
                     var sid=r.id.replace(/\s+/g,'_');
-                    var tid=(rel.target||'').replace(/\s+/g,'_');
+                    var tid=(rel.targetNodeId||rel.target||'').replace(/\s+/g,'_');
                     if(!nM[sid]||!nM[tid])return;
-                    var fam=rel.relationshipFamily||'unknown';
+                    var fam=normFam(rel.relationshipFamily)||'unknown';
                     gE.push({source:sid,target:tid,family:fam,type:rel.relationshipType||'',visible:true,description:rel.description||''});
                     degC[sid]=(degC[sid]||0)+1;degC[tid]=(degC[tid]||0)+1
                 })
@@ -3189,7 +3854,6 @@
             document.getElementById('time-total-count').textContent=nodes.length;
             buildCatToggles();buildFamilyChips();rLC();uTimeFill();uFilt();
             sCV();fCam();uPS();dLoaded=true;
-            /* Initialize ambient effects after dimensions are known */
             initAmbBlobs();initDust();
             document.getElementById('loading-overlay').classList.add('hidden')
         }

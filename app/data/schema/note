@@ -61,7 +61,7 @@
 | **Category**                     | The direct conceptual category of the element (Technique, Agent, Constraint, Requirement, Blueprint, etc.).                                     |
 | **Short Description**            | Concise summary of the element.                                                                                                                 |
 | **Long Description**             | Detailed explanatory description of the element.                                                                                                |
-| **Type Hierarchy**               | Ordered chain of parent and ancestor classes to which the element belongs.                                                                      |
+| **Type Hierarchy Level**               | The number of ancestor classes.                                                                      |
 | **Interface Specification**      | External-facing contract describing purpose, function, inputs, outputs, and interaction surfaces.                                               |
 | **Operation**                    | Description of how the element behaves during execution or use.                                                                                 |
 | **Functional Role Set**          | The set of functions, responsibilities, or effects the element performs within a larger system.                                                 |

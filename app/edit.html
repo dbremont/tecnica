@@ -4362,8 +4362,8 @@ async function loadGlobalContext() {
     try {
         const res = await fetch(aiConfig.contextUrl);
         if (!res.ok) throw new Error('HTTP ' + res.status);
-        // terminology.json is a JSON document — parse and pretty-print it so
-        // the model receives structured terminology rather than raw bytes.
+        // context is a JSON document — parse and pretty-print it so
+        // the model receives structured context rather than raw bytes.
         const raw = await res.text();
         try {
             const parsed = JSON.parse(raw);
@@ -4421,7 +4421,7 @@ function buildSystemPrompt(forCreation = true) {
     }
 
     if (aiConfig.globalContext) {
-        prompt += `TERMINOLOGY:\n${aiConfig.globalContext}\n\n`;
+        prompt += `context:\n${aiConfig.globalContext}\n\n`;
     }
 
     const existingIds = nodes.map(n => n.id).join(', ');
@@ -4435,7 +4435,7 @@ function buildSystemPrompt(forCreation = true) {
 - category: One of the categories from the schema enum (e.g., Reality, TechnicalAgent, Technique)
 - short_description: Concise summary (string)
 - long_description: Detailed explanatory description (string)
-- type_hierarchy: Array of strings (ordered chain of parent/ancestor classes)
+- type_hierarchy_level: Number (count of ancestor classes, integer ≥ 0)
 - interface_specification: External-facing contract — purpose, function, inputs, outputs (string)
 - operation: How the element behaves during execution or use (string)
 - functional_role_set: Array of strings (functions/responsibilities/effects)
@@ -4504,7 +4504,7 @@ RELATIONSHIP FAMILIES: ${RELATIONSHIP_FAMILIES.join(', ')}
 
 RELATIONSHIP TYPES: ${RELATIONSHIP_TYPES.join(', ')}
 
- ${aiConfig.globalContext ? `TERMINOLOGY:\n${aiConfig.globalContext}\n\n` : ''}
+ ${aiConfig.globalContext ? `context:\n${aiConfig.globalContext}\n\n` : ''}
 
 IMPORTANT RULES:
 1. Only suggest relationships that are conceptually meaningful and well-justified
@@ -5412,7 +5412,15 @@ function normalizeNode(d) {
     migrate('historicalContext', 'evolution_history');
     migrate('relationships', 'relationship_set');
     migrate('specific', 'particular_characterization');
-    migrate('typeHierarchy', 'type_hierarchy');
+    // type_hierarchy (array) → type_hierarchy_level (integer): legacy arrays
+    // are collapsed to their length; legacy camelCase keys also migrated.
+    migrate('typeHierarchyLevel', 'type_hierarchy_level');
+    if (d.type_hierarchy_level === undefined) {
+        const legacyArr = d.typeHierarchy ?? d.type_hierarchy;
+        if (Array.isArray(legacyArr)) d.type_hierarchy_level = legacyArr.length;
+        delete d.typeHierarchy;
+        delete d.type_hierarchy;
+    }
     migrate('interfaceSpecification', 'interface_specification');
     migrate('implementationSpecification', 'implementation_specification');
     migrate('scopeSpecification', 'scope_specification');
@@ -5434,7 +5442,7 @@ function normalizeNode(d) {
     if (!d.particular_characterization) d.particular_characterization = {};
     if (!d.metadata) d.metadata = {};
     if (!d.references) d.references = [];
-    if (!d.type_hierarchy) d.type_hierarchy = [];
+    if (typeof d.type_hierarchy_level !== 'number' || isNaN(d.type_hierarchy_level)) d.type_hierarchy_level = 0;
     return d;
 }
 
@@ -5454,7 +5462,7 @@ async function loadData() {
             "layer": "Problem Space",
             "short_description": "The ontological substrate that constrains and responds to technical intervention.",
             "long_description": "Fallback node — the real dataset could not be loaded.",
-            "type_hierarchy": [], "interface_specification": "", "operation": "",
+            "type_hierarchy_level": 0, "interface_specification": "", "operation": "",
             "functional_role_set": ["Constraint imposition", "Affordance provision"],
             "implementation_specification": "", "scope_specification": "",
             "limitation_set": [], "lifecycle": "", "failure_mode_specification": [],
@@ -6098,7 +6106,8 @@ function collectCurrentFormData() {
     d.category = getSSValue('edit-category') || '';
     d.short_description = get('edit-short-description');
     d.long_description = get('edit-long-description');
-    d.type_hierarchy = (typeof getArrayValues === 'function') ? getArrayValues('type_hierarchy') : [];
+    d.type_hierarchy_level = parseInt(get('edit-type-hierarchy-level'), 10);
+    if (isNaN(d.type_hierarchy_level)) d.type_hierarchy_level = 0;
     d.interface_specification = get('edit-interface-specification');
     d.operation = get('edit-operation');
     d.functional_role_set = (typeof getArrayValues === 'function') ? getArrayValues('functional_role_set') : [];
@@ -6151,7 +6160,7 @@ function computeNodeCompleteness(d) {
     push('category', d.category);
     push('short_description', gf(d, 'short_description', 'description'));
     push('long_description', gf(d, 'long_description', 'longDescription'));
-    push('type_hierarchy', gf(d, 'type_hierarchy', 'typeHierarchy'));
+    push('type_hierarchy_level', gf(d, 'type_hierarchy_level', 'typeHierarchyLevel'));
     push('interface_specification', gf(d, 'interface_specification', 'interfaceSpecification'));
     push('operation', gf(d, 'operation', 'operation'));
     push('functional_role_set', gf(d, 'functional_role_set', 'functionalRoles'));
@@ -6393,7 +6402,7 @@ function validateNode(nodeData) {
     // Top-level required fields (new snake_case schema)
     const topRequired = aiConfig.schema?.required || [
         'id', 'name', 'layer', 'category', 'short_description', 'long_description',
-        'type_hierarchy', 'interface_specification', 'operation', 'functional_role_set',
+        'type_hierarchy_level', 'interface_specification', 'operation', 'functional_role_set',
         'implementation_specification', 'scope_specification', 'limitation_set',
         'lifecycle', 'failure_mode_specification', 'resource_use', 'relationship_set',
         'evolution_history', 'particular_characterization', 'metadata', 'references'
@@ -6480,8 +6489,8 @@ function renderForm(nodeData) {
         <div class="form-section">
             <div class="form-section-title">Type Hierarchy</div>
             <div class="form-row">
-                <label class="form-label">Ancestor Classes</label>
-                ${createArrayInput('type_hierarchy', gf(nodeData, 'type_hierarchy', 'typeHierarchy') || [], [])}
+                <label class="form-label">Type Hierarchy Level</label>
+                <input type="number" class="form-input" id="edit-type-hierarchy-level" min="0" step="1" value="${escHTML(String(gf(nodeData, 'type_hierarchy_level', 'typeHierarchyLevel') ?? 0))}" placeholder="0">
             </div>
         </div>
         
@@ -6660,7 +6669,6 @@ function renderForm(nodeData) {
     initSearchableSelect('edit-category');
     initSearchableSelect('edit-layer');
     initSpecificFields();
-    initArrayInput('type_hierarchy', []);
     initArrayInput('limitation_set', []);
     initArrayInput('failure_mode_specification', []);
     initArrayInput('functional_role_set', suggestions.functionalRoles);
@@ -7107,7 +7115,7 @@ function commitFormData() {
         d.layer = getSSValue('edit-layer') || '';
         d.short_description = val('edit-short-description');
         d.long_description = val('edit-long-description');
-        d.type_hierarchy = getArrayValues('type_hierarchy');
+        d.type_hierarchy_level = parseInt(val('edit-type-hierarchy-level'), 10) || 0;
         d.interface_specification = val('edit-interface-specification');
         d.operation = val('edit-operation');
         d.functional_role_set = getArrayValues('functional_role_set');
@@ -7250,7 +7258,7 @@ function addNewNode() {
         layer: 'Problem Space',
         short_description: '',
         long_description: '',
-        type_hierarchy: [],
+        type_hierarchy_level: 0,
         interface_specification: '',
         operation: '',
         functional_role_set: [],

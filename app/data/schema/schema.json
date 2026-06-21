@@ -11,7 +11,7 @@
     "category",
     "short_description",
     "long_description",
-    "type_hierarchy",
+    "type_hierarchy_level",
     "interface_specification",
     "operation",
     "functional_role_set",
@@ -101,10 +101,10 @@
       "type": "string",
       "description": "Detailed explanatory description of the element."
     },
-    "type_hierarchy": {
-      "type": "array",
-      "items": { "type": "string" },
-      "description": "Ordered chain of parent and ancestor classes to which the element belongs."
+    "type_hierarchy_level": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The number of ancestor classes."
     },
     "interface_specification": {
       "type": "string",

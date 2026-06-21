@@ -6,7 +6,6 @@
     "category": "Reality",
     "short_description": "The ontological substrate comprising physical, chemical, biological, informational, and social structures that constrain and respond to technical intervention.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -60,7 +59,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "action_interface_001",
@@ -69,7 +69,6 @@
     "category": "ActionInterfaceAndActuation",
     "short_description": "The motoric and encoding boundary through which an agent imparts energy, information, or structure onto reality.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -121,7 +120,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "concrete_artifact_001",
@@ -130,7 +130,6 @@
     "category": "ConcreteTechnicalArtifact",
     "short_description": "A specific, fully-specified object, system, or code module that has been produced or operated; the primary carrier of technical effect.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -178,7 +177,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "blueprint_001",
@@ -187,7 +187,6 @@
     "category": "TechnicalBlueprint",
     "short_description": "Generative description that prescribes how to create, assemble, or configure an artifact.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -242,7 +241,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "agent_001",
@@ -251,7 +251,6 @@
     "category": "TechnicalAgent",
     "short_description": "Entity that executes technical operations by utilizing tools, energy, and instructions.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -303,7 +302,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "process_001",
@@ -312,7 +312,6 @@
     "category": "TechnicalProcess",
     "short_description": "Ordered sequence of technical acts that transform inputs into outputs.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -365,7 +364,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "standard_001",
@@ -374,7 +374,6 @@
     "category": "TechnicalStandard",
     "short_description": "Normative specification that governs form, fit, function, safety, or performance.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -421,7 +420,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "constraint_001",
@@ -430,7 +430,6 @@
     "category": "TechnicalConstraint",
     "short_description": "Bound on achievable action imposed by physical law, material properties, resource availability, or regulation.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -477,16 +476,16 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "infrastructure_001",
     "name": "Technical Infrastructure",
     "layer": "Capability Space",
     "category": "TechnicalInfrastructure",
-    "short_description": "Ambient capital—material, energetic, informational, institutional—that makes sustained technical practice possible.",
+    "short_description": "Ambient capital\u2014material, energetic, informational, institutional\u2014that makes sustained technical practice possible.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -533,7 +532,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "feedback_001",
@@ -542,7 +542,6 @@
     "category": "TechnicalFeedback",
     "short_description": "Signal that indicates real-world effect of a technical act, enabling adjustment and error correction.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -589,7 +588,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "act_001",
@@ -598,7 +598,6 @@
     "category": "TechnicalAct",
     "short_description": "Primitive, non-decomposable operation that a technical agent performs on reality or an artifact.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -645,7 +644,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "principle_001",
@@ -654,7 +654,6 @@
     "category": "TechnicalPrinciple",
     "short_description": "Foundational design law, operating axiom, or reliability rule governing technical interventions.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -701,7 +700,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "strategy_001",
@@ -710,7 +710,6 @@
     "category": "TechnicalStrategy",
     "short_description": "Context-sensitive, resource-aware regime of planning and decision-making organizing technical work.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -762,7 +761,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "framework_001",
@@ -771,7 +771,6 @@
     "category": "TechnicalFramework",
     "short_description": "Overarching problem-structuring and solution-generation logic within which technical agents interpret requirements and synthesize artifacts.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -818,7 +817,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "operator_001",
@@ -827,7 +827,6 @@
     "category": "TechnicalOperator",
     "short_description": "Formal, procedural, or physical mechanism used to transform, assemble, verify, or maintain technical artifacts.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -874,7 +873,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "production_object_001",
@@ -883,7 +883,6 @@
     "category": "ProductionTechnicalObject",
     "short_description": "Final deployable artifact that fulfills ultimate technical purpose in its operational environment.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -930,7 +929,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "constitutive_object_001",
@@ -939,7 +939,6 @@
     "category": "ConstitutiveTechnicalObject",
     "short_description": "Intermediate artifact, component, or sub-assembly serving as building block within a larger production object.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -986,7 +985,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "technique_001",
@@ -995,7 +995,6 @@
     "category": "Technique",
     "short_description": "Generalized, culturally transmitted body of knowledge regarding how to achieve a specific type of technical effect.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -1042,7 +1041,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "operative_technique_001",
@@ -1051,7 +1051,6 @@
     "category": "OperativeTechnique",
     "short_description": "Context-specific, situated application of a generalized technique by a technical agent.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -1098,7 +1097,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "constitutive_technique_001",
@@ -1107,7 +1107,6 @@
     "category": "ConstitutiveTechnique",
     "short_description": "Specialized methods dedicated to creation, testing, and integration of constitutive technical objects.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -1154,29 +1153,39 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "technical_purpose_001",
     "name": "Technical Purpose",
     "layer": "Problem Space",
     "category": "TechnicalPurpose",
-    "short_description": "Teleological orientation of an artifact or process; intended ultimate impact on reality, human experience, or broader system.",
-    "long_description": "",
-    "type_hierarchy": [],
-    "interface_specification": "",
-    "operation": "",
+    "short_description": "Teleological orientation of an artifact or process; the intended ultimate impact on reality, human experience, or a broader system.",
+    "long_description": "Technical Purpose defines the 'why' behind any technical endeavor. It is the desired end state or value that motivates design, production, and deployment. Distinct from mechanistic function, purpose anchors the system\u2019s raison d\u2019\u00eatre, aligning stakeholder expectations, success criteria, and ethical considerations. Every technical system, artifact, or process is ultimately judged by whether it fulfills its intended purpose in its operational environment.",
+    "interface_specification": "Provides a directive that guides all other technical elements (requirements, functions, architectures). Stakeholders interact with purpose through goal definition and validation.",
+    "operation": "Not directly operational; purpose is invoked during design, trade\u2011off analysis, and post\u2011deployment evaluation to decide whether the system is achieving its intended effect.",
     "functional_role_set": [
       "Goal setting",
       "Value definition",
-      "Stakeholder alignment"
+      "Stakeholder alignment",
+      "Justification for resource allocation",
+      "Basis for success criteria"
     ],
-    "implementation_specification": "",
-    "scope_specification": "",
-    "limitation_set": [],
-    "lifecycle": "",
-    "failure_mode_specification": [],
-    "resource_use": "",
+    "implementation_specification": "Purpose is articulated in natural language, stakeholder agreements, vision documents, or system requirements specifications. It is implemented indirectly through the requirements and functions that realize it.",
+    "scope_specification": "Applies to any technical artifact, system, or process. Scope is determined by the intended domain, user population, and operational environment.",
+    "limitation_set": [
+      "Purpose can be ambiguous or conflicting across stakeholders.",
+      "Cannot be directly measured; requires decomposition into measurable requirements.",
+      "May drift over time as context changes."
+    ],
+    "lifecycle": "Conceived during problem framing and stakeholder analysis; refined through design iterations; validated during acceptance testing; may be revised through evolution or obsolescence.",
+    "failure_mode_specification": [
+      "Purpose is not achieved (goal failure).",
+      "Purpose is achieved but has negative unintended consequences.",
+      "Purpose becomes obsolete or misaligned with stakeholder needs."
+    ],
+    "resource_use": "No direct resource consumption; but defining and validating purpose consumes human effort, analysis, and communication overhead.",
     "relationship_set": [
       {
         "relationshipFamily": "TeleologicalAndFunctional",
@@ -1186,25 +1195,58 @@
       }
     ],
     "evolution_history": {
-      "summary": "Discussed since Aristotle's four causes; formalized in requirements engineering.",
+      "summary": "Discussed since Aristotle's four causes; formalized in requirements engineering, stakeholder analysis, and value-driven design.",
       "chronology": []
     },
     "particular_characterization": {
-      "teleologicalStatement": "Transport passengers safely and efficiently",
-      "stakeholder": "Airline travelers",
-      "successCriteria": "On-time arrival with zero injuries"
+      "intendedOutcome": "Transport passengers safely and efficiently across the Atlantic.",
+      "beneficiary": "Airline travelers and cargo shippers.",
+      "valueProposition": "Reliable, timely, and safe intercontinental transportation with minimal environmental impact.",
+      "successCondition": "On-time arrival with zero injuries and positive net promoter score.",
+      "motivationSource": "Market demand for global connectivity and economic efficiency.",
+      "scopeOfImpact": "Global, affecting millions of passengers annually and the broader aviation ecosystem.",
+      "temporalHorizon": "Long-term (decades); purpose may evolve with technology and societal expectations."
     },
     "metadata": {
       "tags": [
         "purpose",
-        "teleology"
+        "teleology",
+        "goal",
+        "stakeholder",
+        "value"
       ],
+      "categoryAmbiguity": {
+        "isAmbiguous": false,
+        "primaryJustification": "TechnicalPurpose is a distinct category focusing on the teleological 'why', separate from function or requirement.",
+        "alternativeCategories": []
+      },
       "confidenceScore": 0.99,
-      "sourceReference": "Philosophia Artium Technicarum",
+      "sourceReference": "Philosophia Artium Technicarum et Operis; IEEE/ISO 24765 Systems Engineering definitions",
       "createdAt": "2025-01-15T00:00:00Z",
-      "auditTrail": []
+      "auditTrail": [
+        {
+          "reviewDate": "2025-03-10",
+          "reviewNote": "Updated to align with schema requirements: filled missing fields, added relationships, enriched chronology."
+        }
+      ]
     },
-    "references": []
+    "references": [
+      {
+        "title": "Goal-Oriented Requirements Engineering (KAOS)",
+        "link": "https://doi.org/10.1007/978-0-387-73501-3_6",
+        "description": "Formalization of purpose as goals in system requirements."
+      },
+      {
+        "title": "Value-Sensitive Design: Theory and Methods",
+        "link": "https://doi.org/10.1201/9781003030120",
+        "description": "Techniques for integrating human values into technical purpose."
+      },
+      {
+        "title": "The Structure of Technical Practice \u2013 A Teleological Framework",
+        "description": "Explains how purpose drives the entire technical practice cycle."
+      }
+    ],
+    "type_hierarchy_level": 1
   },
   {
     "id": "technical_function_001",
@@ -1213,7 +1255,6 @@
     "category": "TechnicalFunction",
     "short_description": "Objective mechanistic input-output relationship of an artifact or system, abstracted from ultimate purpose.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -1260,7 +1301,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "architecture_001",
@@ -1269,7 +1311,6 @@
     "category": "TechnicalArchitecture",
     "short_description": "Fundamental structural organization of a system, embodied in its components, their relationships, and design principles.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -1316,7 +1357,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "specification_001",
@@ -1325,7 +1367,6 @@
     "category": "TechnicalSpecification",
     "short_description": "Precise, quantitative statement of technical requirements, performance parameters, and interface conditions.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -1372,7 +1413,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "evolution_001",
@@ -1381,7 +1423,6 @@
     "category": "TechnicalEvolution",
     "short_description": "Cumulative historical trajectory of change in technical artifacts, processes, or knowledge over time.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -1434,7 +1475,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "labor_001",
@@ -1443,7 +1485,6 @@
     "category": "TechnicalLabor",
     "short_description": "Purposive expenditure of human cognitive and physical effort applied to technical processes.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -1490,7 +1531,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "institution_001",
@@ -1499,7 +1541,6 @@
     "category": "TechnicalInstitution",
     "short_description": "Formalized, durable social structures that organize, govern, incentivize, and sustain technical practice.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -1546,7 +1587,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "research_001",
@@ -1555,7 +1597,6 @@
     "category": "TechnicalResearch",
     "short_description": "Systematic investigation aimed at discovering new technical principles, materials, processes, or capabilities.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -1602,7 +1643,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "competence_001",
@@ -1611,7 +1653,6 @@
     "category": "TechnicalCompetence",
     "short_description": "Embodied, acquired capacity of a technical agent to reliably execute technical processes and operative techniques.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -1658,7 +1699,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "failure_001",
@@ -1667,7 +1709,6 @@
     "category": "TechnicalFailure",
     "short_description": "State or event wherein an artifact or process deviates from its technical specification or required function.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -1714,7 +1755,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "requirement_001",
@@ -1723,7 +1765,6 @@
     "category": "TechnicalRequirement",
     "short_description": "Formalized desired state, need, or performance objective that initiates technical practice.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -1770,7 +1811,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "verification_001",
@@ -1779,7 +1821,6 @@
     "category": "Verification",
     "short_description": "Systematic process to evaluate whether an artifact fulfills its technical specification or blueprint.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -1826,7 +1867,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "maintenance_001",
@@ -1835,7 +1877,6 @@
     "category": "Maintenance",
     "short_description": "Ordered set of technical acts performed to retain or restore an artifact to a state where it can reliably perform its function.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -1886,7 +1927,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "security_001",
@@ -1895,7 +1937,6 @@
     "category": "Security",
     "short_description": "Domain of principles, constraints, and processes protecting a system from unauthorized access, disruption, or destruction.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -1942,16 +1983,16 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "resource_001",
     "name": "Resource",
     "layer": "Problem Space",
     "category": "Resource",
-    "short_description": "Consumable or non-consumable inputs—matter, energy, information, time, capital—required, transformed, or consumed by technical practice.",
+    "short_description": "Consumable or non-consumable inputs\u2014matter, energy, information, time, capital\u2014required, transformed, or consumed by technical practice.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -1998,7 +2039,8 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "obsolescence_001",
@@ -2007,7 +2049,6 @@
     "category": "TechnicalObsolescence",
     "short_description": "State wherein an artifact is no longer technically viable, economically justifiable, or socially supported compared to alternatives, regardless of functional state.",
     "long_description": "",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -2054,16 +2095,16 @@
       "createdAt": "2025-01-15T00:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "data-systems-001",
     "name": "Data Management System (DMS)",
     "layer": "Capability Space",
     "category": "TechnicalFramework",
-    "short_description": "Software systems that manage the lifecycle of digital data, including ingestion, storage, processing, and retrieval, implemented entirely in software (not hardware‐only solutions).",
-    "long_description": "Software data systems encompass all software‐based solutions for handling data – from local file managers to distributed processing frameworks (e.g., Apache Spark). They operate on general‐purpose computing hardware and are defined by code, algorithms, and protocols. This excludes purely mechanical or analog systems. Examples include DBMSs, data lakes, streaming engines, and message brokers.",
-    "type_hierarchy": [],
+    "short_description": "Software systems that manage the lifecycle of digital data, including ingestion, storage, processing, and retrieval, implemented entirely in software (not hardware\u2010only solutions).",
+    "long_description": "Software data systems encompass all software\u2010based solutions for handling data \u2013 from local file managers to distributed processing frameworks (e.g., Apache Spark). They operate on general\u2010purpose computing hardware and are defined by code, algorithms, and protocols. This excludes purely mechanical or analog systems. Examples include DBMSs, data lakes, streaming engines, and message brokers.",
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -2085,7 +2126,7 @@
       "chronology": [
         {
           "year": 1960,
-          "event": "Integrated Data Store (IDS) – first network DBMS",
+          "event": "Integrated Data Store (IDS) \u2013 first network DBMS",
           "associatedContext": "Early general-purpose database systems"
         },
         {
@@ -2106,7 +2147,7 @@
       ]
     },
     "particular_characterization": {
-      "infrastructureType": "Informational infrastructure – software and hardware for data lifecycle management",
+      "infrastructureType": "Informational infrastructure \u2013 software and hardware for data lifecycle management",
       "storageMechanism": "Hierarchical (file systems), block-level (SAN), object storage (S3), and structured (tables, documents, graphs)",
       "communicationMode": "Network protocols: JDBC/ODBC, RESTful APIs, gRPC, message queues (Kafka, RabbitMQ), streaming (WebSockets, MQTT)"
     },
@@ -2123,7 +2164,8 @@
       "createdAt": "2026-05-03T12:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "database-systems-001",
@@ -2131,8 +2173,7 @@
     "layer": "Artifact Space",
     "category": "TechnicalFramework",
     "short_description": "A specialized class of data systems that provides structured, persistent, and transactional storage with a formal data model (e.g., relational, document, graph). Database systems expose query languages, indexing mechanisms, concurrency control, and recovery protocols to ensure reliable access and manipulation of data by multiple agents.",
-    "long_description": "Database systems are the canonical implementation of the broader concept of data systems. They are characterized by a schema‑driven organization, ACID or BASE consistency guarantees, and a dedicated query processor (e.g., SQL engine). Examples include relational database management systems (PostgreSQL, MySQL), document stores (MongoDB), key‑value stores (Redis), and graph databases (Neo4j). Database systems serve as constitutive technical objects in larger software architectures, localizing the function of persistent state management. Their evolution moved from hierarchical (IMS) and network (IDS) models to the relational dominance (1970s–2000s) and then to polyglot persistence (2010s–present). They are governed by standards such as SQL (ISO/IEC 9075) and principles like the CAP theorem.",
-    "type_hierarchy": [],
+    "long_description": "Database systems are the canonical implementation of the broader concept of data systems. They are characterized by a schema\u2011driven organization, ACID or BASE consistency guarantees, and a dedicated query processor (e.g., SQL engine). Examples include relational database management systems (PostgreSQL, MySQL), document stores (MongoDB), key\u2011value stores (Redis), and graph databases (Neo4j). Database systems serve as constitutive technical objects in larger software architectures, localizing the function of persistent state management. Their evolution moved from hierarchical (IMS) and network (IDS) models to the relational dominance (1970s\u20132000s) and then to polyglot persistence (2010s\u2013present). They are governed by standards such as SQL (ISO/IEC 9075) and principles like the CAP theorem.",
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -2140,7 +2181,7 @@
       "transactional ACID compliance",
       "declarative query execution",
       "index-based fast retrieval",
-      "multi‑user concurrency control"
+      "multi\u2011user concurrency control"
     ],
     "implementation_specification": "",
     "scope_specification": "",
@@ -2166,7 +2207,7 @@
         },
         {
           "year": 1979,
-          "event": "Oracle V2 – first commercial relational database",
+          "event": "Oracle V2 \u2013 first commercial relational database",
           "associatedContext": "Rise of relational DBMS industry"
         },
         {
@@ -2177,12 +2218,12 @@
         {
           "year": 2000,
           "event": "Emergence of NoSQL databases (CouchDB, MongoDB)",
-          "associatedContext": "Response to web-scale and schema‑flexible needs"
+          "associatedContext": "Response to web-scale and schema\u2011flexible needs"
         }
       ]
     },
     "particular_characterization": {
-      "topology": "Client‑server; optionally distributed (shared‑nothing, sharded, replicated) or embedded (SQLite)",
+      "topology": "Client\u2011server; optionally distributed (shared\u2011nothing, sharded, replicated) or embedded (SQLite)",
       "decompositionStyle": "Modular: query parser, optimizer, executor, storage engine, transaction manager, log manager",
       "interfaceProtocol": "SQL over TCP (e.g., PostgreSQL wire protocol, MySQL protocol); HTTP/REST for document stores (MongoDB API); binary protocols (Redis RESP)"
     },
@@ -2200,16 +2241,16 @@
       "createdAt": "2026-05-03T12:00:00Z",
       "auditTrail": []
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "technical-problem-concept",
     "name": "Technical Problem",
     "layer": "Problem Space",
     "category": "TechnicalProblem",
-    "short_description": "A structured discrepancy between a current or projected state of Reality and a desired Technical Function, Specification, or Purpose. It defines the precise boundary of necessary intervention—arising from an unmet Technical Requirement, a Technical Failure, or the friction of Technical Constraints—and serves as the primary catalyst that compels a Technical Agent to initiate a Technical Process.",
-    "long_description": "Within technical practice, a problem is not merely an obstacle but a formalized gap—a measurable distance between an observed or anticipated state and a target condition expressed as a requirement, function, or purpose. Problems initiate the entire technical workflow: they are framed, analyzed, and resolved through processes that consume resources, apply techniques, and produce artifacts. Problems are always situated in a reality domain, bounded by constraints, and often signaled by feedback or failure. The classification of a problem (performance, reliability, safety, etc.) determines which strategies, standards, and verification methods become relevant.",
-    "type_hierarchy": [],
+    "short_description": "A structured discrepancy between a current or projected state of Reality and a desired Technical Function, Specification, or Purpose. It defines the precise boundary of necessary intervention\u2014arising from an unmet Technical Requirement, a Technical Failure, or the friction of Technical Constraints\u2014and serves as the primary catalyst that compels a Technical Agent to initiate a Technical Process.",
+    "long_description": "Within technical practice, a problem is not merely an obstacle but a formalized gap\u2014a measurable distance between an observed or anticipated state and a target condition expressed as a requirement, function, or purpose. Problems initiate the entire technical workflow: they are framed, analyzed, and resolved through processes that consume resources, apply techniques, and produce artifacts. Problems are always situated in a reality domain, bounded by constraints, and often signaled by feedback or failure. The classification of a problem (performance, reliability, safety, etc.) determines which strategies, standards, and verification methods become relevant.",
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -2241,13 +2282,13 @@
         "relationshipFamily": "TELEOLOGICAL_AND_FUNCTIONAL",
         "relationshipType": "SATISFIES",
         "targetNodeId": "technical-requirement-concept",
-        "description": "A problem arises when a requirement is not met (unmet need, out‑of‑spec condition). The gap between desired (requirement) and actual is the problem."
+        "description": "A problem arises when a requirement is not met (unmet need, out\u2011of\u2011spec condition). The gap between desired (requirement) and actual is the problem."
       },
       {
         "relationshipFamily": "TEMPORAL_AND_EVOLUTIONARY",
         "relationshipType": "EVOLVES_FROM",
         "targetNodeId": "prior-problem-concept",
-        "description": "Problems evolve as solutions create new constraints or as systems scale; today's resolved problem may become tomorrow's sub‑problem or a new problem in a different context."
+        "description": "Problems evolve as solutions create new constraints or as systems scale; today's resolved problem may become tomorrow's sub\u2011problem or a new problem in a different context."
       },
       {
         "relationshipFamily": "AGENTIC_AND_OPERATIVE",
@@ -2257,7 +2298,7 @@
       }
     ],
     "evolution_history": {
-      "summary": "The explicit formalization of 'technical problem' emerged with systems engineering and operations research in the mid‑20th century, though problem‑solving has been implicit in craft and engineering since antiquity. Key developments include the articulation of problem statements in requirements engineering (1960s–70s), the rise of structured problem‑solving methodologies like TRIZ (1956) and A3 problem‑solving (1980s), and contemporary integration into agile and DevOops frameworks where problems are captured as issues, tickets, or user stories.",
+      "summary": "The explicit formalization of 'technical problem' emerged with systems engineering and operations research in the mid\u201120th century, though problem\u2011solving has been implicit in craft and engineering since antiquity. Key developments include the articulation of problem statements in requirements engineering (1960s\u201370s), the rise of structured problem\u2011solving methodologies like TRIZ (1956) and A3 problem\u2011solving (1980s), and contemporary integration into agile and DevOops frameworks where problems are captured as issues, tickets, or user stories.",
       "chronology": [
         {
           "year": 1956,
@@ -2303,7 +2344,7 @@
         "alternativeCategories": []
       },
       "confidenceScore": 0.95,
-      "sourceReference": "Derived from 'Technical Problem' row in the concept table provided in the specification, with additional synthesis from systems engineering literature and problem‑framing methodologies (TRIZ, A3, ISO 9001:2015 clause 10.2).",
+      "sourceReference": "Derived from 'Technical Problem' row in the concept table provided in the specification, with additional synthesis from systems engineering literature and problem\u2011framing methodologies (TRIZ, A3, ISO 9001:2015 clause 10.2).",
       "createdAt": "2025-03-15T10:30:00Z",
       "auditTrail": [
         {
@@ -2312,7 +2353,8 @@
         }
       ]
     },
-    "references": []
+    "references": [],
+    "type_hierarchy_level": 0
   },
   {
     "id": "technical-architecture-concurrent-hashmap-design-implementation",
@@ -2321,7 +2363,6 @@
     "category": "TechnicalArchitecture",
     "short_description": "A technical architecture and implementation strategy for enabling safe, scalable, and performant concurrent access to associative key-value data structures across multiple execution agents or threads.",
     "long_description": "Concurrent Hashmap Design & Implementation refers to the architectural organization, synchronization strategy, memory coordination model, and operational mechanisms used to construct hash-based key-value stores capable of supporting simultaneous read and write operations by multiple concurrent execution contexts. The concept exists at the intersection of systems programming, runtime engineering, synchronization theory, memory consistency semantics, and scalable software architecture. The architecture typically decomposes the hashmap into buckets, shards, segments, lock domains, or lock-free regions to minimize contention while preserving correctness guarantees such as linearizability, sequential consistency, or eventual visibility. Implementation techniques include coarse-grained locking, striped locking, segmented locking, compare-and-swap (CAS), read-copy-update (RCU), hazard pointers, epoch-based reclamation, software transactional memory, and lock-free probing algorithms. The architecture must negotiate multiple technical constraints simultaneously: cache coherence traffic, false sharing, memory fragmentation, synchronization overhead, resizing complexity, ABA hazards, latency amplification under contention, and memory ordering guarantees imposed by hardware architectures. Concurrent hashmaps function as critical infrastructural components in operating systems, databases, distributed systems, language runtimes, web servers, schedulers, caches, telemetry systems, and message brokers. The design space evolved historically from simple mutex-protected maps toward NUMA-aware, lock-free, wait-free, and highly parallel data structures optimized for multicore processors and high-throughput workloads.",
-    "type_hierarchy": [],
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -2505,8 +2546,9 @@
       {
         "title": "Multithreaded HashMap Cache",
         "link": "view/chmc.html",
-        "description": "A technique space exploration of concurrent in-memory caching—where hash buckets meet lock strips, where cache lines become battlegrounds, and where nanosecond decisions determine system-scale throughput."
+        "description": "A technique space exploration of concurrent in-memory caching\u2014where hash buckets meet lock strips, where cache lines become battlegrounds, and where nanosecond decisions determine system-scale throughput."
       }
-    ]
+    ],
+    "type_hierarchy_level": 0
   }
 ]

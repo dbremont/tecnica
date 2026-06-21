@@ -3755,7 +3755,7 @@
         /* ═══════ FETCH ═══════ */
         var loaderMsg=document.getElementById('loader-msg');
         loaderMsg.textContent='Loading taxonomy';
-        fetch('data/dataset.json')
+        fetch('data/data.json')
             .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
             .then(function(d){
                 loaderMsg.textContent='Building graph';
@@ -3764,7 +3764,7 @@
                 setTimeout(function(){initGraph(arr)},60)
             })
             .catch(function(err){
-                loaderMsg.innerHTML='<span class="loader-error">Failed to load taxonomy.<br><br>'+err.message+'<br><br>Ensure <code style="font-size:.65rem;opacity:.6">data/dataset.json</code> exists at the expected path.</span>'
+                loaderMsg.innerHTML='<span class="loader-error">Failed to load taxonomy.<br><br>'+err.message+'<br><br>Ensure <code style="font-size:.65rem;opacity:.6">data/data.json</code> exists at the expected path.</span>'
             });
 
         /* ═══════ BOOT ═══════ */

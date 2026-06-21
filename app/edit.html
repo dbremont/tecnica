@@ -3577,7 +3577,7 @@ select:focus-visible {
                     <div class="settings-title">Global Context</div>
                     <div class="settings-row">
                         <label class="settings-label">Context URL</label>
-                        <input type="text" class="settings-input" id="global-context-url" value="../data/terminology.json" placeholder="../data/terminology.json">
+                        <input type="text" class="settings-input" id="global-context-url" value="../data/schema/note" placeholder="../data/schema/note">
                     </div>
                     <div class="settings-row" style="display:flex;gap:10px;">
                         <button class="btn btn-sm" id="load-context-btn">Load Context</button>
@@ -3859,11 +3859,12 @@ function friendlyLabel(k) {
    so the editor UI stays in lockstep with the dataset schema. */
 
 const CATEGORIES = [
-    'Reality', 'ActionInterfaceAndActuation', 'ConcreteTechnicalArtifact',
-    'TechnicalBlueprint', 'TechnicalAgent', 'TechnicalProcess',
+    'Reality', 'TechnicalDomain', 'TechnicalSystem',
+    'ActionInterfaceAndActuation', 'ConcreteTechnicalArtifact',
+    'TechnicalBlueprint', 'TechnicalAgent', 'TechnicalActivity',
     'TechnicalStandard', 'TechnicalConstraint', 'TechnicalInfrastructure',
     'TechnicalFeedback', 'TechnicalAct', 'TechnicalPrinciple',
-    'TechnicalStrategy', 'TechnicalFramework', 'TechnicalOperator',
+    'TechnicalStrategy', 'TechnicalFramework', 'TechnicalMechanism',
     'ProductionTechnicalObject', 'ConstitutiveTechnicalObject', 'Technique',
     'OperativeTechnique', 'ConstitutiveTechnique', 'TechnicalPurpose',
     'TechnicalFunction', 'TechnicalArchitecture', 'TechnicalSpecification',
@@ -3878,7 +3879,9 @@ const RELATIONSHIP_FAMILIES = [
     'AGENTIC_AND_OPERATIVE', 'NORMATIVE_AND_REGULATIVE',
     'EVALUATIVE_AND_CORRECTIVE', 'STRATEGIC_AND_CONTEXTUAL',
     'TEMPORAL_AND_EVOLUTIONARY', 'CONSTITUTIVE_AND_MEREOLOGICAL',
-    'TAXONOMIC_AND_CLASSIFICATORY'
+    'TAXONOMIC_AND_CLASSIFICATORY',
+    'DEPENDENCY_AND_SUPPORT', 'INTERFACE_AND_INTERACTION',
+    'VARIATION_AND_DERIVATION', 'ALTERNATIVE_AND_SUBSTITUTION'
 ];
 
 const RELATIONSHIP_TYPES = [
@@ -3888,7 +3891,11 @@ const RELATIONSHIP_TYPES = [
     'ORCHESTRATED_BY', 'SUPPORTED_BY', 'EMBEDDED_IN', 'EVOLVES_FROM',
     'SUPERSEDES', 'EXPANDS', 'INTEGRATES_INTO', 'LOCALIZES_FUNCTION',
     'SPECIALIZES_TECHNIQUE', 'YIELDS_CONSTITUENT', 'CONSTITUENT_GOVERNED_BY',
-    'COMPOSED_BY_CONSTITUENT', 'TYPE_OF'
+    'COMPOSED_BY_CONSTITUENT', 'TYPE_OF',
+    'DEPENDS_ON', 'REQUIRES', 'USES', 'ENABLED_BY',
+    'INTERFACES_WITH', 'EXCHANGES', 'INPUT_TO', 'OUTPUT_TO', 'COORDINATES_WITH',
+    'VARIANT_OF', 'DERIVED_FROM', 'CONFIGURATION_OF', 'SPECIALIZATION_OF',
+    'ALTERNATIVE_TO', 'SUBSTITUTES_FOR', 'COMPETES_WITH', 'TRADEOFF_WITH'
 ];
 
 /* Tier 3.I: Relationship types grouped by family for the select dropdown.
@@ -3903,7 +3910,11 @@ const RELATIONSHIP_TYPE_GROUPS = {
     'Strategic & Contextual': ['SUPPORTED_BY', 'EMBEDDED_IN'],
     'Temporal & Evolutionary': ['EVOLVES_FROM', 'SUPERSEDES'],
     'Constitutive & Mereological': ['CONSTRAINED_BY', 'SPECIALIZES_TECHNIQUE'],
-    'Taxonomic & Classificatory': ['TYPE_OF']
+    'Taxonomic & Classificatory': ['TYPE_OF'],
+    'Dependency & Support': ['DEPENDS_ON', 'REQUIRES', 'USES', 'ENABLED_BY'],
+    'Interface & Interaction': ['INTERFACES_WITH', 'EXCHANGES', 'INPUT_TO', 'OUTPUT_TO', 'COORDINATES_WITH'],
+    'Variation & Derivation': ['VARIANT_OF', 'DERIVED_FROM', 'CONFIGURATION_OF', 'SPECIALIZATION_OF'],
+    'Alternative & Substitution': ['ALTERNATIVE_TO', 'SUBSTITUTES_FOR', 'COMPETES_WITH', 'TRADEOFF_WITH']
 };
 
 /* Top-level layer enum from schema (properties.layer.enum). */
@@ -4310,9 +4321,9 @@ let aiConfig = {
     endpoint: 'https://api.deepseek.com/v1/chat/completions',
     token: loadPersistedToken(),
     model: 'deepseek-v4-flash',
-    schemaPath: 'data/schema/dataset.json',
+    schemaPath: 'data/schema/schema.json',
     schema: null,
-    contextUrl: 'data/terminology.json',
+    contextUrl: 'data/schema/note',
     globalContext: ''
 };
 
@@ -4403,7 +4414,7 @@ async function callDeepSeekAPI(messages) {
 }
 
 function buildSystemPrompt(forCreation = true) {
-    let prompt = 'You are an expert ontology editor helping to manage the Tecnica technical-practice network following the dataset schema in app/data/schema/dataset.json.\n\n';
+    let prompt = 'You are an expert ontology editor helping to manage the Tecnica technical-practice network following the dataset schema in app/data/schema/schema.json.\n\n';
 
     if (aiConfig.schema) {
         prompt += `SCHEMA:\n${JSON.stringify(aiConfig.schema, null, 2)}\n\n`;
@@ -4417,22 +4428,30 @@ function buildSystemPrompt(forCreation = true) {
     prompt += `EXISTING NODE IDS: ${existingIds || 'None'}\n\n`;
 
     if (forCreation) {
-        prompt += `TASK: Create a new node as a valid JSON object following the Tecnica dataset schema exactly. The JSON must include all required top-level fields:
-- id: A unique identifier following the pattern "<category_snake>.<name>" (e.g., "reality.physical")
-- name: A human-readable name
+        prompt += `TASK: Create a new node as a valid JSON object following the Tecnica dataset schema (app/data/schema/schema.json) EXACTLY. Field names use snake_case. The JSON must include ALL required top-level fields:
+- id: Unique identifier (string)
+- name: Human-readable name (string)
+- layer: One of the layer enum values ("Problem Space", "Capability Space", "Execution Space", "Artifact Space", "Governance Space", "Evolutionary Space")
 - category: One of the categories from the schema enum (e.g., Reality, TechnicalAgent, Technique)
-- layer: One of the layer enum values (e.g., "Problem Space", "Execution Space")
-- inheritanceLevel: Non-negative integer (top-level field)
-- description: A brief description
-- functionalRoles: Array of roles this entity plays
-- realityDomains: Array of domains (e.g., "Physical", "Biological", "Informational", "Social")
-- historicalContext: Object with summary and chronology array
-- specific: Object with category-specific fields (refer to schema $defs)
-- relationships: Array of relationship objects with relationshipFamily, relationshipType, targetNodeId, description
-- metadata: Object with tags array, confidenceScore (0-1), sourceReference, createdAt, auditTrail array
-- references: Array of reference objects
+- short_description: Concise summary (string)
+- long_description: Detailed explanatory description (string)
+- type_hierarchy: Array of strings (ordered chain of parent/ancestor classes)
+- interface_specification: External-facing contract — purpose, function, inputs, outputs (string)
+- operation: How the element behaves during execution or use (string)
+- functional_role_set: Array of strings (functions/responsibilities/effects)
+- implementation_specification: Internal realization — structure, architecture, composition (string)
+- scope_specification: Conditions under which the element applies (string)
+- limitation_set: Array of strings (constraints limiting the element)
+- lifecycle: How the element is created/deployed/operated/retired (string)
+- failure_mode_specification: Array of strings (ways it can malfunction)
+- resource_use: Matter/energy/information/labor/capital consumed (string)
+- relationship_set: Array of relationship objects with relationshipFamily, relationshipType, targetNodeId, description
+- evolution_history: Object with summary (string) and chronology (array of {year:number, event:string, associatedContext:string})
+- particular_characterization: Object with category-specific fields (refer to schema $defs and allOf branches for the chosen category)
+- metadata: Object with tags (array), confidenceScore (0-1), sourceReference (string), createdAt (ISO date-time), auditTrail (array of {reviewDate, reviewNote})
+- references: Array of {title, description, link?}
 
-Use UPPERCASE values for relationshipFamily and relationshipType enums. Return ONLY valid JSON with no additional text or explanation.`;
+Use UPPERCASE SCREAMING_SNAKE_CASE for relationshipFamily and relationshipType enum values. For particular_characterization, include the required fields for the chosen category per the schema $defs. Return ONLY valid JSON with no additional text or explanation.`;
     }
 
     return prompt;
@@ -4510,7 +4529,7 @@ RESPONSE FORMAT (JSON array only, no markdown):
         id: n.id,
         name: n.name,
         category: n.category,
-        description: n._data?.description || ''
+        description: n._data?.short_description || ''
     }));
 
     const messages = [
@@ -4570,7 +4589,7 @@ function updateAIStatus() {
  */
 function stripRelationships(nodeData) {
     const copy = { ...nodeData };
-    delete copy.relationships;
+    delete copy.relationship_set;
     return copy;
 }
 
@@ -4731,7 +4750,7 @@ function setupModals() {
                 container.innerHTML = '<div class="preview-empty">No new relationships were discovered.</div>';
                 applyBtn.disabled = true;
             } else {
-                const existingRels = (selectedNode._data.relationships || []).map(r => r.targetNodeId);
+                const existingRels = (selectedNode._data.relationship_set || []).map(r => r.targetNodeId);
                 suggestedRelations = suggestedRelations.filter(sr => !existingRels.includes(sr.targetNodeId));
                 
                 if (suggestedRelations.length === 0) {
@@ -4762,7 +4781,7 @@ function setupModals() {
             return;
         }
         
-        selectedNode._data.relationships = selectedNode._data.relationships || [];
+        selectedNode._data.relationship_set = selectedNode._data.relationship_set || [];
         
         selectedRels.forEach(rel => {
             const newRel = {
@@ -4771,7 +4790,7 @@ function setupModals() {
                 relationshipFamily: rel.relationshipFamily,
                 description: rel.description
             };
-            selectedNode._data.relationships.push(newRel);
+            selectedNode._data.relationship_set.push(newRel);
             
             if (nodeMap[rel.targetNodeId]) {
                 edges.push({
@@ -4901,9 +4920,9 @@ function setupModals() {
         // touch the `relationships` field (it is stripped before sending to
         // the model and hidden from the diff view). Use "AI Discover Relations"
         // to manage relationships instead. See the Docs modal for details.
-        const preservedRelationships = selectedNode._data.relationships || [];
+        const preservedRelationships = selectedNode._data.relationship_set || [];
         Object.assign(selectedNode._data, improvedNodeData);
-        selectedNode._data.relationships = preservedRelationships;
+        selectedNode._data.relationship_set = preservedRelationships;
         selectedNode.name = improvedNodeData.name || selectedNode.id;
         selectedNode.category = improvedNodeData.category || 'Reality';
 
@@ -4958,7 +4977,7 @@ function renderSuggestedRelation(rel, idx) {
     const targetNode = nodeMap[rel.targetNodeId];
     const confidence = Math.round((rel.confidence || 0.5) * 100);
     
-    const existingRels = (selectedNode._data.relationships || []);
+    const existingRels = (selectedNode._data.relationship_set || []);
     const alreadyExists = existingRels.some(r => r.targetNodeId === rel.targetNodeId);
     
     return `
@@ -5005,11 +5024,11 @@ function extractSuggestions() {
     const functionalRolesSet = new Set();
     const tagsSet = new Set();
     const sourceReferenceSet = new Set();
-    const realityDomainsSet = new Set();
     
     data.forEach(d => {
-        (d.functionalRoles || []).forEach(v => { if (v && typeof v === 'string') functionalRolesSet.add(v); });
-        (d.realityDomains || []).forEach(v => { if (v && typeof v === 'string') realityDomainsSet.add(v); });
+        // Backward-compat: read either new schema key (functional_role_set) or legacy key
+        const roles = d.functional_role_set || d.functionalRoles || [];
+        roles.forEach(v => { if (v && typeof v === 'string') functionalRolesSet.add(v); });
         if (d.metadata) {
             (d.metadata.tags || []).forEach(v => { if (v && typeof v === 'string') tagsSet.add(v); });
             if (d.metadata.sourceReference && typeof d.metadata.sourceReference === 'string') {
@@ -5021,7 +5040,8 @@ function extractSuggestions() {
     suggestions.functionalRoles = Array.from(functionalRolesSet).sort();
     suggestions.tags = Array.from(tagsSet).sort();
     suggestions.sourceReference = Array.from(sourceReferenceSet).sort();
-    suggestions.realityDomains = Array.from(realityDomainsSet).sort();
+    // realityDomains was removed from the new schema — keep the array empty for legacy callers
+    suggestions.realityDomains = [];
 }
 
 /* ═══════ SEARCHABLE SELECT COMPONENT ═══════ */
@@ -5375,25 +5395,73 @@ function worldToScreen(wx, wy) { return { x: wx * cam.z + cam.x, y: wy * cam.z +
 function screenToWorld(sx, sy) { return { x: (sx - cam.x) / cam.z, y: (sy - cam.y) / cam.z }; }
 
 /* ═══════ DATA LOADING ═══════ */
+/* Normalize a single node from legacy camelCase keys to the new snake_case
+   schema (app/data/schema/schema.json). Called on load so the rest of the
+   editor can target canonical keys without scattered fallbacks. */
+function normalizeNode(d) {
+    if (!d || typeof d !== 'object') return d;
+    const migrate = (legacy, canonical) => {
+        if (d[legacy] !== undefined && d[canonical] === undefined) {
+            d[canonical] = d[legacy];
+            delete d[legacy];
+        }
+    };
+    migrate('description', 'short_description');
+    migrate('longDescription', 'long_description');
+    migrate('functionalRoles', 'functional_role_set');
+    migrate('historicalContext', 'evolution_history');
+    migrate('relationships', 'relationship_set');
+    migrate('specific', 'particular_characterization');
+    migrate('typeHierarchy', 'type_hierarchy');
+    migrate('interfaceSpecification', 'interface_specification');
+    migrate('implementationSpecification', 'implementation_specification');
+    migrate('scopeSpecification', 'scope_specification');
+    migrate('limitationSet', 'limitation_set');
+    migrate('failureModeSpecification', 'failure_mode_specification');
+    migrate('resourceUse', 'resource_use');
+    // Chronology entries: context → associatedContext
+    if (d.evolution_history && Array.isArray(d.evolution_history.chronology)) {
+        d.evolution_history.chronology.forEach(entry => {
+            if (entry.context !== undefined && entry.associatedContext === undefined) {
+                entry.associatedContext = entry.context;
+                delete entry.context;
+            }
+        });
+    }
+    // Ensure required objects exist
+    if (!d.evolution_history) d.evolution_history = { summary: '', chronology: [] };
+    if (!d.relationship_set) d.relationship_set = [];
+    if (!d.particular_characterization) d.particular_characterization = {};
+    if (!d.metadata) d.metadata = {};
+    if (!d.references) d.references = [];
+    if (!d.type_hierarchy) d.type_hierarchy = [];
+    return d;
+}
+
 async function loadData() {
     try {
-        const res = await fetch('data/dataset.json');
+        const res = await fetch('data/data.json');
         if (!res.ok) throw new Error('HTTP ' + res.status);
         data = await res.json();
+        // Migrate legacy camelCase keys → new snake_case schema keys
+        data.forEach(normalizeNode);
     } catch (e) {
-        console.warn('Could not load dataset.json, using minimal Tecnica fallback', e);
+        console.warn('Could not load data.json, using minimal Tecnica fallback', e);
         // Minimal Tecnica-shaped fallback so the editor stays usable if the
-        // dataset cannot be fetched. Field shapes mirror app/data/schema/dataset.json.
+        // dataset cannot be fetched. Field shapes mirror app/data/schema/schema.json.
         data = [{
             "id": "reality.fallback", "name": "Reality", "category": "Reality",
-            "layer": "Problem Space", "inheritanceLevel": 0,
-            "description": "The ontological substrate that constrains and responds to technical intervention.",
-            "longDescription": "Fallback node — the real dataset could not be loaded.",
-            "functionalRoles": ["Constraint imposition", "Affordance provision"],
-            "realityDomains": ["Physical", "Biological", "Informational", "Social"],
-            "historicalContext": { "summary": "Foundational layer.", "chronology": [] },
-            "specific": {},
-            "relationships": [],
+            "layer": "Problem Space",
+            "short_description": "The ontological substrate that constrains and responds to technical intervention.",
+            "long_description": "Fallback node — the real dataset could not be loaded.",
+            "type_hierarchy": [], "interface_specification": "", "operation": "",
+            "functional_role_set": ["Constraint imposition", "Affordance provision"],
+            "implementation_specification": "", "scope_specification": "",
+            "limitation_set": [], "lifecycle": "", "failure_mode_specification": [],
+            "resource_use": "",
+            "evolution_history": { "summary": "Foundational layer.", "chronology": [] },
+            "particular_characterization": {},
+            "relationship_set": [],
             "metadata": { "tags": ["ontology", "fallback"], "confidenceScore": 1.0, "sourceReference": "Tecnica", "createdAt": new Date().toISOString(), "auditTrail": [] },
             "references": []
         }];
@@ -5422,7 +5490,8 @@ function initGraph() {
     });
     
     data.forEach(d => {
-        (d.relationships || []).forEach(rel => {
+        const rels = d.relationship_set || d.relationships || [];
+        rels.forEach(rel => {
             if (nodeMap[d.id] && nodeMap[rel.targetNodeId]) {
                 edges.push({
                     source: d.id, target: rel.targetNodeId,
@@ -5452,7 +5521,7 @@ function computeMetrics() {
         nodeDegrees[e.target] = (nodeDegrees[e.target] || 0) + 1;
     });
     nodes.forEach(n => {
-        if (nodeDegrees[n.id] === undefined) nodeDegrees[n.id] = (n._data.relationships || []).length;
+        if (nodeDegrees[n.id] === undefined) nodeDegrees[n.id] = (n._data.relationship_set || n._data.relationships || []).length;
     });
     const degs = nodes.map(n => nodeDegrees[n.id] || 0).sort((a, b) => b - a);
     maxDegree = degs.length ? Math.max(1, degs[0]) : 1;
@@ -5476,7 +5545,7 @@ function computeMetrics() {
 
 /* Degree-based radius mapping: min 3px, max 18px (world units, pre-zoom). */
 function nodeRadius(n) {
-    const deg = nodeDegrees[n.id] || (n._data.relationships || []).length || 0;
+    const deg = nodeDegrees[n.id] || (n._data.relationship_set || n._data.relationships || []).length || 0;
     const t = maxDegree > 0 ? deg / maxDegree : 0;
     return clamp(3 + t * 15, 3, 18);
 }
@@ -5940,7 +6009,7 @@ function showTooltip(node, sx, sy) {
     document.getElementById('tt-cat').textContent = node.category || 'Unknown';
     document.getElementById('tt-cat').style.color = getCategoryColor(node.category);
     document.getElementById('tt-name').textContent = node.name || node.id || 'Unknown';
-    document.getElementById('tt-desc').textContent = node._data.description || '';
+    document.getElementById('tt-desc').textContent = node._data.short_description || node._data.description || '';
     let tx = sx + 18, ty = sy + 18;
     if (tx + 280 > W) tx = sx - 298; if (ty + 110 > H) ty = H - 120;
     tt.style.left = tx + 'px'; tt.style.top = ty + 'px';
@@ -6022,33 +6091,46 @@ function attachDirtyListeners() {
 function collectCurrentFormData() {
     if (!selectedNode) return null;
     const d = {};
-    d.id = (document.getElementById('edit-id')?.value || '').trim();
-    d.name = (document.getElementById('edit-name')?.value || '').trim();
+    const get = id => (document.getElementById(id)?.value || '').trim();
+    d.id = get('edit-id');
+    d.name = get('edit-name');
+    d.layer = getSSValue('edit-layer') || '';
     d.category = getSSValue('edit-category') || '';
-    d.description = (document.getElementById('edit-description')?.value || '').trim();
-    d.longDescription = (document.getElementById('edit-longdesc')?.value || '').trim();
-    d.functionalRoles = (typeof getArrayValues === 'function') ? getArrayValues('functionalRoles') : [];
-    d.historicalContext = {
-        summary: (document.getElementById('edit-hist-summary')?.value || '').trim(),
-        chronology: (selectedNode._data.historicalContext?.chronology || [])
+    d.short_description = get('edit-short-description');
+    d.long_description = get('edit-long-description');
+    d.type_hierarchy = (typeof getArrayValues === 'function') ? getArrayValues('type_hierarchy') : [];
+    d.interface_specification = get('edit-interface-specification');
+    d.operation = get('edit-operation');
+    d.functional_role_set = (typeof getArrayValues === 'function') ? getArrayValues('functional_role_set') : [];
+    d.implementation_specification = get('edit-implementation-specification');
+    d.scope_specification = get('edit-scope-specification');
+    d.limitation_set = (typeof getArrayValues === 'function') ? getArrayValues('limitation_set') : [];
+    d.lifecycle = get('edit-lifecycle');
+    d.failure_mode_specification = (typeof getArrayValues === 'function') ? getArrayValues('failure_mode_specification') : [];
+    d.resource_use = get('edit-resource-use');
+    // Preserve chronology from the existing data (inline edits are collected separately)
+    const existingEvo = selectedNode._data.evolution_history || selectedNode._data.historicalContext || {};
+    d.evolution_history = {
+        summary: get('edit-evo-summary'),
+        chronology: existingEvo.chronology || []
     };
-    d.specific = (typeof collectSpecificValues === 'function') ? collectSpecificValues() : {};
-    d.relationships = selectedNode._data.relationships || [];
+    d.particular_characterization = (typeof collectSpecificValues === 'function') ? collectSpecificValues() : {};
+    // relationship_set — read whichever key currently holds the set
+    const relKey = ('relationship_set' in selectedNode._data) ? 'relationship_set' : 'relationships';
+    d.relationship_set = selectedNode._data[relKey] || [];
     if (!selectedNode._data.metadata) selectedNode._data.metadata = {};
     d.metadata = {
         tags: (typeof getArrayValues === 'function') ? getArrayValues('tags') : [],
-        sourceReference: (document.getElementById('edit-source')?.value || '').trim()
+        confidenceScore: parseFloat(document.getElementById('edit-confidence')?.value) || 0.7,
+        sourceReference: get('edit-source')
     };
-    d.layer = getSSValue('edit-layer') || '';
-    d.inheritanceLevel = (typeof getArrayValues === 'function') ? (parseInt(document.getElementById('edit-inheritance')?.value) || 0) : 0;
-    d.realityDomains = (typeof getArrayValues === 'function') ? getArrayValues('realityDomains') : [];
     d.references = selectedNode._data.references || [];
     return d;
 }
 
 /* Count filled vs total trackable fields. Returns { filled, total, ratio }.
    Only fields rendered in the form are counted so the meter matches what
-   the user actually sees. */
+   the user actually sees. Uses the new snake_case schema with legacy fallbacks. */
 function computeNodeCompleteness(d) {
     if (!d) return { filled: 0, total: 1, ratio: 0 };
     const fields = [];
@@ -6062,28 +6144,38 @@ function computeNodeCompleteness(d) {
         return Boolean(v);
     }
 
-    // Core fields always present in the form
+    // Core fields (new schema keys, with legacy fallbacks)
     push('id', d.id);
     push('name', d.name);
+    push('layer', gf(d, 'layer', 'layer'));
     push('category', d.category);
-    push('description', d.description);
-    push('longDescription', d.longDescription);
-    push('functionalRoles', d.functionalRoles);
-    push('historicalContext.summary', d.historicalContext?.summary);
-    push('relationships', d.relationships);
+    push('short_description', gf(d, 'short_description', 'description'));
+    push('long_description', gf(d, 'long_description', 'longDescription'));
+    push('type_hierarchy', gf(d, 'type_hierarchy', 'typeHierarchy'));
+    push('interface_specification', gf(d, 'interface_specification', 'interfaceSpecification'));
+    push('operation', gf(d, 'operation', 'operation'));
+    push('functional_role_set', gf(d, 'functional_role_set', 'functionalRoles'));
+    push('implementation_specification', gf(d, 'implementation_specification', 'implementationSpecification'));
+    push('scope_specification', gf(d, 'scope_specification', 'scopeSpecification'));
+    push('limitation_set', gf(d, 'limitation_set', 'limitationSet'));
+    push('lifecycle', gf(d, 'lifecycle', 'lifecycle'));
+    push('failure_mode_specification', gf(d, 'failure_mode_specification', 'failureModeSpecification'));
+    push('resource_use', gf(d, 'resource_use', 'resourceUse'));
+    push('evolution_history.summary', gf(d, 'evolution_history', 'historicalContext')?.summary);
+    push('relationship_set', gf(d, 'relationship_set', 'relationships'));
     push('metadata.tags', d.metadata?.tags);
     push('metadata.sourceReference', d.metadata?.sourceReference);
     push('references', d.references);
 
-    // Category-specific fields (from schema if loaded)
+    // Category-specific fields (particular_characterization)
     const def = (typeof getCategoryDef === 'function') ? getCategoryDef(d.category) : null;
+    const pc = gf(d, 'particular_characterization', 'specific');
     if (def && def.properties) {
         Object.keys(def.properties).forEach(key => {
-            push(`specific.${key}`, d.specific ? d.specific[key] : undefined);
+            push(`particular_characterization.${key}`, pc ? pc[key] : undefined);
         });
-    } else if (d.specific) {
-        // No schema — count whatever specific keys exist
-        Object.keys(d.specific).forEach(key => push(`specific.${key}`, d.specific[key]));
+    } else if (pc) {
+        Object.keys(pc).forEach(key => push(`particular_characterization.${key}`, pc[key]));
     }
 
     const filled = fields.filter(f => f.filled).length;
@@ -6166,7 +6258,7 @@ function getCategoryDef(category) {
     const allOf = aiConfig.schema.allOf || [];
     for (const branch of allOf) {
         if (branch.if?.properties?.category?.const === category) {
-            const ref = branch.then?.properties?.specific?.$ref;
+            const ref = branch.then?.properties?.particular_characterization?.$ref;
             if (ref) {
                 const defName = ref.replace('#/$defs/', '');
                 return aiConfig.schema.$defs?.[defName] || null;
@@ -6298,26 +6390,44 @@ function initSpecificFields() {
 function validateNode(nodeData) {
     const errors = [];
     
-    // Top-level required fields
-    const topRequired = aiConfig.schema?.required || ['id', 'name', 'category', 'description', 'functionalRoles', 'historicalContext', 'specific', 'relationships', 'metadata', 'references'];
+    // Top-level required fields (new snake_case schema)
+    const topRequired = aiConfig.schema?.required || [
+        'id', 'name', 'layer', 'category', 'short_description', 'long_description',
+        'type_hierarchy', 'interface_specification', 'operation', 'functional_role_set',
+        'implementation_specification', 'scope_specification', 'limitation_set',
+        'lifecycle', 'failure_mode_specification', 'resource_use', 'relationship_set',
+        'evolution_history', 'particular_characterization', 'metadata', 'references'
+    ];
     topRequired.forEach(field => {
-        if (!nodeData[field] || (Array.isArray(nodeData[field]) && nodeData[field].length === 0)) {
+        const v = nodeData[field];
+        const missing = v === undefined || v === null || v === '' ||
+            (Array.isArray(v) && v.length === 0) ||
+            (typeof v === 'object' && !Array.isArray(v) && Object.keys(v).length === 0);
+        if (missing) {
             errors.push({ field, message: `${friendlyLabel(field)} is required` });
         }
     });
     
-    // Category-specific required fields
+    // Category-specific required fields (particular_characterization)
     const def = getCategoryDef(nodeData.category);
     if (def) {
         const required = def.required || [];
+        const pc = nodeData.particular_characterization || {};
         required.forEach(key => {
-            if (!nodeData.specific || !nodeData.specific[key]) {
-                errors.push({ field: `specific.${key}`, message: `${friendlyLabel(key)} is required for ${nodeData.category}` });
+            if (pc[key] === undefined || pc[key] === null || pc[key] === '' ||
+                (Array.isArray(pc[key]) && pc[key].length === 0)) {
+                errors.push({ field: `particular_characterization.${key}`, message: `${friendlyLabel(key)} is required for ${nodeData.category}` });
             }
         });
     }
     
     return errors;
+}
+
+/* Backward-compat field reader: reads the new schema key, falling back to
+   legacy camelCase keys so the editor works with both old and new data. */
+function gf(nodeData, newKey, legacyKey) {
+    return nodeData[newKey] ?? nodeData[legacyKey] ?? '';
 }
 
 function renderForm(nodeData) {
@@ -6329,8 +6439,10 @@ function renderForm(nodeData) {
     const familyOptions = RELATIONSHIP_FAMILIES.map(f => ({ value: f, label: friendlyLabel(f) }));
     const typeOptions = RELATIONSHIP_TYPES.map(t => ({ value: t, label: t }));
     
-    const specific = nodeData.specific || {};
-    const historicalContext = nodeData.historicalContext || { summary: '', chronology: [] };
+    // Read with backward-compat fallbacks
+    const particular = gf(nodeData, 'particular_characterization', 'specific') || {};
+    const evolution = gf(nodeData, 'evolution_history', 'historicalContext') || { summary: '', chronology: [] };
+    const relationships = gf(nodeData, 'relationship_set', 'relationships') || [];
     
     const html = `
         <div class="form-section">
@@ -6343,27 +6455,13 @@ function renderForm(nodeData) {
                 <label class="form-label">Name</label>
                 <input type="text" class="form-input" id="edit-name" value="${escHTML(nodeData.name || '')}" placeholder="Display Name">
             </div>
-            <div class="form-row-inline">
-                <div class="form-row">
-                    <label class="form-label">Category</label>
-                    ${createSearchableSelect('edit-category', 'Search category...', categoryOptions, nodeData.category || '', null, false)}
-                </div>
-                <div class="form-row">
-                    <label class="form-label">Layer</label>
-                    ${createSearchableSelect('edit-layer', 'Search layer...', LAYERS.map(l => ({ value: l, label: l })), nodeData.layer || '', null, false)}
-                </div>
+            <div class="form-row">
+                <label class="form-label">Layer</label>
+                ${createSearchableSelect('edit-layer', 'Search layer...', LAYERS.map(l => ({ value: l, label: l })), nodeData.layer || '', null, false)}
             </div>
             <div class="form-row">
-                <label class="form-label">Inheritance Level</label>
-                <input type="number" class="form-input" id="edit-inheritance" value="${nodeData.inheritanceLevel ?? 0}" min="0">
-            </div>
-        </div>
-        
-        <div class="form-section">
-            <div class="form-section-title">Reality Domains</div>
-            <div class="form-row">
-                <label class="form-label">Domains</label>
-                ${createArrayInput('realityDomains', nodeData.realityDomains || [], suggestions.realityDomains || [])}
+                <label class="form-label">Category</label>
+                ${createSearchableSelect('edit-category', 'Search category...', categoryOptions, nodeData.category || '', null, false)}
             </div>
         </div>
         
@@ -6371,32 +6469,92 @@ function renderForm(nodeData) {
             <div class="form-section-title">Description</div>
             <div class="form-row">
                 <label class="form-label">Short Description</label>
-                <textarea class="form-textarea" id="edit-description" placeholder="Brief description...">${escHTML(nodeData.description || '')}</textarea>
+                <textarea class="form-textarea" id="edit-short-description" placeholder="Brief description...">${escHTML(gf(nodeData, 'short_description', 'description'))}</textarea>
             </div>
             <div class="form-row">
                 <label class="form-label">Long Description</label>
-                <textarea class="form-textarea" id="edit-longdesc" style="min-height:120px" placeholder="Detailed explanation...">${escHTML(nodeData.longDescription || '')}</textarea>
+                <textarea class="form-textarea" id="edit-long-description" style="min-height:120px" placeholder="Detailed explanation...">${escHTML(gf(nodeData, 'long_description', 'longDescription'))}</textarea>
             </div>
         </div>
         
         <div class="form-section">
-            <div class="form-section-title">Functional Roles</div>
+            <div class="form-section-title">Type Hierarchy</div>
+            <div class="form-row">
+                <label class="form-label">Ancestor Classes</label>
+                ${createArrayInput('type_hierarchy', gf(nodeData, 'type_hierarchy', 'typeHierarchy') || [], [])}
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="form-section-title">Interface & Operation</div>
+            <div class="form-row">
+                <label class="form-label">Interface Specification</label>
+                <textarea class="form-textarea" id="edit-interface-specification" placeholder="External-facing contract: purpose, function, inputs, outputs, interaction surfaces...">${escHTML(gf(nodeData, 'interface_specification', 'interfaceSpecification'))}</textarea>
+            </div>
+            <div class="form-row">
+                <label class="form-label">Operation</label>
+                <textarea class="form-textarea" id="edit-operation" placeholder="How the element behaves during execution or use...">${escHTML(gf(nodeData, 'operation', 'operation'))}</textarea>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="form-section-title">Functional Role Set</div>
             <div class="form-row">
                 <label class="form-label">Roles <span style="opacity:0.5;font-size:0.5em">(${suggestions.functionalRoles.length} suggestions)</span></label>
-                ${createArrayInput('functionalRoles', nodeData.functionalRoles || [], suggestions.functionalRoles)}
+                ${createArrayInput('functional_role_set', gf(nodeData, 'functional_role_set', 'functionalRoles') || [], suggestions.functionalRoles)}
             </div>
         </div>
         
         <div class="form-section">
-            <div class="form-section-title">Historical Context</div>
+            <div class="form-section-title">Implementation & Scope</div>
             <div class="form-row">
-                <label class="form-label">Summary</label>
-                <textarea class="form-textarea" id="edit-hist-summary" placeholder="Historical summary...">${escHTML(historicalContext.summary || '')}</textarea>
+                <label class="form-label">Implementation Specification</label>
+                <textarea class="form-textarea" id="edit-implementation-specification" placeholder="Internal realization: structure, architecture, composition, operational mechanisms...">${escHTML(gf(nodeData, 'implementation_specification', 'implementationSpecification'))}</textarea>
             </div>
             <div class="form-row">
-                <label class="form-label">Chronology <span style="opacity:0.5;font-size:0.5em">(${(historicalContext.chronology || []).length} entries)</span></label>
+                <label class="form-label">Scope Specification</label>
+                <textarea class="form-textarea" id="edit-scope-specification" placeholder="Conditions under which the element applies: domain, operating environment, applicability boundaries, performance characteristics...">${escHTML(gf(nodeData, 'scope_specification', 'scopeSpecification'))}</textarea>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="form-section-title">Limitation Set</div>
+            <div class="form-row">
+                <label class="form-label">Limitations</label>
+                ${createArrayInput('limitation_set', gf(nodeData, 'limitation_set', 'limitationSet') || [], [])}
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="form-section-title">Lifecycle & Failure</div>
+            <div class="form-row">
+                <label class="form-label">Lifecycle</label>
+                <textarea class="form-textarea" id="edit-lifecycle" placeholder="How the element is created, configured, deployed, operated, maintained, evolved, and retired...">${escHTML(gf(nodeData, 'lifecycle', 'lifecycle'))}</textarea>
+            </div>
+            <div class="form-row">
+                <label class="form-label">Failure Mode Specification</label>
+                ${createArrayInput('failure_mode_specification', gf(nodeData, 'failure_mode_specification', 'failureModeSpecification') || [], [])}
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="form-section-title">Resource Use</div>
+            <div class="form-row">
+                <label class="form-label">Resources Consumed</label>
+                <textarea class="form-textarea" id="edit-resource-use" placeholder="Matter, energy, information, labor, time, capital, or infrastructure consumed by the element...">${escHTML(gf(nodeData, 'resource_use', 'resourceUse'))}</textarea>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="form-section-title">Evolution History</div>
+            <div class="form-row">
+                <label class="form-label">Summary</label>
+                <textarea class="form-textarea" id="edit-evo-summary" placeholder="Historical development summary...">${escHTML(evolution.summary || '')}</textarea>
+            </div>
+            <div class="form-row">
+                <label class="form-label">Chronology <span style="opacity:0.5;font-size:0.5em">(${(evolution.chronology || []).length} entries)</span></label>
                 <div id="chronology-container">
-                    ${(historicalContext.chronology || []).map((entry, i) => renderChronologyEntry(entry, i)).join('')}
+                    ${(evolution.chronology || []).map((entry, i) => renderChronologyEntry(entry, i)).join('')}
                 </div>
                 <div class="add-chronology-form" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border-subtle);">
                     <div class="form-row-inline">
@@ -6410,7 +6568,7 @@ function renderForm(nodeData) {
                         </div>
                     </div>
                     <div class="form-row">
-                        <label class="form-label">Context</label>
+                        <label class="form-label">Associated Context</label>
                         <input type="text" class="form-input" id="new-chron-context" placeholder="Event context or details">
                     </div>
                     <button class="btn btn-sm" id="add-chron-btn" style="margin-top:8px">Add Chronology Entry</button>
@@ -6419,16 +6577,16 @@ function renderForm(nodeData) {
         </div>
         
         <div class="form-section" id="specific-properties-section">
-            <div class="form-section-title">Specific Properties <span id="specific-category-hint" style="font-size:0.62rem;font-style:italic;color:var(--text-muted);font-family:var(--font-body);font-weight:400;letter-spacing:0;text-transform:none;"></span></div>
+            <div class="form-section-title">Particular Characterization <span id="specific-category-hint" style="font-size:0.62rem;font-style:italic;color:var(--text-muted);font-family:var(--font-body);font-weight:400;letter-spacing:0;text-transform:none;"></span></div>
             <div id="specific-fields-container">
-                ${renderSpecificFromSchema(nodeData.category, specific)}
+                ${renderSpecificFromSchema(nodeData.category, particular)}
             </div>
         </div>
         
         <div class="form-section">
-            <div class="form-section-title">Relationships (${(nodeData.relationships || []).length})</div>
+            <div class="form-section-title">Relationship Set (${relationships.length})</div>
             <div id="relationships-container">
-                ${(nodeData.relationships || []).map((rel, i) => renderRelationshipItem(rel, i)).join('')}
+                ${relationships.map((rel, i) => renderRelationshipItem(rel, i)).join('')}
             </div>
             <div class="add-rel-form">
                 <div class="add-rel-row">
@@ -6475,6 +6633,26 @@ function renderForm(nodeData) {
             </div>
             <button class="btn btn-sm" id="add-ref-btn" style="margin-top:10px">Add Reference</button>
         </div>
+        
+        <div class="form-section">
+            <div class="form-section-title">Audit Trail <span style="opacity:0.5;font-size:0.5em">(${((nodeData.metadata || {}).auditTrail || []).length} entries)</span></div>
+            <div id="audit-trail-container">
+                ${((nodeData.metadata || {}).auditTrail || []).map((entry, i) => renderAuditTrailEntry(entry, i)).join('')}
+            </div>
+            <div class="add-audit-form" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border-subtle);">
+                <div class="form-row-inline">
+                    <div class="form-row">
+                        <label class="form-label">Review Date</label>
+                        <input type="date" class="form-input" id="new-audit-date" value="${new Date().toISOString().split('T')[0]}">
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Review Note</label>
+                        <input type="text" class="form-input" id="new-audit-note" placeholder="Review note...">
+                    </div>
+                </div>
+                <button class="btn btn-sm" id="add-audit-btn" style="margin-top:8px">Add Audit Entry</button>
+            </div>
+        </div>
     `;
     
     document.getElementById('panel-body').innerHTML = html;
@@ -6482,13 +6660,14 @@ function renderForm(nodeData) {
     initSearchableSelect('edit-category');
     initSearchableSelect('edit-layer');
     initSpecificFields();
-    initArrayInput('realityDomains', suggestions.realityDomains || []);
+    initArrayInput('type_hierarchy', []);
+    initArrayInput('limitation_set', []);
+    initArrayInput('failure_mode_specification', []);
+    initArrayInput('functional_role_set', suggestions.functionalRoles);
+    initArrayInput('tags', suggestions.tags);
     initSearchableSelect('new-rel-type');
     initSearchableSelect('new-rel-family');
     initSearchableSelect('new-rel-target');
-    
-    initArrayInput('functionalRoles', suggestions.functionalRoles);
-    initArrayInput('tags', suggestions.tags);
     
     // Update specific category hint
     const hintEl = document.getElementById('specific-category-hint');
@@ -6508,12 +6687,10 @@ function renderForm(nodeData) {
         const originalOnSelect = ssRegistry['edit-category']?.onSelect;
         ssRegistry['edit-category'].onSelect = (value) => {
             if (value && value !== nodeData.category) {
-                // Re-render just the specific fields section
                 const container = document.getElementById('specific-fields-container');
                 if (container) {
                     container.innerHTML = renderSpecificFromSchema(value, {});
                     initSpecificFields();
-                    // Update hint
                     const hintEl2 = document.getElementById('specific-category-hint');
                     if (hintEl2) {
                         const def2 = getCategoryDef(value);
@@ -6542,11 +6719,15 @@ function renderForm(nodeData) {
         btn.addEventListener('click', () => removeChronologyEntry(parseInt(btn.dataset.idx)));
     });
     
+    document.querySelectorAll('.audit-remove-btn').forEach(btn => {
+        btn.addEventListener('click', () => removeAuditEntry(parseInt(btn.dataset.idx)));
+    });
+    
     document.getElementById('add-rel-btn')?.addEventListener('click', addRelationship);
     document.getElementById('add-ref-btn')?.addEventListener('click', addReference);
     document.getElementById('add-chron-btn')?.addEventListener('click', addChronologyEntry);
+    document.getElementById('add-audit-btn')?.addEventListener('click', addAuditEntry);
 
-    // Refresh the completeness meter so it reflects the just-rendered fields.
     updateCompletenessIndicator();
 }
 
@@ -6558,7 +6739,7 @@ function renderChronologyEntry(entry, idx) {
                 <button class="chron-remove-btn" data-idx="${idx}" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;padding:0 5px;">&times;</button>
             </div>
             <div style="font-size:0.8rem;color:var(--text-primary);margin-bottom:6px;">${escHTML(entry.event || 'Unnamed Event')}</div>
-            <div style="font-size:0.7rem;color:var(--text-muted);line-height:1.5;">${escHTML(entry.context || '')}</div>
+            <div style="font-size:0.7rem;color:var(--text-muted);line-height:1.5;">${escHTML(entry.associatedContext || '')}</div>
         </div>
     `;
 }
@@ -6575,13 +6756,13 @@ function addChronologyEntry() {
         return;
     }
     
-    selectedNode._data.historicalContext = selectedNode._data.historicalContext || { summary: '', chronology: [] };
-    selectedNode._data.historicalContext.chronology = selectedNode._data.historicalContext.chronology || [];
+    selectedNode._data.evolution_history = selectedNode._data.evolution_history || { summary: '', chronology: [] };
+    selectedNode._data.evolution_history.chronology = selectedNode._data.evolution_history.chronology || [];
     
-    selectedNode._data.historicalContext.chronology.push({
+    selectedNode._data.evolution_history.chronology.push({
         year: year || new Date().getFullYear(),
         event: event,
-        context: context
+        associatedContext: context
     });
     
     document.getElementById('new-chron-year').value = '';
@@ -6593,9 +6774,9 @@ function addChronologyEntry() {
 
 function removeChronologyEntry(idx) {
     if (!selectedNode) return;
-    if (!selectedNode._data.historicalContext || !selectedNode._data.historicalContext.chronology) return;
+    if (!selectedNode._data.evolution_history || !selectedNode._data.evolution_history.chronology) return;
     
-    selectedNode._data.historicalContext.chronology.splice(idx, 1);
+    selectedNode._data.evolution_history.chronology.splice(idx, 1);
     renderForm(selectedNode._data);
 }
 
@@ -6697,8 +6878,8 @@ function collectInlineEdits() {
     // Relationships
     document.querySelectorAll('.rel-desc-edit').forEach(el => {
         const idx = parseInt(el.dataset.idx);
-        if (selectedNode._data.relationships && selectedNode._data.relationships[idx]) {
-            selectedNode._data.relationships[idx].description = el.value;
+        if (selectedNode._data.relationship_set && selectedNode._data.relationship_set[idx]) {
+            selectedNode._data.relationship_set[idx].description = el.value;
         }
     });
     
@@ -6796,8 +6977,8 @@ function addRelationship() {
     if (!type || !target) { alert('Please select a relationship type and target node.'); return; }
     
     const rel = { relationshipType: type, targetNodeId: target, relationshipFamily: family || 'not_specified', description: '' };
-    selectedNode._data.relationships = selectedNode._data.relationships || [];
-    selectedNode._data.relationships.push(rel);
+    selectedNode._data.relationship_set = selectedNode._data.relationship_set || [];
+    selectedNode._data.relationship_set.push(rel);
     edges.push({ source: selectedNode.id, target: target, family: family || 'not_specified', type: type, description: '' });
     updateStats();
     markGraphDirty();
@@ -6806,8 +6987,8 @@ function addRelationship() {
 
 function removeRelationship(idx) {
     if (!selectedNode) return;
-    const rel = selectedNode._data.relationships[idx];
-    selectedNode._data.relationships.splice(idx, 1);
+    const rel = selectedNode._data.relationship_set[idx];
+    selectedNode._data.relationship_set.splice(idx, 1);
     const edgeIdx = edges.findIndex(e => e.source === selectedNode.id && e.target === rel.targetNodeId && e.type === rel.relationshipType);
     if (edgeIdx >= 0) edges.splice(edgeIdx, 1);
     updateStats();
@@ -6828,16 +7009,53 @@ function removeReference(idx) {
     renderForm(selectedNode._data);
 }
 
+function addAuditEntry() {
+    if (!selectedNode) return;
+
+    const date = document.getElementById('new-audit-date').value;
+    const note = document.getElementById('new-audit-note').value.trim();
+
+    if (!note) {
+        alert('Please provide a review note.');
+        return;
+    }
+
+    if (!selectedNode._data.metadata) selectedNode._data.metadata = {};
+    selectedNode._data.metadata.auditTrail = selectedNode._data.metadata.auditTrail || [];
+
+    selectedNode._data.metadata.auditTrail.push({
+        reviewDate: date || new Date().toISOString().split('T')[0],
+        reviewNote: note
+    });
+
+    document.getElementById('new-audit-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('new-audit-note').value = '';
+
+    renderForm(selectedNode._data);
+}
+
+function removeAuditEntry(idx) {
+    if (!selectedNode) return;
+    if (!selectedNode._data.metadata || !selectedNode._data.metadata.auditTrail) return;
+
+    selectedNode._data.metadata.auditTrail.splice(idx, 1);
+    renderForm(selectedNode._data);
+}
+
 /* Detect whether a node is new/empty (Create mode) vs populated (Improve mode).
    A node is "empty" if it has no description, no longDescription, no relationships,
    and default name — i.e., the user just clicked "Add Node" and hasn't filled it in. */
 function isNewOrEmptyNode(node) {
     if (!node || !node._data) return false;
     const d = node._data;
-    return (!d.description || !d.description.trim()) &&
-           (!d.longDescription || !d.longDescription.trim()) &&
-           (!d.relationships || d.relationships.length === 0) &&
-           (!d.functionalRoles || d.functionalRoles.length === 0) &&
+    const sd = d.short_description || '';
+    const ld = d.long_description || '';
+    const rels = d.relationship_set || [];
+    const roles = d.functional_role_set || [];
+    return (!sd.trim()) &&
+           (!ld.trim()) &&
+           (rels.length === 0) &&
+           (roles.length === 0) &&
            (d.name === 'New Node' || !d.name);
 }
 
@@ -6862,6 +7080,9 @@ function markGraphDirty() {
    the Save flow can commit pending data without disrupting the current UI state
    (no validation banner, no panel reload, no title change).
    Returns true on success, false if the JSON tab has a parse error. */
+/* Read the text content of a textarea/input by id, returning '' if absent. */
+function val(id) { return (document.getElementById(id)?.value || '').trim(); }
+
 function commitFormData() {
     if (!selectedNode) return false;
 
@@ -6879,30 +7100,50 @@ function commitFormData() {
             return false; // invalid JSON — caller decides how to surface
         }
     } else {
-        selectedNode._data.id = document.getElementById('edit-id').value;
-        selectedNode._data.name = document.getElementById('edit-name').value;
-        selectedNode._data.category = getSSValue('edit-category') || 'Reality';
-        selectedNode._data.description = document.getElementById('edit-description').value;
-        selectedNode._data.longDescription = document.getElementById('edit-longdesc').value;
-        selectedNode._data.functionalRoles = getArrayValues('functionalRoles');
+        const d = selectedNode._data;
+        d.id = val('edit-id');
+        d.name = val('edit-name');
+        d.category = getSSValue('edit-category') || 'Reality';
+        d.layer = getSSValue('edit-layer') || '';
+        d.short_description = val('edit-short-description');
+        d.long_description = val('edit-long-description');
+        d.type_hierarchy = getArrayValues('type_hierarchy');
+        d.interface_specification = val('edit-interface-specification');
+        d.operation = val('edit-operation');
+        d.functional_role_set = getArrayValues('functional_role_set');
+        d.implementation_specification = val('edit-implementation-specification');
+        d.scope_specification = val('edit-scope-specification');
+        d.limitation_set = getArrayValues('limitation_set');
+        d.lifecycle = val('edit-lifecycle');
+        d.failure_mode_specification = getArrayValues('failure_mode_specification');
+        d.resource_use = val('edit-resource-use');
 
-        selectedNode._data.historicalContext = selectedNode._data.historicalContext || { summary: '', chronology: [] };
-        selectedNode._data.historicalContext.summary = document.getElementById('edit-hist-summary').value;
+        // Evolution history — preserve chronology, update summary
+        const existingEvo = d.evolution_history || d.historicalContext || { summary: '', chronology: [] };
+        d.evolution_history = {
+            summary: val('edit-evo-summary'),
+            chronology: existingEvo.chronology || []
+        };
+        // Drop legacy key so the new schema key is authoritative
+        delete d.historicalContext;
 
-        selectedNode._data.specific = collectSpecificValues();
+        // Particular characterization (category-specific)
+        d.particular_characterization = collectSpecificValues();
+        delete d.specific;
 
-        if (!selectedNode._data.metadata) selectedNode._data.metadata = {};
-        selectedNode._data.metadata.tags = getArrayValues('tags');
-        selectedNode._data.metadata.confidenceScore = parseFloat(document.getElementById('edit-confidence').value) || 0.7;
-        selectedNode._data.metadata.sourceReference = document.getElementById('edit-source').value;
+        // Relationship set — preserve whatever key holds the current set
+        const relKey = ('relationship_set' in d) ? 'relationship_set' : 'relationships';
+        d.relationship_set = d[relKey] || [];
+        delete d.relationships;
 
-        // Top-level schema fields (per app/data/schema/dataset.json)
-        selectedNode._data.layer = getSSValue('edit-layer') || '';
-        selectedNode._data.inheritanceLevel = parseInt(document.getElementById('edit-inheritance').value) || 0;
-        selectedNode._data.realityDomains = getArrayValues('realityDomains');
+        // Metadata
+        if (!d.metadata) d.metadata = {};
+        d.metadata.tags = getArrayValues('tags');
+        d.metadata.confidenceScore = parseFloat(document.getElementById('edit-confidence')?.value) || 0.7;
+        d.metadata.sourceReference = val('edit-source');
 
-        selectedNode.name = selectedNode._data.name;
-        selectedNode.category = selectedNode._data.category;
+        selectedNode.name = d.name;
+        selectedNode.category = d.category;
         return true;
     }
 }
@@ -7003,12 +7244,25 @@ function showValidationSummary(errors) {
 function addNewNode() {
     const id = 'new.node.' + Date.now();
     const newNodeData = {
-        id: id, name: 'New Node', category: 'Reality',
-        layer: 'Problem Space', inheritanceLevel: 0,
-        description: '', longDescription: '', functionalRoles: [],
-        realityDomains: [],
-        historicalContext: { summary: '', chronology: [] },
-        specific: {}, relationships: [],
+        id: id,
+        name: 'New Node',
+        category: 'Reality',
+        layer: 'Problem Space',
+        short_description: '',
+        long_description: '',
+        type_hierarchy: [],
+        interface_specification: '',
+        operation: '',
+        functional_role_set: [],
+        implementation_specification: '',
+        scope_specification: '',
+        limitation_set: [],
+        lifecycle: '',
+        failure_mode_specification: [],
+        resource_use: '',
+        evolution_history: { summary: '', chronology: [] },
+        particular_characterization: {},
+        relationship_set: [],
         metadata: { tags: [], confidenceScore: 0.7, sourceReference: '', createdAt: new Date().toISOString(), auditTrail: [] },
         references: []
     };
@@ -7408,7 +7662,7 @@ function computeGraphStats() {
     // Degree distribution (histogram)
     const degreeCounts = {};
     nodes.forEach(n => {
-        const deg = nodeDegrees[n.id] || (n._data.relationships || []).length || 0;
+        const deg = nodeDegrees[n.id] || (n._data.relationship_set || []).length || 0;
         degreeCounts[deg] = (degreeCounts[deg] || 0) + 1;
     });
     const maxBucket = Math.max(...Object.keys(degreeCounts).map(Number), 0);
@@ -7416,7 +7670,7 @@ function computeGraphStats() {
     // Top 5 nodes by degree (centrality)
     const centrality = nodes.map(n => ({
         node: n,
-        degree: nodeDegrees[n.id] || (n._data.relationships || []).length || 0
+        degree: nodeDegrees[n.id] || (n._data.relationship_set || []).length || 0
     })).sort((a, b) => b.degree - a.degree).slice(0, 5);
 
     return { V, E, density, avgClustering, degreeCounts, maxBucket, centrality };
@@ -7508,8 +7762,8 @@ function setupEventHandlers() {
         if (linkMode && node) {
             if (linkSourceNode && linkSourceNode !== node) {
                 const rel = { relationshipType: 'not_specified', targetNodeId: node.id, relationshipFamily: 'not_specified', description: '' };
-                linkSourceNode._data.relationships = linkSourceNode._data.relationships || [];
-                linkSourceNode._data.relationships.push(rel);
+                linkSourceNode._data.relationship_set = linkSourceNode._data.relationship_set || [];
+                linkSourceNode._data.relationship_set.push(rel);
                 edges.push({ source: linkSourceNode.id, target: node.id, family: 'not_specified', type: 'not_specified', description: '' });
                 updateStats(); markGraphDirty(); if (selectedNode === linkSourceNode) renderForm(linkSourceNode._data);
             }

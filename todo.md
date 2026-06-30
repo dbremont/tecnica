@@ -8,4 +8,5 @@
 - [Why Problem Statements Aren't Enough](https://letters.unchartedpathbreakthroughs.com/posts/why-problem-statements-arent-enough)
 - https://w.pitula.me/fintech-engineering-handbook/#notifying-reliably-outbox-and-cdc
 - (Finance) Terminal Value
-- ...
+- Formal Verification: Why3 -- Why3, Lean, Coq.
+- 

@@ -1,4 +1,8 @@
--  Autoregia - Index of Tecnical Objects Should Just Point to This.
+-  Autoregia - Index of **Tecnical Objects** Should Just Point to This.
   - It should  have a graph integrated - but not the edit.
 - This should just point to autoregia - Work Management System.
-- ... 
+- Java Project File Encoding -> Eclipse File Encoding  (Should It Be a Policy or Not)
+- Firm Valuation:   Discounted Cash Flow of Future Earning?  What type of element in the tecnica dataset is this?
+- API: Token, Key? What kinds of elements are they? What kind of element is a API?
+- What is a Convertible bond? (https://en.wikipedia.org/wiki/Convertible_bond)
+- ...

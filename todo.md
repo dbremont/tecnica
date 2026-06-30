@@ -5,4 +5,5 @@
 - Firm Valuation:   Discounted Cash Flow of Future Earning?  What type of element in the tecnica dataset is this?
 - API: Token, Key? What kinds of elements are they? What kind of element is a API?
 - What is a Convertible bond? (https://en.wikipedia.org/wiki/Convertible_bond)
-- ...
+- [Why Problem Statements Aren't Enough](https://letters.unchartedpathbreakthroughs.com/posts/why-problem-statements-arent-enough)
+- https://w.pitula.me/fintech-engineering-handbook/#notifying-reliably-outbox-and-cdc

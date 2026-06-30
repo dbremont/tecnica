@@ -1,0 +1,4 @@
+-  Autoregia - Index of Tecnical Objects Should Just Point to This.
+  - It should  have a graph integrated - but not the edit.
+- This should just point to autoregia - Work Management System.
+- 

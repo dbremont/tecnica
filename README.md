@@ -13,6 +13,8 @@
 ## TODO
 
 - [ ] Include the mechanism to save the dataset.json - similar to [sociogene](https://github.com/csiglab/Sociognosis).
+- [ ] Pre-compute the layout.json
+- [ ] Save things to the database - and implement the server mechanism similar to autoregia.
 
 ## References
 

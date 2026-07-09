@@ -1,3 +1,4 @@
+- We need so separate the update the of node in to micro task -  so we don't send to much to the server - and increase the probably of mistakes.
 -  Autoregia - Index of **Tecnical Objects** Should Just Point to This.
   - It should  have a graph integrated - but not the edit.
 - This should just point to autoregia - Work Management System.

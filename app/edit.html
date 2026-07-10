@@ -3821,6 +3821,9 @@ select:focus-visible {
         <div class="wa-tip">Tab to accept • Esc to dismiss • Runs locally when available</div>
     </div>
 
+    <script src="vendor/deck.min.js"></script>
+    <script src="vendor/socio-graph.js"></script>
+    <script src="js/couch.js"></script>
     <script>
 /* ═══════ UTILITIES ═══════ */
 function hexToRGBA(hex, alpha) {
@@ -3859,15 +3862,15 @@ function friendlyLabel(k) {
    so the editor UI stays in lockstep with the dataset schema. */
 
 const CATEGORIES = [
-    'Reality', 'TechnicalDomain', 'TechnicalSystem',
+    'Reality', 'TechnicalDomain', 'TechnicalElementSetModulo',
     'ActionInterfaceAndActuation', 'ConcreteTechnicalArtifact',
-    'TechnicalBlueprint', 'TechnicalAgent', 'TechnicalActivity',
+    'TechnicalBlueprint', 'TechnicalAgent', 'TechnicalPractice', 'TechnicalActivity',
     'TechnicalStandard', 'TechnicalConstraint', 'TechnicalInfrastructure',
     'TechnicalFeedback', 'TechnicalAct', 'TechnicalPrinciple',
     'TechnicalStrategy', 'TechnicalFramework', 'TechnicalMechanism',
     'ProductionTechnicalObject', 'ConstitutiveTechnicalObject', 'Technique',
     'OperativeTechnique', 'ConstitutiveTechnique', 'TechnicalPurpose',
-    'TechnicalFunction', 'TechnicalArchitecture', 'TechnicalSpecification',
+    'TechnicalArchitecture', 'TechnicalSpecification',
     'TechnicalEvolution', 'TechnicalLabor', 'TechnicalInstitution',
     'TechnicalResearch', 'TechnicalCompetence', 'TechnicalFailure',
     'TechnicalRequirement', 'Verification', 'Maintenance', 'Security',
@@ -4041,6 +4044,31 @@ let silhouetteDirty = true;
 
 /* Pre-computed hulls: { colorIndex: [{x,y}, ...] } */
 let communityHulls = {};
+
+/* ═══════ DECK (WebGL) RENDER STATE ═══════ */
+/* deck.gl renders into #graph-canvas. Positions are static (read once from
+   layout.json); there is no live force simulation. Layers rebuild only when
+   graph/highlight/zoom state changes (dirty); the view is pushed every frame
+   from cam. Picking is GPU-side via SocioGraph.pickAt (hitTest delegates to it). */
+let deckInst = null, deckReady = false, currentLayers = [], dirty = false, lastZ = -1;
+function hexToRgb(h){ if(!h) return [136,136,136]; h = String(h).replace('#',''); if(h.length===3) h = h.replace(/(.)/g,'$1$1'); var n = parseInt(h,16); if(isNaN(n)) return [136,136,136]; return [(n>>16)&255, (n>>8)&255, n&255]; }
+function colorFor(nd){ return hexToRgb(getCategoryColor(nd.category)); }
+function _searchSet(){ var o={}; searchHighlightNodes.forEach(function(id){ o[id]=1; }); return o; }
+function rebuildLayers(){
+    var link = (linkMode && linkSourceNode) ? {
+        source: linkSourceNode.position,
+        target: (hoveredNode && hoveredNode !== linkSourceNode) ? hoveredNode.position : [mouseWorld.x, mouseWorld.y]
+    } : null;
+    currentLayers = SocioGraph.buildLayers(nodes, edges, nodeMap, {
+        z: cam.z,
+        hoveredId: hoveredNode && hoveredNode.id,
+        selectedId: selectedNode && selectedNode.id,
+        searchSet: _searchSet(),
+        colorFor: colorFor,
+        linkSourceId: linkSourceNode && linkSourceNode.id,
+        link: link
+    });
+}
 
 /* ═══════ LOCAL STORAGE PERSISTENCE ═══════ */
 const STORAGE_KEY_TOKEN = 'sociognosis-api-token';
@@ -5373,7 +5401,6 @@ function getArrayValues(field) {
 /* ═══════ CANVAS SETUP ═══════ */
 function setupCanvas() {
     canvas = document.getElementById('graph-canvas');
-    ctx = canvas.getContext('2d');
     mmCanvas = document.getElementById('minimap-canvas');
     mmCtx = mmCanvas.getContext('2d');
     resizeCanvas();
@@ -5382,9 +5409,6 @@ function setupCanvas() {
 function resizeCanvas() {
     const rect = canvas.parentElement.getBoundingClientRect();
     W = rect.width; H = rect.height;
-    canvas.width = W * devicePixelRatio;
-    canvas.height = H * devicePixelRatio;
-    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
     mmCanvas.width = 160 * devicePixelRatio;
     mmCanvas.height = 110 * devicePixelRatio;
     mmCtx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
@@ -5448,13 +5472,17 @@ function normalizeNode(d) {
 
 async function loadData() {
     try {
-        const res = await fetch('data/data.json');
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        data = await res.json();
+        const [dataArr, layoutRes] = await Promise.all([
+            CouchData.loadNodes(),
+            fetch('data/layout.json').catch(() => null)
+        ]);
+        data = dataArr;
         // Migrate legacy camelCase keys → new snake_case schema keys
         data.forEach(normalizeNode);
+        var layoutData = (layoutRes && layoutRes.ok) ? await layoutRes.json() : null;
+        if (!layoutData) console.warn('layout.json missing — run: python bin/layout.py. Using random fallback.');
     } catch (e) {
-        console.warn('Could not load data.json, using minimal Tecnica fallback', e);
+        console.warn('Could not load from CouchDB, using minimal Tecnica fallback', e);
         // Minimal Tecnica-shaped fallback so the editor stays usable if the
         // dataset cannot be fetched. Field shapes mirror app/data/schema/schema.json.
         data = [{
@@ -5475,10 +5503,10 @@ async function loadData() {
         }];
     }
     extractSuggestions();
-    initGraph();
+    initGraph(layoutData);
 }
 
-function initGraph() {
+function initGraph(layout) {
     nodes = [];
     edges = [];
     nodeMap = {};
@@ -5490,8 +5518,7 @@ function initGraph() {
         
         const node = {
             id: d.id, name: d.name, category: d.category,
-            x: (Math.random() - 0.5) * 600, y: (Math.random() - 0.5) * 600,
-            vx: 0, vy: 0, _data: d
+            x: 0, y: 0, vx: 0, vy: 0, _data: d
         };
         nodes.push(node);
         nodeMap[d.id] = node;
@@ -5513,11 +5540,16 @@ function initGraph() {
     
     updateStats();
     computeMetrics();
+    nodes.forEach(n => { n.degree = nodeDegrees[n.id] || 0; });
+
+    // Positions are precomputed — read once from layout.json (random-in-bounds fallback).
+    SocioGraph.seedPositions(nodes, layout || {}, null);
     silhouetteDirty = true;
 
-    // Settle the layout before fitting, then snap directly to the fit view
-    // so the initial frame is the macro "fit-all" view of the real graph.
-    warmupLayout(300);
+    if (!deckInst) deckInst = SocioGraph.createDeck({ canvasId: 'graph-canvas', width: W, height: H });
+    deckReady = true; dirty = true; lastZ = -1;
+
+    // Snap directly to the fit view so the initial frame frames the real graph.
     fitCamera(true);
 }
 
@@ -5963,19 +5995,9 @@ function drawMinimap() {
     mmCtx.strokeRect(vx1 * s + ox, vy1 * s + oy, (vx2 - vx1) * s, (vy2 - vy1) * s);
 }
 
-/* ═══════ HIT TESTING (degree-based radius) ═══════ */
+/* ═══════ HIT TESTING (GPU pick via deck) ═══════ */
 function hitTest(sx, sy) {
-    const wp = screenToWorld(sx, sy);
-    let best = null;
-    let bestD = Infinity;
-    nodes.forEach(n => {
-        const dx = n.x - wp.x, dy = n.y - wp.y, d2 = dx * dx + dy * dy;
-        const r = nodeRadius(n);
-        // Generous hit area: 1.5× radius (a little larger for easy targeting)
-        const hr = r * 1.5;
-        if (d2 < hr * hr && d2 < bestD) { bestD = d2; best = n; }
-    });
-    return best;
+    return deckReady ? SocioGraph.pickAt(deckInst, sx, sy) : null;
 }
 
 /* ═══════ CAMERA ═══════ */
@@ -6223,6 +6245,7 @@ async function selectNode(node) {
     }
 
     selectedNode = node;
+    dirty = true;
     const selChip = document.getElementById('selection-chip');
     const selName = node ? (node.name || node.id) : 'None';
     document.getElementById('selected-name').textContent = selName;
@@ -7078,8 +7101,10 @@ function fitToNode(node) {
 /* Mark graph metrics + silhouettes dirty — called on any structural change */
 function markGraphDirty() {
     computeMetrics();
+    nodes.forEach(n => { n.degree = nodeDegrees[n.id] || 0; });
     edgeWeights = null;
     silhouetteDirty = true;
+    dirty = true;
 }
 
 /* ═══════ SAVE & ADD NODE ═══════ */
@@ -7275,7 +7300,8 @@ function addNewNode() {
         references: []
     };
     data.push(newNodeData);
-    const node = { id: id, name: 'New Node', category: 'Reality', x: (Math.random() - 0.5) * 200, y: (Math.random() - 0.5) * 200, vx: 0, vy: 0, _data: newNodeData };
+    const _nx = (Math.random() - 0.5) * 200, _ny = (Math.random() - 0.5) * 200;
+    const node = { id: id, name: 'New Node', category: 'Reality', x: _nx, y: _ny, position: [_nx, _ny], vx: 0, vy: 0, degree: 0, _data: newNodeData };
     nodes.push(node); nodeMap[id] = node;
     selectNode(node); fitToNode(node); alpha = 1; updateStats();
     markGraphDirty();
@@ -7452,7 +7478,9 @@ async function handleSave() {
             });
         }
     } else {
-        // Fallback: download full JSON file
+        // @deprecated — save-to-file fallback. CouchDB (via the sync server
+        // /api/graph/save) is now the persistence backend; this branch only
+        // runs when no backend URL is configured. Slated for removal.
         saveJSON();
         clearDirtyState();
 
@@ -7466,6 +7494,8 @@ async function handleSave() {
     }
 }
 
+// @deprecated — save-to-file path. CouchDB is the backend now; this remains
+// only as an offline fallback / export. Slated for removal.
 function saveJSON() {
     const json = JSON.stringify(data, null, 2);
     const blob = new Blob([json], { type: 'application/json' });
@@ -7534,6 +7564,7 @@ function handleSearch(query) {
 
     // Reset highlights on every search
     searchHighlightNodes = new Set();
+    dirty = true;
 
     if (!query.trim()) {
         dropdown.classList.remove('open');
@@ -7623,6 +7654,7 @@ function toggleSearchMode() {
 function resetSelection() {
     selectNode(null);
     searchHighlightNodes = new Set();
+    dirty = true;
     searchMatchCount = 0;
     const searchInput = document.getElementById('search-input');
     if (searchInput) searchInput.value = '';
@@ -7775,7 +7807,7 @@ function setupEventHandlers() {
                 edges.push({ source: linkSourceNode.id, target: node.id, family: 'not_specified', type: 'not_specified', description: '' });
                 updateStats(); markGraphDirty(); if (selectedNode === linkSourceNode) renderForm(linkSourceNode._data);
             }
-            linkSourceNode = node;
+            linkSourceNode = node; dirty = true;
             document.getElementById('link-source-name').textContent = node.name || node.id;
         } else if (node) { draggedNode = node; canvas.style.cursor = 'grabbing'; }
         else { isPanning = true; panStart = { x: e.clientX - cam.x, y: e.clientY - cam.y }; canvas.style.cursor = 'grabbing'; }
@@ -7785,11 +7817,11 @@ function setupEventHandlers() {
         const rect = canvas.getBoundingClientRect();
         const sx = e.clientX - rect.left, sy = e.clientY - rect.top;
         mouseWorld = screenToWorld(sx, sy);
-        if (draggedNode) { draggedNode.x = mouseWorld.x; draggedNode.y = mouseWorld.y; draggedNode.vx = 0; draggedNode.vy = 0; }
+        if (draggedNode) { draggedNode.x = mouseWorld.x; draggedNode.y = mouseWorld.y; draggedNode.position = [mouseWorld.x, mouseWorld.y]; draggedNode.vx = 0; draggedNode.vy = 0; dirty = true; }
         else if (isPanning) { cam.x = e.clientX - panStart.x; cam.y = e.clientY - panStart.y; }
         else {
             const node = hitTest(sx, sy);
-            if (node !== hoveredNode) { hoveredNode = node; if (node) showTooltip(node, sx, sy); else hideTooltip(); }
+            if (node !== hoveredNode) { hoveredNode = node; dirty = true; if (node) showTooltip(node, sx, sy); else hideTooltip(); }
             else if (node) showTooltip(node, sx, sy);
             canvas.style.cursor = node ? 'pointer' : 'grab';
         }
@@ -7818,7 +7850,7 @@ function setupEventHandlers() {
     
     document.getElementById('fit-btn').addEventListener('click', fitCamera);
     document.getElementById('link-mode-btn').addEventListener('click', () => {
-        linkMode = !linkMode; linkSourceNode = linkMode ? selectedNode : null;
+        linkMode = !linkMode; linkSourceNode = linkMode ? selectedNode : null; dirty = true;
         const linkBtn = document.getElementById('link-mode-btn');
         linkBtn.classList.toggle('active', linkMode);
         linkBtn.setAttribute('aria-pressed', String(linkMode));
@@ -7969,7 +8001,7 @@ function setupEventHandlers() {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         if (e.key === 'f') fitCamera();
         if (e.key === 'l') {
-            linkMode = !linkMode; linkSourceNode = linkMode ? selectedNode : null;
+        linkMode = !linkMode; linkSourceNode = linkMode ? selectedNode : null; dirty = true;
             const linkBtnKey = document.getElementById('link-mode-btn');
             linkBtnKey.classList.toggle('active', linkMode);
             linkBtnKey.setAttribute('aria-pressed', String(linkMode));
@@ -7997,6 +8029,7 @@ function setupEventHandlers() {
         if (e.key === 'Escape') {
             // Unified reset: clear selection, search highlights, link mode, close all modals
             searchHighlightNodes = new Set();
+            dirty = true;
             searchMatchCount = 0;
             const searchInputEl = document.getElementById('search-input');
             if (searchInputEl) searchInputEl.value = '';
@@ -8042,10 +8075,13 @@ function setupEventHandlers() {
 
 /* ═══════ MAIN LOOP ═══════ */
 function animate() {
-    simulate();
-    // Refresh silhouettes periodically while layout is settling
-    if (alpha > 0.05 && Math.random() < 0.05) silhouetteDirty = true;
-    draw();
+    const now = performance.now();
+    updateCameraTween(now);
+    if (deckReady) {
+        if (dirty || cam.z !== lastZ) { rebuildLayers(); dirty = false; lastZ = cam.z; }
+        SocioGraph.setView(deckInst, currentLayers, cam, W, H);
+    }
+    drawMinimap();
     requestAnimationFrame(animate);
 }
 

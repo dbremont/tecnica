@@ -53,11 +53,12 @@
       "enum": [
         "Reality",
         "TechnicalDomain",
-        "TechnicalSystem",
+        "TechnicalElementSetModulo",
         "ActionInterfaceAndActuation",
         "ConcreteTechnicalArtifact",
         "TechnicalBlueprint",
         "TechnicalAgent",
+        "TechnicalPractice",
         "TechnicalActivity",
         "TechnicalStandard",
         "TechnicalConstraint",
@@ -74,7 +75,6 @@
         "OperativeTechnique",
         "ConstitutiveTechnique",
         "TechnicalPurpose",
-        "TechnicalFunction",
         "TechnicalArchitecture",
         "TechnicalSpecification",
         "TechnicalEvolution",
@@ -285,15 +285,15 @@
                   "category": {
                     "type": "string",
                     "enum": [
-                      "Reality", "TechnicalDomain", "TechnicalSystem",
+                      "Reality", "TechnicalDomain", "TechnicalElementSetModulo",
                       "ActionInterfaceAndActuation", "ConcreteTechnicalArtifact",
-                      "TechnicalBlueprint", "TechnicalAgent", "TechnicalActivity",
+                      "TechnicalBlueprint", "TechnicalAgent", "TechnicalPractice", "TechnicalActivity",
                       "TechnicalStandard", "TechnicalConstraint", "TechnicalInfrastructure",
                       "TechnicalFeedback", "TechnicalAct", "TechnicalPrinciple",
                       "TechnicalStrategy", "TechnicalFramework", "TechnicalMechanism",
                       "ProductionTechnicalObject", "ConstitutiveTechnicalObject", "Technique",
                       "OperativeTechnique", "ConstitutiveTechnique", "TechnicalPurpose",
-                      "TechnicalFunction", "TechnicalArchitecture", "TechnicalSpecification",
+                      "TechnicalArchitecture", "TechnicalSpecification",
                       "TechnicalEvolution", "TechnicalLabor", "TechnicalInstitution",
                       "TechnicalResearch", "TechnicalCompetence", "TechnicalFailure",
                       "TechnicalRequirement", "Verification", "Maintenance", "Security",
@@ -362,11 +362,12 @@
   "allOf": [
     { "if": { "properties": { "category": { "const": "Reality" } } }, "then": { "properties": { "particular_characterization": { "$ref": "#/$defs/RealitySpecific" } } } },
     { "if": { "properties": { "category": { "const": "TechnicalDomain" } } }, "then": { "properties": { "particular_characterization": { "$ref": "#/$defs/TechnicalDomainSpecific" } } } },
-    { "if": { "properties": { "category": { "const": "TechnicalSystem" } } }, "then": { "properties": { "particular_characterization": { "$ref": "#/$defs/TechnicalSystemSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalElementSetModulo" } } }, "then": { "properties": { "particular_characterization": { "$ref": "#/$defs/TechnicalElementSetModuloSpecific" } } } },
     { "if": { "properties": { "category": { "const": "ActionInterfaceAndActuation" } } }, "then": { "properties": { "particular_characterization": { "$ref": "#/$defs/ActionInterfaceAndActuationSpecific" } } } },
     { "if": { "properties": { "category": { "const": "ConcreteTechnicalArtifact" } } }, "then": { "properties": { "particular_characterization": { "$ref": "#/$defs/ConcreteTechnicalArtifactSpecific" } } } },
     { "if": { "properties": { "category": { "const": "TechnicalBlueprint" } } }, "then": { "properties": { "particular_characterization": { "$ref": "#/$defs/TechnicalBlueprintSpecific" } } } },
     { "if": { "properties": { "category": { "const": "TechnicalAgent" } } }, "then": { "properties": { "particular_characterization": { "$ref": "#/$defs/TechnicalAgentSpecific" } } } },
+    { "if": { "properties": { "category": { "const": "TechnicalPractice" } } }, "then": { "properties": { "particular_characterization": { "$ref": "#/$defs/TechnicalPracticeSpecific" } } } },
     { "if": { "properties": { "category": { "const": "TechnicalActivity" } } }, "then": { "properties": { "particular_characterization": { "$ref": "#/$defs/TechnicalActivitySpecific" } } } },
     { "if": { "properties": { "category": { "const": "TechnicalStandard" } } }, "then": { "properties": { "particular_characterization": { "$ref": "#/$defs/TechnicalStandardSpecific" } } } },
     { "if": { "properties": { "category": { "const": "TechnicalConstraint" } } }, "then": { "properties": { "particular_characterization": { "$ref": "#/$defs/TechnicalConstraintSpecific" } } } },
@@ -383,7 +384,6 @@
     { "if": { "properties": { "category": { "const": "OperativeTechnique" } } }, "then": { "properties": { "particular_characterization": { "$ref": "#/$defs/OperativeTechniqueSpecific" } } } },
     { "if": { "properties": { "category": { "const": "ConstitutiveTechnique" } } }, "then": { "properties": { "particular_characterization": { "$ref": "#/$defs/ConstitutiveTechniqueSpecific" } } } },
     { "if": { "properties": { "category": { "const": "TechnicalPurpose" } } }, "then": { "properties": { "particular_characterization": { "$ref": "#/$defs/TechnicalPurposeSpecific" } } } },
-    { "if": { "properties": { "category": { "const": "TechnicalFunction" } } }, "then": { "properties": { "particular_characterization": { "$ref": "#/$defs/TechnicalFunctionSpecific" } } } },
     { "if": { "properties": { "category": { "const": "TechnicalArchitecture" } } }, "then": { "properties": { "particular_characterization": { "$ref": "#/$defs/TechnicalArchitectureSpecific" } } } },
     { "if": { "properties": { "category": { "const": "TechnicalSpecification" } } }, "then": { "properties": { "particular_characterization": { "$ref": "#/$defs/TechnicalSpecificationSpecific" } } } },
     { "if": { "properties": { "category": { "const": "TechnicalEvolution" } } }, "then": { "properties": { "particular_characterization": { "$ref": "#/$defs/TechnicalEvolutionSpecific" } } } },
@@ -428,7 +428,7 @@
       },
       "additionalProperties": false
     },
-    "TechnicalSystemSpecific": {
+    "TechnicalElementSetModuloSpecific": {
       "type": "object",
       "required": ["constituentTechnicalElement", "productSpace", "problemSpace"],
       "properties": {
@@ -490,6 +490,20 @@
         "decisionRights": { "type": "string", "description": "The scope and bounds of decisions the agent may make autonomously." },
         "certifications": { "type": "array", "items": { "type": "string" }, "description": "Formal qualifications or credentials attesting to the agent's competence." },
         "experienceLevel": { "type": "string", "description": "The degree of expertise or seasoning possessed by the agent." }
+      },
+      "additionalProperties": false
+    },
+    "TechnicalPracticeSpecific": {
+      "type": "object",
+      "required": ["practiceType", "governingActivities", "embodiedPrinciples"],
+      "properties": {
+        "practiceType": { "type": "string", "enum": ["development", "operations", "quality", "manufacturing", "governance", "other"], "description": "The kind of practice—development, operations, quality, manufacturing, governance, or other." },
+        "governingActivities": { "type": "array", "items": { "type": "string" }, "description": "The coordinated set of Technical Activities the practice prescribes for approaching a class of technical problems." },
+        "embodiedPrinciples": { "type": "array", "items": { "type": "string" }, "description": "The accumulated Techniques, Principles, Standards, and supporting knowledge the practice mobilizes." },
+        "supportingTools": { "type": "array", "items": { "type": "string" }, "description": "The tooling through which the practice is operationalized." },
+        "repeatabilityMechanism": { "type": "string", "description": "How the pattern is made repeatable and consistent across multiple projects or operational contexts." },
+        "applicabilityScope": { "type": "string", "description": "The class of technical problems, projects, or contexts to which the practice applies." },
+        "outcomeProfile": { "type": "string", "description": "The typical outcomes the practice yields—e.g., reliability, efficiency, quality, traceability." }
       },
       "additionalProperties": false
     },
@@ -742,16 +756,6 @@
         "motivationSource": { "type": "string", "description": "The origin from which the purpose arises." },
         "scopeOfImpact": { "type": "string", "description": "The breadth of the intended effects." },
         "temporalHorizon": { "type": "string", "description": "The timeframe over which the purpose is pursued." }
-      },
-      "additionalProperties": false
-    },
-    "TechnicalFunctionSpecific": {
-      "type": "object",
-      "required": ["inputOutputMapping", "physicalLaw", "abstractionLevel"],
-      "properties": {
-        "inputOutputMapping": { "type": "string", "description": "How inputs are transformed into outputs by the function." },
-        "physicalLaw": { "type": "string", "description": "The underlying physical or logical law governing the function." },
-        "abstractionLevel": { "type": "string", "description": "The level of abstraction at which the function is described." }
       },
       "additionalProperties": false
     },

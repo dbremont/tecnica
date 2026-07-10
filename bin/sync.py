@@ -1,37 +1,43 @@
 #!/usr/bin/env python3
 """
-Minimal sync server for the Tecnia Editor.
+Sync server for the Tecnica Editor.
 
-Serves static files from the root directory inferred from the data file
-and persists JSON sync POST requests to that data file.
+Serves the static app/ files and proxies graph saves to CouchDB.
+
+  - GET  /api/health        -> pings CouchDB, reports db + doc count.
+  - POST /api/graph/save    -> upserts the patch {nodes, timestamp} into
+                               CouchDB via _bulk_docs (server resolves _rev).
+
+CouchDB connection is read from .env (see bin/envutil.py). No file is written —
+the old save-to-data.json code path has been removed; CouchDB is the backend.
 
 Usage:
 
-    python bin/sync.py \
-        --data-file docs/data/index/data.json
+    python bin/sync.py
+    python bin/sync.py --root . --port 8000
 
-In the editor's Settings → "Backend Sync" → "Backend Save URL", enter:
+In the editor's Settings -> "Backend Sync" -> "Backend Save URL", enter:
 
     http://localhost:8000/api/graph/save
 """
 
 import argparse
 import json
-import os
 import sys
-import tempfile
 from functools import partial
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import couchdb_client  # noqa: E402
+import envutil  # noqa: E402
 
 SAVE_ENDPOINT = "/api/graph/save"
 HEALTH_ENDPOINT = "/api/health"
 
 
 class SyncHandler(SimpleHTTPRequestHandler):
-    """Serves static files and handles graph save requests."""
-
-    data_file = None
+    """Serves static files and proxies graph save requests to CouchDB."""
 
     # ------------------------------------------------------------------
     # CORS
@@ -67,19 +73,36 @@ class SyncHandler(SimpleHTTPRequestHandler):
         super().do_GET()
 
     def _handle_health(self):
-        exists = self.data_file.exists()
+        cfg = envutil.couch()
+        client = couchdb_client.Client(cfg)
+
+        couch_ok = False
+        version = None
+        try:
+            status, body = client.get(cfg.url + "/")
+            couch_ok = status == 200
+            if isinstance(body, dict):
+                version = body.get("version")
+        except Exception as exc:
+            version = "error: %s" % exc
+
+        doc_count = None
+        try:
+            status, body = client.get(cfg.db_url)
+            if status == 200 and isinstance(body, dict):
+                doc_count = body.get("doc_count")
+        except Exception:
+            pass
 
         self._send_json(
             {
-                "status": "ok",
-                "service": "sociognosis-sync",
-                "data_file": str(self.data_file),
-                "data_file_exists": exists,
-                "data_file_size": (
-                    self.data_file.stat().st_size
-                    if exists
-                    else None
-                ),
+                "status": "ok" if couch_ok else "degraded",
+                "service": "tecnica-sync",
+                "couchdb_url": cfg.url,
+                "couchdb_version": version,
+                "couchdb_ok": couch_ok,
+                "database": cfg.db,
+                "doc_count": doc_count,
             }
         )
 
@@ -107,82 +130,33 @@ class SyncHandler(SimpleHTTPRequestHandler):
                 self._send_json({"status": "ok", "saved": 0})
                 return
 
-            with open(self.data_file, "r", encoding="utf-8") as fh:
-                data = json.load(fh)
-
-            id_index = {
-                node["id"]: i
-                for i, node in enumerate(data)
-                if isinstance(node, dict) and "id" in node
-            }
-
-            saved = 0
-
-            for node in changed:
-                if not isinstance(node, dict):
-                    continue
-
-                node_id = node.get("id")
-                if not node_id:
-                    continue
-
-                if node_id in id_index:
-                    data[id_index[node_id]] = node
-                else:
-                    id_index[node_id] = len(data)
-                    data.append(node)
-
-                saved += 1
-
-            self.data_file.parent.mkdir(
-                parents=True,
-                exist_ok=True,
-            )
-
-            tmp_fd, tmp_path = tempfile.mkstemp(
-                suffix=".tmp",
-                dir=str(self.data_file.parent),
-            )
-
-            try:
-                with os.fdopen(
-                    tmp_fd,
-                    "w",
-                    encoding="utf-8",
-                ) as fh:
-                    json.dump(
-                        data,
-                        fh,
-                        indent=2,
-                        ensure_ascii=False,
-                    )
-
-                os.replace(tmp_path, self.data_file)
-                os.chmod(self.data_file, 0o644) # Only the owner to write (usually safer).
-
-            except Exception:
-                try:
-                    os.unlink(tmp_path)
-                except OSError:
-                    pass
-                raise
+            result = couchdb_client.bulk_upsert(changed)
 
             self._send_json(
                 {
                     "status": "ok",
-                    "saved": saved,
-                    "timestamp": patch.get(
-                        "timestamp",
-                        "",
-                    ),
+                    "saved": result["ok"],
+                    "new": result["new"],
+                    "updated": result["updated"],
+                    "errors": result["errors"],
+                    "timestamp": patch.get("timestamp", ""),
                 }
+            )
+
+        except couchdb_client.CouchError as exc:
+            self._send_json(
+                {
+                    "status": "error",
+                    "message": str(exc),
+                },
+                502,
             )
 
         except json.JSONDecodeError as exc:
             self._send_json(
                 {
                     "status": "error",
-                    "message": f"Invalid JSON: {exc}",
+                    "message": "Invalid JSON: %s" % exc,
                 },
                 400,
             )
@@ -218,22 +192,23 @@ class SyncHandler(SimpleHTTPRequestHandler):
 
     def log_message(self, fmt, *args):
         sys.stderr.write(
-            f"[sync] {self.address_string()} - {fmt % args}\n"
+            "[sync] %s - %s\n" % (self.address_string(), fmt % args)
         )
 
 
 def main():
     parser = argparse.ArgumentParser(
         prog="sync.py",
-        description=(
-            "Minimal sync server for the Sociognosis Editor."
-        ),
+        description="Tecnica sync server (static + CouchDB proxy).",
     )
 
+    here = Path(__file__).resolve().parent
+    repo = here.parent
+
     parser.add_argument(
-        "--data-file",
-        required=True,
-        help="Path to the graph JSON file.",
+        "--root",
+        default=str(repo),
+        help="Directory to serve static files from (default: repo root).",
     )
 
     parser.add_argument(
@@ -252,18 +227,16 @@ def main():
 
     args = parser.parse_args()
 
-    data_file = Path(args.data_file).resolve()
+    root_dir = Path(args.root).resolve()
 
-    if not data_file.exists():
+    if not root_dir.exists():
         print(
-            f"WARNING: data file not found: {data_file}",
+            "ERROR: static root not found: %s" % root_dir,
             file=sys.stderr,
         )
+        return 1
 
-    # docs/data/index/data.json -> docs/
-    root_dir = data_file.parents[2]
-
-    SyncHandler.data_file = data_file
+    cfg = envutil.couch()
 
     handler = partial(
         SyncHandler,
@@ -282,13 +255,15 @@ def main():
     )
 
     print("══════════════════════════════════════════════")
-    print("  Sociognosis Sync Server")
+    print("  Tecnica Sync Server (CouchDB backend)")
     print("──────────────────────────────────────────────")
+    print("  Root:    %s" % root_dir)
+    print("  CouchDB: %s/%s" % (cfg.url, cfg.db))
     print(
-        f"  Save:    http://{display_host}:{args.port}{SAVE_ENDPOINT}"
+        "  Save:    http://%s:%d%s" % (display_host, args.port, SAVE_ENDPOINT)
     )
     print(
-        f"  Health:  http://{display_host}:{args.port}{HEALTH_ENDPOINT}"
+        "  Health:  http://%s:%d%s" % (display_host, args.port, HEALTH_ENDPOINT)
     )
     print("══════════════════════════════════════════════")
     print()
@@ -302,4 +277,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

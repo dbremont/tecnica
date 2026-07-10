@@ -484,7 +484,7 @@
     "name": "Technical Infrastructure",
     "layer": "Capability Space",
     "category": "TechnicalInfrastructure",
-    "short_description": "Ambient capital\u2014material, energetic, informational, institutional\u2014that makes sustained technical practice possible.",
+    "short_description": "Ambient capital—material, energetic, informational, institutional—that makes sustained technical practice possible.",
     "long_description": "",
     "interface_specification": "",
     "operation": "",
@@ -1162,9 +1162,9 @@
     "layer": "Problem Space",
     "category": "TechnicalPurpose",
     "short_description": "Teleological orientation of an artifact or process; the intended ultimate impact on reality, human experience, or a broader system.",
-    "long_description": "Technical Purpose defines the 'why' behind any technical endeavor. It is the desired end state or value that motivates design, production, and deployment. Distinct from mechanistic function, purpose anchors the system\u2019s raison d\u2019\u00eatre, aligning stakeholder expectations, success criteria, and ethical considerations. Every technical system, artifact, or process is ultimately judged by whether it fulfills its intended purpose in its operational environment.",
+    "long_description": "Technical Purpose defines the 'why' behind any technical endeavor. It is the desired end state or value that motivates design, production, and deployment. Distinct from mechanistic function, purpose anchors the system’s raison d’être, aligning stakeholder expectations, success criteria, and ethical considerations. Every technical system, artifact, or process is ultimately judged by whether it fulfills its intended purpose in its operational environment.",
     "interface_specification": "Provides a directive that guides all other technical elements (requirements, functions, architectures). Stakeholders interact with purpose through goal definition and validation.",
-    "operation": "Not directly operational; purpose is invoked during design, trade\u2011off analysis, and post\u2011deployment evaluation to decide whether the system is achieving its intended effect.",
+    "operation": "Not directly operational; purpose is invoked during design, trade‑off analysis, and post‑deployment evaluation to decide whether the system is achieving its intended effect.",
     "functional_role_set": [
       "Goal setting",
       "Value definition",
@@ -1242,67 +1242,11 @@
         "description": "Techniques for integrating human values into technical purpose."
       },
       {
-        "title": "The Structure of Technical Practice \u2013 A Teleological Framework",
+        "title": "The Structure of Technical Practice – A Teleological Framework",
         "description": "Explains how purpose drives the entire technical practice cycle."
       }
     ],
     "type_hierarchy_level": 1
-  },
-  {
-    "id": "technical_function_001",
-    "name": "Technical Function",
-    "layer": "Artifact Space",
-    "category": "TechnicalFunction",
-    "short_description": "Objective mechanistic input-output relationship of an artifact or system, abstracted from ultimate purpose.",
-    "long_description": "",
-    "interface_specification": "",
-    "operation": "",
-    "functional_role_set": [
-      "State transformation",
-      "Abstraction",
-      "Composition"
-    ],
-    "implementation_specification": "",
-    "scope_specification": "",
-    "limitation_set": [],
-    "lifecycle": "",
-    "failure_mode_specification": [],
-    "resource_use": "",
-    "relationship_set": [
-      {
-        "relationshipFamily": "TeleologicalAndFunctional",
-        "relationshipType": "EMBODIES",
-        "targetNodeId": "technical_purpose_001",
-        "description": "Function embodies purpose"
-      }
-    ],
-    "evolution_history": {
-      "summary": "Central to functional decomposition in engineering design.",
-      "chronology": [
-        {
-          "year": 1960,
-          "event": "Function structures in design methodology",
-          "associatedContext": "Systematic design"
-        }
-      ]
-    },
-    "particular_characterization": {
-      "inputOutputMapping": "Torque in -> rotation out",
-      "physicalLaw": "Newton's laws of motion",
-      "abstractionLevel": "Subsystem"
-    },
-    "metadata": {
-      "tags": [
-        "function",
-        "mapping"
-      ],
-      "confidenceScore": 0.97,
-      "sourceReference": "Philosophia Artium Technicarum",
-      "createdAt": "2025-01-15T00:00:00Z",
-      "auditTrail": []
-    },
-    "references": [],
-    "type_hierarchy_level": 0
   },
   {
     "id": "architecture_001",
@@ -1991,7 +1935,7 @@
     "name": "Resource",
     "layer": "Problem Space",
     "category": "Resource",
-    "short_description": "Consumable or non-consumable inputs\u2014matter, energy, information, time, capital\u2014required, transformed, or consumed by technical practice.",
+    "short_description": "Consumable or non-consumable inputs—matter, energy, information, time, capital—required, transformed, or consumed by technical practice.",
     "long_description": "",
     "interface_specification": "",
     "operation": "",
@@ -2103,8 +2047,8 @@
     "name": "Data Management System (DMS)",
     "layer": "Capability Space",
     "category": "TechnicalFramework",
-    "short_description": "Software systems that manage the lifecycle of digital data, including ingestion, storage, processing, and retrieval, implemented entirely in software (not hardware\u2010only solutions).",
-    "long_description": "Software data systems encompass all software\u2010based solutions for handling data \u2013 from local file managers to distributed processing frameworks (e.g., Apache Spark). They operate on general\u2010purpose computing hardware and are defined by code, algorithms, and protocols. This excludes purely mechanical or analog systems. Examples include DBMSs, data lakes, streaming engines, and message brokers.",
+    "short_description": "Software systems that manage the lifecycle of digital data, including ingestion, storage, processing, and retrieval, implemented entirely in software (not hardware‐only solutions).",
+    "long_description": "Software data systems encompass all software‐based solutions for handling data – from local file managers to distributed processing frameworks (e.g., Apache Spark). They operate on general‐purpose computing hardware and are defined by code, algorithms, and protocols. This excludes purely mechanical or analog systems. Examples include DBMSs, data lakes, streaming engines, and message brokers.",
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -2126,7 +2070,7 @@
       "chronology": [
         {
           "year": 1960,
-          "event": "Integrated Data Store (IDS) \u2013 first network DBMS",
+          "event": "Integrated Data Store (IDS) – first network DBMS",
           "associatedContext": "Early general-purpose database systems"
         },
         {
@@ -2147,7 +2091,7 @@
       ]
     },
     "particular_characterization": {
-      "infrastructureType": "Informational infrastructure \u2013 software and hardware for data lifecycle management",
+      "infrastructureType": "Informational infrastructure – software and hardware for data lifecycle management",
       "storageMechanism": "Hierarchical (file systems), block-level (SAN), object storage (S3), and structured (tables, documents, graphs)",
       "communicationMode": "Network protocols: JDBC/ODBC, RESTful APIs, gRPC, message queues (Kafka, RabbitMQ), streaming (WebSockets, MQTT)"
     },
@@ -2173,7 +2117,7 @@
     "layer": "Artifact Space",
     "category": "TechnicalFramework",
     "short_description": "A specialized class of data systems that provides structured, persistent, and transactional storage with a formal data model (e.g., relational, document, graph). Database systems expose query languages, indexing mechanisms, concurrency control, and recovery protocols to ensure reliable access and manipulation of data by multiple agents.",
-    "long_description": "Database systems are the canonical implementation of the broader concept of data systems. They are characterized by a schema\u2011driven organization, ACID or BASE consistency guarantees, and a dedicated query processor (e.g., SQL engine). Examples include relational database management systems (PostgreSQL, MySQL), document stores (MongoDB), key\u2011value stores (Redis), and graph databases (Neo4j). Database systems serve as constitutive technical objects in larger software architectures, localizing the function of persistent state management. Their evolution moved from hierarchical (IMS) and network (IDS) models to the relational dominance (1970s\u20132000s) and then to polyglot persistence (2010s\u2013present). They are governed by standards such as SQL (ISO/IEC 9075) and principles like the CAP theorem.",
+    "long_description": "Database systems are the canonical implementation of the broader concept of data systems. They are characterized by a schema‑driven organization, ACID or BASE consistency guarantees, and a dedicated query processor (e.g., SQL engine). Examples include relational database management systems (PostgreSQL, MySQL), document stores (MongoDB), key‑value stores (Redis), and graph databases (Neo4j). Database systems serve as constitutive technical objects in larger software architectures, localizing the function of persistent state management. Their evolution moved from hierarchical (IMS) and network (IDS) models to the relational dominance (1970s–2000s) and then to polyglot persistence (2010s–present). They are governed by standards such as SQL (ISO/IEC 9075) and principles like the CAP theorem.",
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -2181,7 +2125,7 @@
       "transactional ACID compliance",
       "declarative query execution",
       "index-based fast retrieval",
-      "multi\u2011user concurrency control"
+      "multi‑user concurrency control"
     ],
     "implementation_specification": "",
     "scope_specification": "",
@@ -2207,7 +2151,7 @@
         },
         {
           "year": 1979,
-          "event": "Oracle V2 \u2013 first commercial relational database",
+          "event": "Oracle V2 – first commercial relational database",
           "associatedContext": "Rise of relational DBMS industry"
         },
         {
@@ -2218,12 +2162,12 @@
         {
           "year": 2000,
           "event": "Emergence of NoSQL databases (CouchDB, MongoDB)",
-          "associatedContext": "Response to web-scale and schema\u2011flexible needs"
+          "associatedContext": "Response to web-scale and schema‑flexible needs"
         }
       ]
     },
     "particular_characterization": {
-      "topology": "Client\u2011server; optionally distributed (shared\u2011nothing, sharded, replicated) or embedded (SQLite)",
+      "topology": "Client‑server; optionally distributed (shared‑nothing, sharded, replicated) or embedded (SQLite)",
       "decompositionStyle": "Modular: query parser, optimizer, executor, storage engine, transaction manager, log manager",
       "interfaceProtocol": "SQL over TCP (e.g., PostgreSQL wire protocol, MySQL protocol); HTTP/REST for document stores (MongoDB API); binary protocols (Redis RESP)"
     },
@@ -2249,8 +2193,8 @@
     "name": "Technical Problem",
     "layer": "Problem Space",
     "category": "TechnicalProblem",
-    "short_description": "A structured discrepancy between a current or projected state of Reality and a desired Technical Function, Specification, or Purpose. It defines the precise boundary of necessary intervention\u2014arising from an unmet Technical Requirement, a Technical Failure, or the friction of Technical Constraints\u2014and serves as the primary catalyst that compels a Technical Agent to initiate a Technical Process.",
-    "long_description": "Within technical practice, a problem is not merely an obstacle but a formalized gap\u2014a measurable distance between an observed or anticipated state and a target condition expressed as a requirement, function, or purpose. Problems initiate the entire technical workflow: they are framed, analyzed, and resolved through processes that consume resources, apply techniques, and produce artifacts. Problems are always situated in a reality domain, bounded by constraints, and often signaled by feedback or failure. The classification of a problem (performance, reliability, safety, etc.) determines which strategies, standards, and verification methods become relevant.",
+    "short_description": "A structured discrepancy between a current or projected state of Reality and a desired Technical Function, Specification, or Purpose. It defines the precise boundary of necessary intervention—arising from an unmet Technical Requirement, a Technical Failure, or the friction of Technical Constraints—and serves as the primary catalyst that compels a Technical Agent to initiate a Technical Process.",
+    "long_description": "Within technical practice, a problem is not merely an obstacle but a formalized gap—a measurable distance between an observed or anticipated state and a target condition expressed as a requirement, function, or purpose. Problems initiate the entire technical workflow: they are framed, analyzed, and resolved through processes that consume resources, apply techniques, and produce artifacts. Problems are always situated in a reality domain, bounded by constraints, and often signaled by feedback or failure. The classification of a problem (performance, reliability, safety, etc.) determines which strategies, standards, and verification methods become relevant.",
     "interface_specification": "",
     "operation": "",
     "functional_role_set": [
@@ -2282,13 +2226,13 @@
         "relationshipFamily": "TELEOLOGICAL_AND_FUNCTIONAL",
         "relationshipType": "SATISFIES",
         "targetNodeId": "technical-requirement-concept",
-        "description": "A problem arises when a requirement is not met (unmet need, out\u2011of\u2011spec condition). The gap between desired (requirement) and actual is the problem."
+        "description": "A problem arises when a requirement is not met (unmet need, out‑of‑spec condition). The gap between desired (requirement) and actual is the problem."
       },
       {
         "relationshipFamily": "TEMPORAL_AND_EVOLUTIONARY",
         "relationshipType": "EVOLVES_FROM",
         "targetNodeId": "prior-problem-concept",
-        "description": "Problems evolve as solutions create new constraints or as systems scale; today's resolved problem may become tomorrow's sub\u2011problem or a new problem in a different context."
+        "description": "Problems evolve as solutions create new constraints or as systems scale; today's resolved problem may become tomorrow's sub‑problem or a new problem in a different context."
       },
       {
         "relationshipFamily": "AGENTIC_AND_OPERATIVE",
@@ -2298,7 +2242,7 @@
       }
     ],
     "evolution_history": {
-      "summary": "The explicit formalization of 'technical problem' emerged with systems engineering and operations research in the mid\u201120th century, though problem\u2011solving has been implicit in craft and engineering since antiquity. Key developments include the articulation of problem statements in requirements engineering (1960s\u201370s), the rise of structured problem\u2011solving methodologies like TRIZ (1956) and A3 problem\u2011solving (1980s), and contemporary integration into agile and DevOops frameworks where problems are captured as issues, tickets, or user stories.",
+      "summary": "The explicit formalization of 'technical problem' emerged with systems engineering and operations research in the mid‑20th century, though problem‑solving has been implicit in craft and engineering since antiquity. Key developments include the articulation of problem statements in requirements engineering (1960s–70s), the rise of structured problem‑solving methodologies like TRIZ (1956) and A3 problem‑solving (1980s), and contemporary integration into agile and DevOops frameworks where problems are captured as issues, tickets, or user stories.",
       "chronology": [
         {
           "year": 1956,
@@ -2344,7 +2288,7 @@
         "alternativeCategories": []
       },
       "confidenceScore": 0.95,
-      "sourceReference": "Derived from 'Technical Problem' row in the concept table provided in the specification, with additional synthesis from systems engineering literature and problem\u2011framing methodologies (TRIZ, A3, ISO 9001:2015 clause 10.2).",
+      "sourceReference": "Derived from 'Technical Problem' row in the concept table provided in the specification, with additional synthesis from systems engineering literature and problem‑framing methodologies (TRIZ, A3, ISO 9001:2015 clause 10.2).",
       "createdAt": "2025-03-15T10:30:00Z",
       "auditTrail": [
         {
@@ -2358,29 +2302,43 @@
   },
   {
     "id": "technical-architecture-concurrent-hashmap-design-implementation",
-    "name": "Concurrent Hashmap Design & Implementation",
+    "name": "Concurrent Hashmap",
     "layer": "Artifact Space",
-    "category": "TechnicalArchitecture",
-    "short_description": "A technical architecture and implementation strategy for enabling safe, scalable, and performant concurrent access to associative key-value data structures across multiple execution agents or threads.",
-    "long_description": "Concurrent Hashmap Design & Implementation refers to the architectural organization, synchronization strategy, memory coordination model, and operational mechanisms used to construct hash-based key-value stores capable of supporting simultaneous read and write operations by multiple concurrent execution contexts. The concept exists at the intersection of systems programming, runtime engineering, synchronization theory, memory consistency semantics, and scalable software architecture. The architecture typically decomposes the hashmap into buckets, shards, segments, lock domains, or lock-free regions to minimize contention while preserving correctness guarantees such as linearizability, sequential consistency, or eventual visibility. Implementation techniques include coarse-grained locking, striped locking, segmented locking, compare-and-swap (CAS), read-copy-update (RCU), hazard pointers, epoch-based reclamation, software transactional memory, and lock-free probing algorithms. The architecture must negotiate multiple technical constraints simultaneously: cache coherence traffic, false sharing, memory fragmentation, synchronization overhead, resizing complexity, ABA hazards, latency amplification under contention, and memory ordering guarantees imposed by hardware architectures. Concurrent hashmaps function as critical infrastructural components in operating systems, databases, distributed systems, language runtimes, web servers, schedulers, caches, telemetry systems, and message brokers. The design space evolved historically from simple mutex-protected maps toward NUMA-aware, lock-free, wait-free, and highly parallel data structures optimized for multicore processors and high-throughput workloads.",
-    "interface_specification": "",
-    "operation": "",
+    "category": "ConstitutiveTechnicalObject",
+    "short_description": "A thread-safe key-value storage component designed for concurrent access across multiple execution contexts, used as a building block in larger systems requiring efficient shared-state management.",
+    "long_description": "This component is a concurrent hashmap: an associative data structure that supports simultaneous read and write operations by multiple threads without external synchronization. It serves as a shared mutable state container inside software systems where many agents need to store, retrieve, and update structured key-value pairs concurrently. The component encapsulates concurrency control mechanisms (segmented locking, lock-free algorithms, or read-copy-update) and memory management to provide thread-safe operations (put, get, delete) with strong consistency guarantees. As a constitutive technical object, it is integrated into larger systems such as application servers, database engines, caching layers, and runtime environments, where it fulfills the localized function of high-throughput, low-latency associative storage.",
+    "interface_specification": "The component exposes a thread-safe associative interface: put(key, value) → void, get(key) → value|nullable, delete(key) → boolean. Optionally includes putIfAbsent, compute, replace, clear, size, isEmpty, and iteration with weak consistency. All operations are atomic and visibility-guaranteed according to the underlying memory ordering model. Internal synchronization is fully encapsulated; callers do not manage locks.",
+    "operation": "On put(key, value), the hash function maps the key to an internal segment or bucket. The associated synchronization domain is acquired. The entry is inserted or updated, then memory ordering is enforced to ensure visibility to subsequent operations. Get operations use only read-side synchronization. Write operations may trigger resizing, executed incrementally to minimize latency spikes.",
     "functional_role_set": [
       "Concurrent key-value storage",
-      "Synchronization of shared mutable state",
+      "Synchronized shared mutable state",
       "Low-latency associative lookup under contention",
-      "Scalable concurrent data access",
       "Thread-safe mutation coordination",
       "Runtime caching infrastructure",
-      "Memory-efficient parallel indexing",
-      "State sharing across execution agents"
+      "State sharing across execution agents",
+      "Memory-efficient parallel indexing"
     ],
-    "implementation_specification": "",
-    "scope_specification": "",
-    "limitation_set": [],
-    "lifecycle": "",
-    "failure_mode_specification": [],
-    "resource_use": "",
+    "implementation_specification": "Composed of a hash function (e.g., MurmurHash, xxHash) mapping keys to bucket indices; a concurrency control layer (e.g., striped locking, lock-free open addressing with CAS, or RCU); and a storage layer (closed-addressing with linked-list chains or open-addressing with probing sequences). Memory reclamation uses hazard pointers or epoch-based reclamation. Resizing is incremental or background-thread-based to avoid long pauses.",
+    "scope_specification": "Applicable wherever multiple execution contexts (threads, fibers) share mutable key-value state. Typical domains: multi-threaded application servers, in-memory caches, database buffer pools, OS kernel modules, real-time trading systems, web load balancers, parallel processing frameworks. Not suitable for extremely high write contention – append-only logs or disjoint partitioning are more effective. Best performance with uniform key distribution and concurrency granularity matching hardware cores. Works on x86, ARM, RISC-V with proper memory fences.",
+    "limitation_set": [
+      "Memory overhead higher than non-concurrent hashmap due to synchronization metadata and alignment padding",
+      "Resizing can cause latency spikes in blocking implementations",
+      "Lock-free algorithms require careful correctness verification and may exhibit performance cliffs under specific contention patterns",
+      "NUMA-unaware designs suffer cross-socket memory access penalties",
+      "Iterator consistency is typically weak (snapshot or weakly consistent)",
+      "Atomic compound operations (e.g., computeIfAbsent) add implementation complexity"
+    ],
+    "lifecycle": "Creation: allocate backing array, initialize segment locks or synchronization structures, configure concurrency level and load factor. Operation: accept read/write calls; perform resizing when occupancy exceeds threshold. Maintenance: rehashing under load factor adjustments; periodic compaction in open-addressing designs; safe reclamation of retired entries. Shutdown: drain operations, deallocate memory, release locks (if supported).",
+    "failure_mode_specification": [
+      "Deadlock if lock ordering violated (e.g., nested locking across multiple hashmaps)",
+      "Livelock in lock-free retry loops under high contention",
+      "ABA problem in lock-free list implementations if not mitigated by tagged pointers or hazard pointers",
+      "Memory corruption from race conditions in reclamation (use-after-free)",
+      "Performance degradation under adversarial hash collisions (attacker-controlled keys)",
+      "Unbounded memory growth if deletion fails to reclaim entries",
+      "Inconsistent iteration if mutations occur during traversal without snapshot semantics"
+    ],
+    "resource_use": "Memory: per-entry storage (key+value+pointers), synchronization overhead (locks, cache-line padding, epoch records), backing array (power-of-two sized). CPU: hash computation, memory fences, CAS instructions, cache-miss penalties. Bandwidth: cache-coherence traffic from invalidation of shared lines under contention. Time: operation latency tens of nanoseconds (uncontended read) to microseconds (CAS retries with remote access).",
     "relationship_set": [
       {
         "relationshipFamily": "TELEOLOGICAL_AND_FUNCTIONAL",
@@ -2462,12 +2420,12 @@
       }
     ],
     "evolution_history": {
-      "summary": "Concurrent hashmap architectures evolved alongside multicore computing, synchronization theory, and scalable systems engineering. Early approaches relied on global locks, while later architectures introduced segmented locking, non-blocking synchronization, and cache-aware designs.",
+      "summary": "Concurrent hashmap architectures evolved alongside multicore computing and synchronization theory. Early designs used global locks; later introduced segmented locking, non-blocking algorithms, and cache-aware structures.",
       "chronology": [
         {
           "year": 1970,
           "event": "Introduction of shared-memory synchronization primitives in operating systems",
-          "associatedContext": "Early concurrent systems and multiprocessing research"
+          "associatedContext": "Early concurrent systems research"
         },
         {
           "year": 1986,
@@ -2481,20 +2439,24 @@
         },
         {
           "year": 2011,
-          "event": "Modern memory model standardization influences concurrent hashmap implementation semantics",
-          "associatedContext": "C++11 and Java Memory Model adoption"
+          "event": "Modern memory model standardization influences concurrent hashmap semantics",
+          "associatedContext": "C++11 and Java Memory Model"
         },
         {
           "year": 2020,
-          "event": "NUMA-aware and lock-free hashmap implementations optimized for high-core-count processors",
+          "event": "NUMA-aware and lock-free hashmap implementations for high-core-count processors",
           "associatedContext": "Cloud-scale infrastructure and multicore scalability"
         }
       ]
     },
     "particular_characterization": {
-      "topology": "Partitioned hash bucket topology with synchronization domains distributed across buckets, shards, or lock-free regions",
-      "decompositionStyle": "Concurrent decomposition into hash computation, bucket management, synchronization control, memory reclamation, resizing coordination, and contention mitigation subsystems",
-      "interfaceProtocol": "Thread-safe associative operations including insert, lookup, update, remove, iteration, resize coordination, and atomic synchronization semantics"
+      "componentType": "Thread-safe associative data structure (concurrent hashmap)",
+      "parentSystem": "Application server, database engine, caching layer, runtime environment, OS kernel",
+      "localFunction": "Provide high-throughput, low-latency concurrent key-value storage with encapsulated synchronization",
+      "integrationRequirements": "Must be linked into a multi-threaded execution environment; requires a memory model with proper ordering visibility (e.g., sequential consistency on x86 with appropriate fences); callers must ensure no external deadlock or atomicity violations",
+      "manufacturingMethod": "Compiled from source code (e.g., Java, C++, Go) following the design blueprint; may be assembled from pre-existing libraries or hand-optimized for specific hardware",
+      "toleranceRequirements": "Must guarantee correctness under all interleavings; acceptable performance degradation determined by spec (e.g., < 5% throughput loss per additional thread on NUMA); memory consumption within 2x of non-concurrent variant",
+      "replaceability": "Replaceable by any other concurrent hashmap implementation offering the same interface and consistency guarantees; substitution may affect performance and memory characteristics"
     },
     "metadata": {
       "tags": [
@@ -2509,36 +2471,33 @@
         "memory-models",
         "data-structures",
         "cache-coherence",
-        "thread-safety"
+        "thread-safety",
+        "constitutive-technical-object",
+        "component"
       ],
       "categoryAmbiguity": {
-        "isAmbiguous": true,
-        "primaryJustification": "The concept is primarily architectural because it defines the structural organization and coordination topology of a concurrent data structure system.",
+        "isAmbiguous": false,
+        "primaryJustification": "This is a concrete component (constitutive technical object) used as a building block in larger systems. It has a specific local function, integration requirements, and replaceability characteristics, fitting the ConstitutiveTechnicalObject category.",
         "alternativeCategories": [
           {
             "category": "TechnicalBlueprint",
-            "justification": "Implementation source code and synchronization layout can also function as a generative blueprint.",
-            "confidence": 0.76
+            "justification": "The design patterns and algorithms for concurrent hashmap could be considered a blueprint, but here we focus on the resulting component.",
+            "confidence": 0.5
           },
           {
-            "category": "Technique",
-            "justification": "Concurrent hashmap implementation also constitutes a reusable engineering technique for scalable synchronization.",
-            "confidence": 0.72
-          },
-          {
-            "category": "TechnicalFramework",
-            "justification": "Some implementations encode broader concurrency-management frameworks and synchronization paradigms.",
-            "confidence": 0.51
+            "category": "TechnicalMechanism",
+            "justification": "The internal coordination mechanisms (locking, CAS, RCU) are mechanisms, but the component as a whole is an object.",
+            "confidence": 0.3
           }
         ]
       },
-      "confidenceScore": 0.95,
-      "sourceReference": "User-provided technical ontology and systems formulation for technical practice modeling.",
+      "confidenceScore": 0.9,
+      "sourceReference": "User-provided technical ontology and systems engineering domain knowledge.",
       "createdAt": "2026-05-15T03:00:00Z",
       "auditTrail": [
         {
           "reviewDate": "2026-05-15",
-          "reviewNote": "Initial formalization aligned to TechnicalArchitecture classification and concurrent systems engineering domain semantics. Grammatical correction applied to description."
+          "reviewNote": "Reclassified from TechnicalArchitecture/ConstitutiveTechnicalObject ambiguous to clear ConstitutiveTechnicalObject, reframed as concrete component, filled particular_characterization fields, removed design and implementation narrative."
         }
       ]
     },
@@ -2546,9 +2505,153 @@
       {
         "title": "Multithreaded HashMap Cache",
         "link": "view/chmc.html",
-        "description": "A technique space exploration of concurrent in-memory caching\u2014where hash buckets meet lock strips, where cache lines become battlegrounds, and where nanosecond decisions determine system-scale throughput."
+        "description": "A technical exploration of concurrent in-memory caching covering hash buckets, lock stripes, and cache-line contention."
       }
     ],
-    "type_hierarchy_level": 0
+    "type_hierarchy_level": 1
+  },
+  {
+    "id": "new.node.1783705704474",
+    "name": "Data Structure",
+    "category": "ConstitutiveTechnicalObject",
+    "layer": "Artifact Space",
+    "short_description": "A configurable, reusable component that organizes, stores, and manages data within a larger computational system.",
+    "long_description": "As a Constitutive Technical Object, a data structure is a building-block component of software systems, responsible for organizing collections of data and providing efficient access and modification operations. Examples include arrays, linked lists, hash tables, balanced trees, and heaps. Each data structure offers a specific set of local functions—such as insertion, lookup, deletion, traversal—that support higher-level system behaviors like database indexing, caching, routing, or scheduling. Data structures are manufactured (implemented) by programmers using a particular programming language and runtime environment, subject to performance constraints (time and space) and integration requirements (interfaces, memory layout). They can be upgraded or replaced with alternative structures to meet evolving system needs, making them a classic example of a modular, replaceable component within a technical architecture.",
+    "type_hierarchy_level": 0,
+    "interface_specification": "Each data structure exposes a well-defined API (e.g., put(key, value), get(key), delete(key), iterate()) that abstracts internal organization from consumers. The interface specifies supported operations, their time complexity guarantees, and any preconditions (e.g., keys must be comparable for a balanced tree). Integration with host code occurs through function calls or method invocations; in distributed systems, this may include serialization contracts.",
+    "operation": "The data structure operates by maintaining an internal arrangement of elements—contiguous memory, pointers, hash buckets, tree nodes—and executing algorithms for each supported operation. Operations must preserve invariants (e.g., balance factor in AVL trees) and respect the underlying memory model (e.g., sequential consistency for concurrent structures). Performance characteristics (latency, throughput) depend on the chosen algorithm and hardware platform.",
+    "functional_role_set": [
+      "Store and retrieve data items with guaranteed time bounds",
+      "Support iteration, ordering, and searching of contained elements",
+      "Provide thread-safe or transactional access in concurrent environments",
+      "Enable efficient memory utilization through compact layouts or pooling",
+      "Abstract low‑level memory management from higher system layers"
+    ],
+    "implementation_specification": "Data structures are implemented as software modules (classes, libraries) in programming languages such as C++, Java, Rust, or Python. The implementation consists of: (1) a data layout (e.g., contiguous array, node with pointers, hash bucket chain), (2) algorithms for each operation, (3) memory allocation/deallocation logic, and (4) synchronization primitives if concurrent. Common implementation variants include hand‑written (embedded in business logic) and library‑provided (e.g., STL, Java Collections).",
+    "scope_specification": "Applicable wherever software systems require organized data storage: operating system kernels (process queues, page tables), database engines (index structures), network stacks (routing tables), application servers (caches, session stores), embedded systems (fixed‑size buffers), and distributed frameworks (consistent hashing rings).",
+    "limitation_set": [
+      "Fixed or dynamic memory footprint—may cause fragmentation or out‑of‑memory errors",
+      "Operation cost tradeoffs: e.g., hash tables have fast lookups but no ordering; trees have ordering but higher overhead",
+      "Concurrency protocols (locking, CAS) can introduce scalability bottlenecks",
+      "Cache‑unfriendly layouts degrade performance under heavy access patterns",
+      "Cannot be natively serialized without explicit conversion to/from byte streams"
+    ],
+    "lifecycle": "A data structure is created (instantiated) at runtime via constructor, configured (size, comparator, thread‑safety options), used over the lifespan of the parent system, and destroyed (deallocated) when no longer needed. In managed languages, garbage collection handles destruction; in systems languages, explicit free or destructor calls are required. Some structures persist to disk or network (e.g., serialized cache files) and are re‑loaded later.",
+    "failure_mode_specification": [
+      "Memory allocation failure during growth leads to std::bad_alloc or out‑of‑memory exception",
+      "Invariant corruption due to buggy custom comparators or hash functions",
+      "Deadlock from improper lock ordering in concurrent variants",
+      "ABA problem in lock‑free structures if not handled with tagged pointers",
+      "Stack overflow from deep recursion in tree traversal (unbalanced or pathological input)"
+    ],
+    "resource_use": "Consumes CPU cycles for operation execution, memory (RAM) for element storage and structural overhead, and, in persisted forms, disk I/O or network bandwidth. Additional memory is needed for synchronization objects (mutexes, atomic flags) in concurrent implementations.",
+    "evolution_history": {
+      "summary": "Data structures have evolved from simple arrays and linked lists (1950s) to a rich ecosystem of specialized components: balanced trees (1960s), hash tables (1970s), concurrent structures (1990s), persistent and lock‑free varieties (2000s), and hardware‑aware structures (2010s‑2020s). This evolution reflects the growing complexity of software systems and the need for reliable, efficient building blocks.",
+      "chronology": [
+        {
+          "year": 1950,
+          "event": "Arrays and linked lists used in early stored‑program computers as basic data components",
+          "associatedContext": "Machine code, early assemblers"
+        },
+        {
+          "year": 1960,
+          "event": "Binary search trees and B‑trees introduced for database indexing and symbol tables",
+          "associatedContext": "COBOL, ALGOL, early databases (IDS, IMS)"
+        },
+        {
+          "year": 1970,
+          "event": "Hash tables become mainstream; array‑based stacks and queues are formalized",
+          "associatedContext": "C language, UNIX, early compilers"
+        },
+        {
+          "year": 1990,
+          "event": "Standard libraries (C++ STL, Java Collections) package reusable data structure components",
+          "associatedContext": "Object‑oriented programming, widespread library reuse"
+        },
+        {
+          "year": 2000,
+          "event": "Lock‑free and concurrent data structures emerge for multi‑core processors",
+          "associatedContext": "Java concurrency package (JUC), Intel TBB, multi‑core era"
+        },
+        {
+          "year": 2010,
+          "event": "LSM‑trees, skip lists, Bloom filters become standard components in NoSQL databases and caching layers",
+          "associatedContext": "Cassandra, LevelDB, Redis, cloud native systems"
+        },
+        {
+          "year": 2020,
+          "event": "Hardware‑aware structures (e.g., persistent memory indices, CXL pooling) and formally verified implementations (e.g., Rust std collections)",
+          "associatedContext": "Non‑volatile memory, Rust, formal verification tools (Dafny, Verus)"
+        }
+      ]
+    },
+    "particular_characterization": {
+      "componentType": "Software component (abstract data type implementation)",
+      "parentSystem": "Computational system (application, database, operating system, distributed service)",
+      "localFunction": "Store, retrieve, and manipulate data items with specified performance guarantees for the parent system’s data management sub‑domain",
+      "integrationRequirements": "Must be compatible with the host language’s type system, memory model, and concurrency primitives. For distributed use, must support serialization (e.g., Protocol Buffers, JSON). Must respect parent system’s lifecycle (e.g., RAII, garbage collection).",
+      "manufacturingMethod": "Hand‑written by a developer or instantiated via a library call (e.g., `new ArrayList<>()`). The manufacturing process includes design (choice of structure), coding, unit testing, and integration testing.",
+      "toleranceRequirements": "Performance tolerances: operation latencies must stay within O(f(n)) bounds for the intended load; memory overhead must remain below parent system’s budget (e.g., < 10% of heap). Correctness tolerances: the structure must maintain invariants under all permitted inputs and concurrent access patterns.",
+      "replaceability": "High. A data structure can be replaced by an alternative (e.g., replacing a linked list with a hash set) as long as the interface contract remains unchanged. Libraries like the C++ STL allow swapping containers via template parameterization."
+    },
+    "relationship_set": [],
+    "metadata": {
+      "tags": [
+        "data structure",
+        "constitutive component",
+        "software building block",
+        "ABET",
+        "computer science",
+        "component",
+        "modular design"
+      ],
+      "categoryAmbiguity": {
+        "isAmbiguous": true,
+        "primaryJustification": "Data structures also function as Technical Blueprints (abstract data types) and as TechnicalDomain (the field of study). The choice of ConstitutiveTechnicalObject emphasizes their role as reusable, integrated components in larger systems, which best matches their practical use in engineering.",
+        "alternativeCategories": [
+          {
+            "category": "TechnicalBlueprint",
+            "justification": "Abstract data types (e.g., Stack, Queue) are blueprints that prescribe behavior independent of implementation.",
+            "confidence": 0.3
+          },
+          {
+            "category": "TechnicalDomain",
+            "justification": "Data structures constitute a defined domain of study within computer science with core problem spaces and techniques.",
+            "confidence": 0.2
+          }
+        ]
+      },
+      "confidenceScore": 0.9,
+      "sourceReference": "Cormen, T. H., Leiserson, C. E., Rivest, R. L., & Stein, C. (2022). Introduction to Algorithms (4th ed.). MIT Press; Knuth, D. E. (1997). The Art of Computer Programming, Vol. 1: Fundamental Algorithms (3rd ed.). Addison‑Wesley.",
+      "createdAt": "2026-07-10T17:48:24.474Z",
+      "auditTrail": [
+        {
+          "reviewDate": "2026-07-10",
+          "reviewNote": "Initial population of node with comprehensive fields. Category chosen as ConstitutiveTechnicalObject to reflect its role as a building block. Ambiguity noted."
+        },
+        {
+          "reviewDate": "2027-05-14",
+          "reviewNote": "Revised to align content with ConstitutiveTechnicalObject specifications: added componentType, parentSystem, integrationRequirements, etc. Updated layer to Artifact Space and added relationship_set."
+        }
+      ]
+    },
+    "references": [
+      {
+        "title": "Introduction to Algorithms (CLRS)",
+        "description": "Standard textbook covering data structures as algorithmic components; provides formal analysis and implementation detail for many constitutive variants."
+      },
+      {
+        "title": "The Art of Computer Programming, Vol. 1: Fundamental Algorithms",
+        "description": "Knuth's comprehensive treatment of data structures as fundamental programming components."
+      },
+      {
+        "title": "Purely Functional Data Structures",
+        "description": "Chris Okasaki's monograph on persistent data structures as reusable components in functional languages."
+      },
+      {
+        "title": "Concurrent Data Structures",
+        "description": "Survey by Moir and Shavit providing taxonomy and design patterns for lock‑free and wait‑free structures as components in concurrent systems."
+      }
+    ]
   }
 ]

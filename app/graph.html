@@ -2527,32 +2527,12 @@
             <div class="sb-group"><span class="sb-group-label">Relationship Families</span>
                 <div class="chip-grid" id="family-chips"></div>
             </div>
-            <div class="sb-group"><span class="sb-group-label">Visual Lenses</span>
-                <div class="toggle-group" id="lens-controls"><label class="toggle-item"
-                        data-conflict="umap"><input type="checkbox" id="lens-hulls" checked><span
-                            class="checkmark"></span>Category Hulls</label><label class="toggle-item"
-                        data-conflict="umap"><input type="checkbox" id="lens-heatmap"><span
-                            class="checkmark"></span>Constraint Heatmap</label><label class="toggle-item"
-                        data-conflict="umap"><input type="checkbox" id="lens-centrality"><span
-                            class="checkmark"></span>Centrality Sizing</label><label class="toggle-item"
-                        data-conflict="umap"><input type="checkbox" id="lens-confidence-color"><span
-                            class="checkmark"></span>Confidence Gradient</label><label class="toggle-item"
-                        data-conflict="umap"><input type="checkbox" id="lens-flow" checked><span
-                            class="checkmark"></span>Luminous Flow</label><label class="toggle-item"
-                        data-conflict="umap"><input type="checkbox" id="lens-observability"><span
-                            class="checkmark"></span>Observability Ghosting</label></div>
-            </div>
         </div>
     </aside>
     <main class="canvas-area">
         <button class="sidebar-toggle" id="sidebar-toggle-btn">&#9776;</button>
         <canvas id="graph-canvas"></canvas>
         <div class="quick-actions"><button class="qa-btn" id="qa-fit" title="Fit View (F)">&#8862;</button><button class="qa-btn" id="qa-epistemic" title="Epistemic Artifacts (E)">&#931;</button></div>
-        <div class="projection-chips" id="projection-chips">
-            <button class="proj-chip active" data-proj="default">Force</button>
-            <button class="proj-chip" data-proj="umap">UMAP</button>
-            <div class="proj-pill"></div>
-        </div>
         <div class="minimap-wrap" id="minimap-wrap"><canvas id="minimap-canvas"></canvas></div>
         <div class="empty-state" id="empty-state">
             <div class="empty-state-icon">&#9675;</div>
@@ -2560,7 +2540,7 @@
             <div class="empty-state-hint">Adjust temporal scope, layers, categories, or families</div>
         </div>
         <footer class="status-bar"><span>Nodes <span id="hud-v">0</span></span><span>Edges <span
-                    id="hud-e">0</span></span><span id="hud-proj">Force</span><span id="fps-counter">0 FPS</span></footer>
+                    id="hud-e">0</span></span><span id="hud-proj">Layout</span><span id="fps-counter">0 FPS</span></footer>
         <div id="tooltip">
             <div class="tt-cat" id="tt-cat"></div>
             <div class="tt-layer" id="tt-layer"></div>
@@ -2630,11 +2610,14 @@
         <div class="loader-dots"><span></span><span></span><span></span></div>
         <div class="loader-text" id="loader-msg">Initializing graph</div>
     </div>
+    <script src="vendor/deck.min.js"></script>
+    <script src="vendor/socio-graph.js"></script>
+    <script src="js/couch.js"></script>
     <script>
         /* ═══════ UTILITIES ═══════ */
         function hexToRGBA(h,a){if(!h||h.startsWith('rgb'))return h;var r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);return'rgba('+r+','+g+','+b+','+a+')'}
         function friendlyLabel(k){return k.replace(/([A-Z])/g,' $1').replace(/_/g,' ').replace(/^./,function(s){return s.toUpperCase()}).replace(/\s+/g,' ').trim().replace(/^Technical\s/,'Tech. ').replace(/\sAnd\s/g,' & ')}
-        function shortLabel(k){var m={'ActionInterfaceAndActuation':'Interface & Actuation','ConcreteTechnicalArtifact':'Concrete Artifact','ConstitutiveTechnicalObject':'Constitutive Obj.','ConstitutiveTechnique':'Constitutive Tech.','OperativeTechnique':'Operative Tech.','ProductionTechnicalObject':'Production Obj.','TechnicalArchitecture':'Architecture','TechnicalBlueprint':'Blueprint','TechnicalCompetence':'Competence','TechnicalConstraint':'Constraint','TechnicalDomain':'Domain','TechnicalEvolution':'Evolution','TechnicalFailure':'Failure','TechnicalFeedback':'Feedback','TechnicalFramework':'Framework','TechnicalFunction':'Function','TechnicalInfrastructure':'Infrastructure','TechnicalInstitution':'Institution','TechnicalLabor':'Labor','TechnicalMechanism':'Mechanism','TechnicalObsolescence':'Obsolescence','TechnicalOperator':'Operator','TechnicalPrinciple':'Principle','TechnicalProblem':'Problem','TechnicalProcess':'Process','TechnicalPurpose':'Purpose','TechnicalResearch':'Research','TechnicalRequirement':'Requirement','TechnicalSpecification':'Specification','TechnicalStandard':'Standard','TechnicalStrategy':'Strategy','TechnicalSystem':'System','TechnicalActivity':'Activity'};return m[k]||friendlyLabel(k)}
+        function shortLabel(k){var m={'ActionInterfaceAndActuation':'Interface & Actuation','ConcreteTechnicalArtifact':'Concrete Artifact','ConstitutiveTechnicalObject':'Constitutive Obj.','ConstitutiveTechnique':'Constitutive Tech.','OperativeTechnique':'Operative Tech.','ProductionTechnicalObject':'Production Obj.','TechnicalArchitecture':'Architecture','TechnicalBlueprint':'Blueprint','TechnicalCompetence':'Competence','TechnicalConstraint':'Constraint','TechnicalDomain':'Domain','TechnicalEvolution':'Evolution','TechnicalFailure':'Failure','TechnicalFeedback':'Feedback','TechnicalFramework':'Framework','TechnicalInfrastructure':'Infrastructure','TechnicalInstitution':'Institution','TechnicalLabor':'Labor','TechnicalMechanism':'Mechanism','TechnicalObsolescence':'Obsolescence','TechnicalOperator':'Operator','TechnicalPrinciple':'Principle','TechnicalProblem':'Problem','TechnicalProcess':'Process','TechnicalPurpose':'Purpose','TechnicalResearch':'Research','TechnicalRequirement':'Requirement','TechnicalSpecification':'Specification','TechnicalStandard':'Standard','TechnicalStrategy':'Strategy','TechnicalElementSetModulo':'Elem. Set Modulo','TechnicalPractice':'Practice','TechnicalActivity':'Activity'};return m[k]||friendlyLabel(k)}
         function confidenceColor(s){var r,g,b;if(s<=0.5){var t=s/0.5;r=224;g=Math.round(96+128*t);b=Math.round(112+104*t)}else{var t2=(s-0.5)/0.5;r=Math.round(224-152*t2);g=Math.round(224+8*t2);b=216}return'rgb('+r+','+g+','+b+')'}
         function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v))}
         function hlMatch(text,q){if(!q)return text;var i=text.toLowerCase().indexOf(q.toLowerCase());if(i===-1)return text;return text.substring(0,i)+'<mark>'+text.substring(i,i+q.length)+'</mark>'+text.substring(i+q.length)}
@@ -2659,7 +2642,7 @@
         }
         var SC=['circle','triangle','square','diamond','hexagon'];
         var LPC={'Problem Space':'#d4a857','Capability Space':'#6b8caa','Execution Space':'#7ba388','Artifact Space':'#c9956c','Governance Space':'#c47d8a','Evolutionary Space':'#9b7eb0'};
-        var CLL={'Reality':'Problem Space','TechnicalDomain':'Problem Space','TechnicalSystem':'Capability Space','TechnicalPurpose':'Problem Space','TechnicalProblem':'Problem Space','TechnicalRequirement':'Problem Space','TechnicalConstraint':'Problem Space','ActionInterfaceAndActuation':'Capability Space','TechnicalAgent':'Capability Space','TechnicalCompetence':'Capability Space','Technique':'Capability Space','OperativeTechnique':'Capability Space','ConstitutiveTechnique':'Capability Space','Resource':'Capability Space','TechnicalInfrastructure':'Capability Space','TechnicalAct':'Execution Space','TechnicalActivity':'Execution Space','TechnicalOperator':'Execution Space','TechnicalProcess':'Execution Space','TechnicalMechanism':'Execution Space','TechnicalFeedback':'Execution Space','ConcreteTechnicalArtifact':'Execution Space','TechnicalBlueprint':'Artifact Space','TechnicalSpecification':'Artifact Space','TechnicalArchitecture':'Artifact Space','ProductionTechnicalObject':'Artifact Space','ConstitutiveTechnicalObject':'Artifact Space','TechnicalFunction':'Artifact Space','TechnicalStandard':'Governance Space','TechnicalPrinciple':'Governance Space','TechnicalStrategy':'Governance Space','TechnicalFramework':'Governance Space','Security':'Governance Space','Verification':'Governance Space','Maintenance':'Governance Space','TechnicalInstitution':'Governance Space','TechnicalEvolution':'Evolutionary Space','TechnicalResearch':'Evolutionary Space','TechnicalLabor':'Evolutionary Space','TechnicalFailure':'Evolutionary Space','TechnicalObsolescence':'Evolutionary Space'};
+        var CLL={'Reality':'Problem Space','TechnicalDomain':'Problem Space','TechnicalElementSetModulo':'Capability Space','TechnicalPractice':'Capability Space','TechnicalPurpose':'Problem Space','TechnicalProblem':'Problem Space','TechnicalRequirement':'Problem Space','TechnicalConstraint':'Problem Space','ActionInterfaceAndActuation':'Capability Space','TechnicalAgent':'Capability Space','TechnicalCompetence':'Capability Space','Technique':'Capability Space','OperativeTechnique':'Capability Space','ConstitutiveTechnique':'Capability Space','Resource':'Capability Space','TechnicalInfrastructure':'Capability Space','TechnicalAct':'Execution Space','TechnicalActivity':'Execution Space','TechnicalOperator':'Execution Space','TechnicalProcess':'Execution Space','TechnicalMechanism':'Execution Space','TechnicalFeedback':'Execution Space','ConcreteTechnicalArtifact':'Execution Space','TechnicalBlueprint':'Artifact Space','TechnicalSpecification':'Artifact Space','TechnicalArchitecture':'Artifact Space','ProductionTechnicalObject':'Artifact Space','ConstitutiveTechnicalObject':'Artifact Space','TechnicalStandard':'Governance Space','TechnicalPrinciple':'Governance Space','TechnicalStrategy':'Governance Space','TechnicalFramework':'Governance Space','Security':'Governance Space','Verification':'Governance Space','Maintenance':'Governance Space','TechnicalInstitution':'Governance Space','TechnicalEvolution':'Evolutionary Space','TechnicalResearch':'Evolutionary Space','TechnicalLabor':'Evolutionary Space','TechnicalFailure':'Evolutionary Space','TechnicalObsolescence':'Evolutionary Space'};
 
         var CL=[],CLB={},CC={},CS={};
         var LL=[],LLB={},LC={};
@@ -2707,10 +2690,26 @@
         var tR={min:-Infinity,max:Infinity};var tRF={min:0,max:0};
         var pCache={};var dLoaded=false;
         var ddOpen=false,kbFI=-1,fRes=[];
-        var canvas=document.getElementById('graph-canvas'),ctx=canvas.getContext('2d');
+        var canvas=document.getElementById('graph-canvas');
         var mmC=document.getElementById('minimap-canvas'),mmX=mmC.getContext('2d');
         var W=0,H=0;
         var umapK=0;
+
+        /* ═══════ DECK (WebGL) RENDER STATE ═══════ */
+        /* deck.gl renders into #graph-canvas. Positions are static (read from
+           layout.json); there is no live force simulation. Layers are rebuilt
+           only when graph/highlight/zoom state changes (dirty), and the view is
+           pushed every frame from cam. Picking is GPU-side via SocioGraph.pickAt. */
+        var deckInst=null,deckReady=false,currentLayers=[],dirty=false,lastZ=-1;
+        function hexToRgb(h){if(!h)return[136,136,136];h=String(h).replace('#','');if(h.length===3)h=h.replace(/(.)/g,'$1$1');var n=parseInt(h,16);if(isNaN(n))return[136,136,136];return[(n>>16)&255,(n>>8)&255,n&255]}
+        function colorFor(nd){return hexToRgb(CC[nd.category])}
+        function _pinSet(){if(!pinN)return{};var o={};o[pinN.id]=1;return o}
+        function rebuildLayers(){
+            currentLayers=SocioGraph.buildLayers(nodes,gE,nM,{
+                z:cam.z, hoveredId:hovN&&hovN.id, selectedId:selN&&selN.id,
+                searchSet:_pinSet(), colorFor:colorFor
+            })
+        }
 
         /* ═══════ CANVAS TOAST STATE ═══════ */
         var toastNode=null,toastStart=0;
@@ -2798,13 +2797,13 @@
         }
 
         /* ═══════ VIEW HELPERS ═══════ */
-        function uPS(){var p=document.getElementById('projection-chips'),a=p.querySelector('.proj-chip.active');if(a){p.style.setProperty('--pill-left',a.offsetLeft+'px');p.style.setProperty('--pill-width',a.offsetWidth+'px')}}
+        function uPS(){}
         function sPC(pj){pCache[pj]=nodes.map(function(n){return{id:n.id,x:n.x,y:n.y}})}
         function rPC(pj){var c=pCache[pj];if(!c)return false;var m={};c.forEach(function(v){m[v.id]=v});nodes.forEach(function(n){if(m[n.id]){n.x=m[n.id].x;n.y=m[n.id].y}});return true}
-        function sCV(){var r=canvas.parentElement.getBoundingClientRect();W=r.width;H=r.height;canvas.width=W*devicePixelRatio;canvas.height=H*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
+        function sCV(){var r=canvas.parentElement.getBoundingClientRect();W=r.width;H=r.height}
         function resize(){sCV();if(dLoaded){rCC();rLC();fCam()}uPS()}
 
-        function fCam(){var v=nodes.filter(function(n){return n.visible});if(!v.length)return;var x1=Infinity,x2=-Infinity,y1=Infinity,y2=-Infinity;var ut=curProj!=='default';v.forEach(function(n){var px=ut&&n.targetX!==undefined?n.targetX:n.x;var py=ut&&n.targetY!==undefined?n.targetY:n.y;if(px<x1)x1=px;if(px>x2)x2=px;if(py<y1)y1=py;if(py>y2)y2=py});if(x1===Infinity)return;var p=120,gw=x2-x1+p*2,gh=y2-y1+p*2,z=Math.min(W/gw,H/gh,1.2);cam.z=z;cam.x=W/2-((x1+x2)/2)*z;cam.y=H/2-((y1+y2)/2)*z;camTgt=null}
+        function fCam(){SocioGraph.fitCam(cam,nodes,W,H,true);camTgt=null}
 
         function pTN(nd){if(!nd)return;var tz=Math.max(cam.z,1.2);camTgt={x:W/2-nd.x*tz,y:H/2-nd.y*tz,z:tz}}
         function uCP(){if(!camTgt)return;var dx=camTgt.x-cam.x,dy=camTgt.y-cam.y,dz=camTgt.z-cam.z;if(Math.abs(dx)<.3&&Math.abs(dy)<.3&&Math.abs(dz)<.001){cam.x=camTgt.x;cam.y=camTgt.y;cam.z=camTgt.z;camTgt=null;return}cam.x+=dx*.09;cam.y+=dy*.09;cam.z+=dz*.09}
@@ -2916,10 +2915,9 @@
             document.getElementById('hud-v').textContent=vc;
             var ec=gE.filter(function(e){return e.visible}).length;
             document.getElementById('hud-e').textContent=ec;
-            if(curProj!=='default'){applyProjection(curProj)}
             rCC();
-            if(curProj==='default')reheatAlpha();
-            eoRefreshIfOpen()
+            eoRefreshIfOpen();
+            dirty=true
         }
         function rCC(){CL.forEach(function(c){var el=document.getElementById('ctog-'+c);if(el){var cnt=cNC[c]||0;el.querySelector('.node-count').textContent=cnt;el.classList.toggle('disabled',cnt===0)}})}
         function rLC(){
@@ -3135,30 +3133,15 @@
             fc++;var now=performance.now();
             if(now-lt>=1000){fps=fc;fc=0;lt=now;document.getElementById('fps-counter').textContent=fps+' FPS'}
             uCP();
-            simTick();
-            interpTick();
-            catC={};nodes.forEach(function(n){if(n.visible){if(!catC[n.category])catC[n.category]=[];catC[n.category].push(n)}});
-            ctx.clearRect(0,0,W,H);
-            drawHulls();drawEdges();drawNodes();
-            drawUMAPInfo();
-            drawToast();
+            if(deckReady){
+                if(dirty||cam.z!==lastZ){rebuildLayers();dirty=false;lastZ=cam.z}
+                SocioGraph.setView(deckInst,currentLayers,cam,W,H)
+            }
             drawMinimap()
         }
 
-        /* ═══════ HIT TESTING ═══════ */
-        function hitNode(sx,sy){
-            var best=null,bestD=Infinity;
-            nodes.forEach(function(n){
-                if(!n.visible)return;
-                var sp=w2s(n.x,n.y);
-                var dx=sp.x-sx,dy=sp.y-sy,d2=dx*dx+dy*dy;
-                var baseR=4.5+n.degree*0.55;
-                var visR=Math.max(2.5,baseR)*cam.z;visR=Math.max(2,Math.min(visR,24));
-                var hitR=Math.max(visR*2.2,14);
-                if(d2<hitR*hitR&&d2<bestD){bestD=d2;best=n}
-            });
-            return best
-        }
+        /* ═══════ HIT TESTING (GPU pick via deck) ═══════ */
+        function pickDeck(sx,sy){return deckReady?SocioGraph.pickAt(deckInst,sx,sy):null}
         /* ═══════ TOOLTIP ═══════ */
         function showTT(nd,sx,sy){
             var tt=document.getElementById('tooltip');
@@ -3315,10 +3298,10 @@
                 dyn.innerHTML += rh;
             }
 
-            panel.classList.add('open')
+            panel.classList.add('open');dirty=true
         }
 
-        function closeInspect(){document.getElementById('inspect-panel').classList.remove('open');selN=null}
+        function closeInspect(){document.getElementById('inspect-panel').classList.remove('open');selN=null;dirty=true}
 
         /* ═══════ SEARCH ═══════ */
         function posDropdown(){
@@ -3356,7 +3339,7 @@
         function uKBF(){var items=document.getElementById('search-dropdown-inner').querySelectorAll('.search-result');items.forEach(function(el,i){el.classList.toggle('kb-focus',i===kbFI)})}
 
         function selectSearchResult(idx){
-            var nd=fRes[idx];if(!nd)return;pinN=nd;
+            var nd=fRes[idx];if(!nd)return;pinN=nd;dirty=true;
             document.getElementById('search-selected').classList.add('visible');
             document.getElementById('search-selected-dot').style.background=CC[nd.category];
             document.getElementById('search-selected-name').textContent=nd.name;
@@ -3366,22 +3349,22 @@
             triggerToast(nd);
             openInspect(nd)
         }
-        function clearSearchSel(){pinN=null;document.getElementById('search-selected').classList.remove('visible')}
+        function clearSearchSel(){pinN=null;document.getElementById('search-selected').classList.remove('visible');dirty=true}
 
         /* ═══════ EVENT HANDLERS ═══════ */
         canvas.addEventListener('mousedown',function(e){
             var r=canvas.getBoundingClientRect();var sx=e.clientX-r.left,sy=e.clientY-r.top;
             mdS={x:sx,y:sy};
-            var nd=hitNode(sx,sy);
+            var nd=pickDeck(sx,sy);
             if(nd){dragN=nd;canvas.classList.add('locked')}else{isPan=true;panS={x:e.clientX-cam.x,y:e.clientY-cam.y};canvas.classList.add('locked')}
         });
         canvas.addEventListener('mousemove',function(e){
             var r=canvas.getBoundingClientRect();var sx=e.clientX-r.left,sy=e.clientY-r.top;
             mS={x:e.clientX,y:e.clientY};wM={x:sx,y:sy};
-            if(dragN){var wp=s2w(sx,sy);dragN.x=wp.x;dragN.y=wp.y;dragN.vx=0;dragN.vy=0;if(SP.indexOf(curProj)>=0){dragN.targetX=wp.x;dragN.targetY=wp.y}return}
+            if(dragN){var wp=s2w(sx,sy);dragN.x=wp.x;dragN.y=wp.y;dragN.position=[wp.x,wp.y];dirty=true;return}
             if(isPan){cam.x=e.clientX-panS.x;cam.y=e.clientY-panS.y;camTgt=null;return}
-            var nd=hitNode(sx,sy);
-            if(nd!==hovN){hovN=nd;if(nd)showTT(nd,sx,sy);else hideTT()}
+            var nd=pickDeck(sx,sy);
+            if(nd!==hovN){hovN=nd;dirty=true;if(nd)showTT(nd,sx,sy);else hideTT()}
             else if(nd)showTT(nd,sx,sy)
         });
         canvas.addEventListener('mouseup',function(e){
@@ -3461,40 +3444,15 @@
         document.getElementById('search-clear').addEventListener('click',function(){document.getElementById('search-input').value='';this.classList.remove('visible');doSearch('')});
         document.getElementById('search-selected-clear').addEventListener('click',clearSearchSel);
 
-        document.getElementById('projection-chips').addEventListener('click',function(e){
-            var chip=e.target.closest('.proj-chip');if(!chip)return;
-            var pj=chip.dataset.proj;if(pj===curProj)return;
-            this.querySelectorAll('.proj-chip').forEach(function(c){c.classList.remove('active')});
-            chip.classList.add('active');uPS();
-            sPC(curProj);
-            curProj=pj;
-            document.getElementById('hud-proj').textContent=PL[pj]||pj;
-            toastNode=null;
-            if(SP.indexOf(pj)>=0){applyProjection(pj);fCam()}
-            else if(rPC(pj)){fCam()}
-            else{reheatAlpha();fCam()}
-        });
-
-        document.querySelectorAll('#lens-controls .toggle-item').forEach(function(el){
-            var conflicts=(el.dataset.conflict||'').split(',');
-            el.querySelector('input').addEventListener('change',function(){
-                if(this.checked){var self=this;conflicts.forEach(function(c){if(c===curProj){self.checked=false;return}var other=document.querySelector('#lens-'+c);if(other&&other.checked&&other!==self){other.checked=false}})}
-            })
-        });
+        /* (projection-chips and lens toggle handlers removed — deck.gl pipeline) */
 
         document.getElementById('reset-all-btn').addEventListener('click',function(){
             aCats=new Set(CL);aFams=new Set(FL);aLayers=new Set(LL);
             tR={min:tRF.min,max:tRF.max};
             document.getElementById('time-min').value=0;document.getElementById('time-max').value=1000;
             uTimeFill();uFilt();buildCatToggles();buildFamilyChips();rLC();
-            document.getElementById('lens-hulls').checked=true;document.getElementById('lens-heatmap').checked=false;
-            document.getElementById('lens-centrality').checked=false;document.getElementById('lens-confidence-color').checked=false;
-            document.getElementById('lens-flow').checked=true;document.getElementById('lens-observability').checked=false;
-            clearSearchSel();closeInspect();toastNode=null;curProj='default';pCache={};
-            document.querySelectorAll('.proj-chip').forEach(function(c){c.classList.remove('active')});
-            document.querySelector('.proj-chip[data-proj="default"]').classList.add('active');uPS();
-            document.getElementById('hud-proj').textContent='Force';
-            reheatAlpha();cam={x:0,y:0,z:1};camTgt=null;fCam()
+            clearSearchSel();closeInspect();toastNode=null;
+            cam={x:0,y:0,z:1};camTgt=null;fCam();dirty=true
         });
 
         /* ═══════ TIME SLIDER ═══════ */
@@ -3704,7 +3662,7 @@
             chron.forEach(function(c){var y=parseInt(c.year);if(!isNaN(y)&&(best===null||y<best))best=y});
             return best;
         }
-        function initGraph(data){
+        function initGraph(data,layout){
             deriveSchema(data);
             nM={};nodes=[];gE=[];
             minY=Infinity;maxY=-Infinity;maxIL=1;
@@ -3715,15 +3673,13 @@
                 var yr=resolveYear(r);
                 if(yr!==null&&yr<minY)minY=yr;if(yr!==null&&yr>maxY)maxY=yr;
                 var il=r.type_hierarchy_level||0;if(il>maxIL)maxIL=il;
-                var initSpread=Math.max(800,Math.sqrt(data.length)*60);
                 var md=r.metadata||{},pc=r.particular_characterization||{};
                 var nd={
                     id:id,name:r.name||r.id,category:r.category,layer:resolveLayer(r),
                     description:r.short_description||'',confidence:md.confidenceScore!=null?md.confidenceScore:0.7,
-                    degree:0,inheritanceLevel:il,
-                    year:yr,x:(Math.random()-.5)*initSpread,y:(Math.random()-.5)*initSpread,
+                    degree:0,inheritanceLevel:il,year:yr,
                     observability:pc.observability||'observable',
-                    vx:0,vy:0,visible:true,_raw:r
+                    visible:true,_raw:r
                 };
                 nodes.push(nd);nM[id]=nd;degC[id]=0
             });
@@ -3739,28 +3695,36 @@
                 })
             });
             nodes.forEach(function(n){n.degree=degC[n.id]||0});
+            /* Positions are precomputed — read once from layout.json. */
+            SocioGraph.seedPositions(nodes,layout||{},null);
             tRF.min=minY===Infinity?0:minY;tRF.max=maxY===-Infinity?2025:maxY;
             tR.min=tRF.min;tR.max=tRF.max;
             document.getElementById('time-total-count').textContent=nodes.length;
             buildCatToggles();buildFamilyChips();rLC();uTimeFill();uFilt();
-            sCV();fCam();uPS();dLoaded=true;
+            sCV();
+            if(!deckInst){deckInst=SocioGraph.createDeck({canvasId:'graph-canvas',width:W,height:H})}
+            deckReady=true;dirty=true;lastZ=-1;
+            fCam();uPS();dLoaded=true;
             document.getElementById('loading-overlay').classList.add('hidden')
         }
 
         /* ═══════ FETCH ═══════ */
         var loaderMsg=document.getElementById('loader-msg');
         loaderMsg.textContent='Loading taxonomy';
-        fetch('data/data.json')
-            .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
-            .then(function(d){
-                loaderMsg.textContent='Building graph';
-                var arr=Array.isArray(d)?d:(d.nodes||d.categories||[]);
-                if(!arr.length)throw new Error('Empty dataset');
-                setTimeout(function(){initGraph(arr)},60)
-            })
-            .catch(function(err){
-                loaderMsg.innerHTML='<span class="loader-error">Failed to load taxonomy.<br><br>'+err.message+'<br><br>Ensure <code style="font-size:.65rem;opacity:.6">data/data.json</code> exists at the expected path.</span>'
-            });
+        Promise.all([
+            CouchData.loadNodes(),
+            fetch('data/layout.json').then(function(r){if(!r.ok)throw new Error('layout.json: HTTP '+r.status);return r.json()})
+                .catch(function(e){console.warn('layout.json not loaded — using random fallback. Run: python bin/layout.py',e);return null})
+        ]).then(function(res){
+            var d=res[0],layout=res[1];
+            loaderMsg.textContent='Building graph';
+            var arr=Array.isArray(d)?d:(d.nodes||d.categories||[]);
+            if(!arr.length)throw new Error('Empty dataset');
+            setTimeout(function(){initGraph(arr,layout)},60)
+        })
+        .catch(function(err){
+            loaderMsg.innerHTML='<span class="loader-error">Failed to load taxonomy.<br><br>'+err.message+'<br><br>Ensure CouchDB is running and seeded (run <code>python bin/couchdb_setup.py</code> and <code>python bin/seed_couchdb.py</code>), and that <code>data/layout.json</code> exists (run <code>python bin/layout.py</code>).</span>'
+        });
 
         /* ═══════ BOOT ═══════ */
         resize();

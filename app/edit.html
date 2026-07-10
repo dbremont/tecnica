@@ -166,6 +166,34 @@ select:-webkit-autofill {
 .search-clear:hover { color: var(--accent-rose); }
 .btn-group .search-clear { right: 34px; font-size: 14px; padding: 1px 3px; }
 
+/* Visually-hidden but accessible to AT / keyboard. */
+.sr-only {
+    position: absolute !important;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Skip link — hidden until focused by keyboard. */
+.skip-link {
+    position: absolute;
+    left: 12px; top: 12px;
+    z-index: 1000;
+    padding: 8px 14px;
+    background: var(--accent-copper);
+    color: var(--bg-deep);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transform: translateY(-150%);
+    transition: transform 0.2s ease;
+}
+.skip-link:focus { transform: translateY(0); }
+
 body {
     background: var(--bg-deep);
     color: var(--text-primary);
@@ -3434,7 +3462,7 @@ select:focus-visible {
                     </svg>
                     <span class="sb-chip-label" id="backend-status-text">Backend: Offline</span>
                 </span>
-                <span class="sb-chip sb-ai unconfigured" id="ai-status" data-tip="AI: Not configured — click to set up">
+                <span class="sb-chip sb-ai unconfigured" id="ai-status" data-tip="AI: Not configured — click to set up" role="button" tabindex="0">
                     <svg class="sb-chip-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                     </svg>
@@ -3530,20 +3558,20 @@ select:focus-visible {
 
     <!-- Settings Modal -->
     <div class="modal-overlay" id="settings-modal">
-        <div class="modal">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
             <div class="modal-header">
-                <div class="modal-title">AI Settings</div>
-                <button class="modal-close" id="settings-close">&times;</button>
+                <div class="modal-title" id="settings-title">AI Settings</div>
+                <button class="modal-close" id="settings-close" type="button" aria-label="Close">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="settings-section">
                     <div class="settings-title">DeepSeek API Configuration</div>
                     <div class="settings-row">
-                        <label class="settings-label">API Endpoint</label>
-                        <input type="text" class="settings-input" id="api-endpoint" placeholder="https://api.deepseek.com/v1/chat/completions">
+                        <label class="settings-label" for="api-endpoint">API Endpoint</label>
+                        <input type="url" class="settings-input" id="api-endpoint" autocomplete="url" placeholder="https://api.deepseek.com/v1/chat/completions">
                     </div>
                     <div class="settings-row">
-                        <label class="settings-label">API Token</label>
+                        <label class="settings-label" for="api-token">API Token</label>
                         <input type="password" class="settings-input" id="api-token" placeholder="Enter your DeepSeek API token">
                         <label class="settings-checkbox-label" style="margin-top:8px;">
                             <input type="checkbox" id="save-token-toggle">
@@ -3552,7 +3580,7 @@ select:focus-visible {
                         <span class="settings-hint">When enabled, the token is stored in localStorage and auto-loaded on next visit. Note: localStorage is accessible to scripts on this origin — use only on a trusted machine.</span>
                     </div>
                     <div class="settings-row">
-                        <label class="settings-label">Model</label>
+                        <label class="settings-label" for="api-model">Model</label>
                         <input type="text" class="settings-input" id="api-model" value="deepseek-v4-flash" placeholder="deepseek-v4-flash">
                     </div>
                     <div class="settings-status">
@@ -3564,7 +3592,7 @@ select:focus-visible {
                 <div class="settings-section">
                     <div class="settings-title">Schema Configuration</div>
                     <div class="settings-row">
-                        <label class="settings-label">Schema Path</label>
+                        <label class="settings-label" for="schema-path">Schema Path</label>
                         <input type="text" class="settings-input" id="schema-path" placeholder="data/schema/dataset.json">
                     </div>
                     <div class="settings-row" style="display:flex;gap:10px;">
@@ -3576,15 +3604,15 @@ select:focus-visible {
                 <div class="settings-section">
                     <div class="settings-title">Global Context</div>
                     <div class="settings-row">
-                        <label class="settings-label">Context URL</label>
-                        <input type="text" class="settings-input" id="global-context-url" value="../data/schema/note" placeholder="../data/schema/note">
+                        <label class="settings-label" for="global-context-url">Context URL</label>
+                        <input type="url" class="settings-input" id="global-context-url" autocomplete="url" value="../data/schema/note" placeholder="../data/schema/note">
                     </div>
                     <div class="settings-row" style="display:flex;gap:10px;">
                         <button class="btn btn-sm" id="load-context-btn">Load Context</button>
                         <span id="context-status" style="color:var(--text-muted);font-size:0.74rem;display:flex;align-items:center;"></span>
                     </div>
                     <div class="settings-row" style="margin-top:14px;">
-                        <label class="settings-label">Loaded Context Preview</label>
+                        <label class="settings-label" for="global-context-preview">Loaded Context Preview</label>
                         <textarea class="settings-input settings-textarea" id="global-context-preview" readonly placeholder="Context will appear here after loading..."></textarea>
                     </div>
                 </div>
@@ -3593,8 +3621,8 @@ select:focus-visible {
                 <div class="settings-section">
                     <div class="settings-title">Backend Sync</div>
                     <div class="settings-row">
-                        <label class="settings-label">Backend Save URL</label>
-                        <input type="text" class="settings-input" id="backend-save-url" placeholder="https://your-backend.example.com/api/graph/save">
+                        <label class="settings-label" for="backend-save-url">Backend Save URL</label>
+                        <input type="url" class="settings-input" id="backend-save-url" autocomplete="url" placeholder="https://your-backend.example.com/api/graph/save">
                         <span class="settings-hint">When configured, the Save button sends a JSON patch (the list of modified nodes) to this URL via HTTP POST. When left empty, Save downloads a full JSON file instead.</span>
                     </div>
                     <div class="settings-row">
@@ -3623,10 +3651,10 @@ select:focus-visible {
 
     <!-- AI Relations Modal -->
     <div class="modal-overlay" id="ai-relations-modal">
-        <div class="modal" style="max-width:900px;">
+        <div class="modal" style="max-width:900px;" role="dialog" aria-modal="true" aria-labelledby="ai-relations-title">
             <div class="modal-header">
-                <div class="modal-title">AI Discover Relations</div>
-                <button class="modal-close" id="ai-relations-close">&times;</button>
+                <div class="modal-title" id="ai-relations-title">AI Discover Relations</div>
+                <button class="modal-close" id="ai-relations-close" type="button" aria-label="Close">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="context-block" style="margin-bottom:22px;">
@@ -3655,10 +3683,10 @@ select:focus-visible {
 
     <!-- AI Improve Modal -->
     <div class="modal-overlay" id="ai-improve-modal">
-        <div class="modal" style="max-width:900px;">
+        <div class="modal" style="max-width:900px;" role="dialog" aria-modal="true" aria-labelledby="ai-improve-title">
             <div class="modal-header">
-                <div class="modal-title">AI Improve Node</div>
-                <button class="modal-close" id="ai-improve-close">&times;</button>
+                <div class="modal-title" id="ai-improve-title">AI Improve Node</div>
+                <button class="modal-close" id="ai-improve-close" type="button" aria-label="Close">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="ai-rel-note">
@@ -3715,10 +3743,10 @@ select:focus-visible {
 
     <!-- AI Improve Docs Modal -->
     <div class="modal-overlay" id="ai-improve-docs-modal">
-        <div class="modal" style="max-width:560px;">
+        <div class="modal" style="max-width:560px;" role="dialog" aria-modal="true" aria-labelledby="ai-improve-docs-title">
             <div class="modal-header">
-                <div class="modal-title">AI Improve — Relationships Policy</div>
-                <button class="modal-close" id="ai-improve-docs-close">&times;</button>
+                <div class="modal-title" id="ai-improve-docs-title">AI Improve — Relationships Policy</div>
+                <button class="modal-close" id="ai-improve-docs-close" type="button" aria-label="Close">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="docs-body">
@@ -3741,10 +3769,10 @@ select:focus-visible {
 
     <!-- Help Modal -->
     <div class="modal-overlay" id="help-modal-overlay">
-        <div class="modal help-modal">
+        <div class="modal help-modal" role="dialog" aria-modal="true" aria-labelledby="help-title">
             <div class="modal-header">
-                <div class="modal-title">Help & Shortcuts</div>
-                <button class="modal-close" id="help-close">&times;</button>
+                <div class="modal-title" id="help-title">Help & Shortcuts</div>
+                <button class="modal-close" id="help-close" type="button" aria-label="Close">&times;</button>
             </div>
             <div class="modal-body">
                 <input type="text" class="help-search" id="help-search" placeholder="Search shortcuts...">
@@ -3778,10 +3806,10 @@ select:focus-visible {
 
     <!-- Stats Modal -->
     <div class="modal-overlay" id="stats-modal">
-        <div class="modal stats-modal">
+        <div class="modal stats-modal" role="dialog" aria-modal="true" aria-labelledby="stats-title">
             <div class="modal-header">
-                <div class="modal-title">Graph Statistics</div>
-                <button class="modal-close" id="stats-close">&times;</button>
+                <div class="modal-title" id="stats-title">Graph Statistics</div>
+                <button class="modal-close" id="stats-close" type="button" aria-label="Close">&times;</button>
             </div>
             <div class="modal-body" id="stats-modal-body"></div>
             <div class="modal-footer">
@@ -5610,52 +5638,6 @@ function convexHull(points) {
     return lower.concat(upper);
 }
 
-/* ═══════ COMMUNITY SILHOUETTES (offscreen, blurred clouds) ═══════ */
-function computeHulls() {
-    const groups = {};
-    nodes.forEach(n => {
-        const ci = categoryColorIndex(n.category);
-        if (!groups[ci]) groups[ci] = [];
-        groups[ci].push({ x: n.x, y: n.y });
-    });
-    communityHulls = {};
-    Object.keys(groups).forEach(ci => {
-        communityHulls[ci] = convexHull(groups[ci]);
-    });
-}
-
-function renderSilhouettes() {
-    if (!silhouetteCanvas) {
-        silhouetteCanvas = document.createElement('canvas');
-        silhouetteCtx = silhouetteCanvas.getContext('2d');
-    }
-    // Compute world bounds to size the offscreen canvas
-    if (!nodes.length) { silhouetteCanvas.width = 1; silhouetteCanvas.height = 1; return; }
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    nodes.forEach(n => { if (n.x < minX) minX = n.x; if (n.x > maxX) maxX = n.x; if (n.y < minY) minY = n.y; if (n.y > maxY) maxY = n.y; });
-    const pad = 120;
-    const bw = Math.max(1, maxX - minX + pad * 2);
-    const bh = Math.max(1, maxY - minY + pad * 2);
-    silhouetteCanvas.width = Math.min(bw, 4000);
-    silhouetteCanvas.height = Math.min(bh, 4000);
-    const sc = silhouetteCtx;
-    sc.clearRect(0, 0, silhouetteCanvas.width, silhouetteCanvas.height);
-
-    const ox = -minX + pad, oy = -minY + pad;
-    sc.filter = 'blur(70px)';
-    Object.keys(communityHulls).forEach(ci => {
-        const hull = communityHulls[ci];
-        if (!hull || hull.length < 2) return;
-        sc.beginPath();
-        sc.moveTo(hull[0].x + ox, hull[0].y + oy);
-        for (let i = 1; i < hull.length; i++) sc.lineTo(hull[i].x + ox, hull[i].y + oy);
-        sc.closePath();
-        sc.fillStyle = hexToRGBA(COMMUNITY_COLORS[ci % COMMUNITY_COLORS.length], 0.08);
-        sc.fill();
-    });
-    sc.filter = 'none';
-}
-
 /* ═══════ CAMERA TWEEN (cubic-bezier ease over ~600ms) ═══════ */
 const CAM_EASE = 0.2; // (0.2, 0, 0.2, 1) approximated as exponential approach
 function tweenCamera(toX, toY, toZ, duration = 600) {
@@ -5670,16 +5652,6 @@ function updateCameraTween(now) {
     cam.y = camTween.from.y + (camTween.to.y - camTween.from.y) * e;
     cam.z = camTween.from.z + (camTween.to.z - camTween.from.z) * e;
     if (t >= 1) camTween = null;
-}
-
-/* ═══════ VIEWPORT COVERAGE (semantic zoom band metric) ═══════ */
-function computeViewportCoverage() {
-    if (!nodes.length) { viewportCoverage = 1; return; }
-    let minX = Infinity, maxX = -Infinity;
-    nodes.forEach(n => { if (n.x < minX) minX = n.x; if (n.x > maxX) maxX = n.x; });
-    const graphW = Math.max(1, maxX - minX);
-    const visW = W / cam.z;
-    viewportCoverage = clamp(visW / graphW, 0, 2);
 }
 
 /* ═══════ SIMULATION ═══════ */
@@ -5737,231 +5709,6 @@ function computeEdgeWeights() {
         if (w > mw) mw = w;
     }
     maxEdgeWeight = mw;
-}
-
-function edgeShouldShow(i, band) {
-    const w = edgeWeights[i];
-    if (band === 'macro') return w >= maxEdgeWeight * 0.95;       // top 5%
-    if (band === 'meso') {
-        const e = edges[i];
-        const ts = labelTiers[e.source] !== 'micro' || labelTiers[e.target] !== 'micro';
-        return ts || w >= maxEdgeWeight * 0.9;
-    }
-    return true; // micro: all edges
-}
-
-function zoomBand() {
-    if (viewportCoverage > 0.7) return 'macro';
-    if (viewportCoverage > 0.2) return 'meso';
-    return 'micro';
-}
-
-/* ═══════ LABEL VISIBILITY (tier + band + hover/selected) ═══════ */
-function labelTargetOpacity(n, band) {
-    const tier = labelTiers[n.id] || 'micro';
-    if (n === hoveredNode || n === selectedNode) return 1;
-    if (tier === 'always') return 1;
-    if (tier === 'meso' && (band === 'meso' || band === 'micro')) return 0.85;
-    if (tier === 'micro' && band === 'micro') return 0.7;
-    return 0;
-}
-
-/* ═══════ DRAWING — Oxford layered pipeline ═══════ */
-/* Layers: (1) silhouettes → (2) edges → (3) nodes → (4) labels.
-   Depth by shadow not glow; matte velvet nodes; faint graphite threads. */
-function draw() {
-    const now = performance.now();
-    updateCameraTween(now);
-    computeViewportCoverage();
-    const band = zoomBand();
-
-    // Recompute silhouettes when layout has shifted substantially
-    if (silhouetteDirty) {
-        computeHulls();
-        renderSilhouettes();
-        silhouetteDirty = false;
-    }
-    // Recompute edge weights if structure changed
-    if (edgeWeights === null || edgeWeights.length !== edges.length) computeEdgeWeights();
-
-    ctx.clearRect(0, 0, W, H);
-
-    /* ── LAYER 1: Community silhouettes (background clouds) ── */
-    // Fade clouds in macro, dim them to near-invisibility in micro
-    const silhouetteAlpha = band === 'macro' ? 1 : band === 'meso' ? 0.5 : 0.15;
-    if (silhouetteCanvas && silhouetteCanvas.width > 1 && silhouetteAlpha > 0) {
-        if (!nodes.length) { /* skip */ } else {
-            let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-            nodes.forEach(n => { if (n.x < minX) minX = n.x; if (n.x > maxX) maxX = n.x; if (n.y < minY) minY = n.y; if (n.y > maxY) maxY = n.y; });
-            const pad = 120;
-            // The silhouette canvas was drawn with offset ox=-minX+pad, oy=-minY+pad
-            // Map world (minX-pad .. maxX+pad) to screen
-            const tlx = (minX - pad) * cam.z + cam.x;
-            const tly = (minY - pad) * cam.z + cam.y;
-            const sw = (silhouetteCanvas.width) * cam.z;
-            const sh = (silhouetteCanvas.height) * cam.z;
-            ctx.globalAlpha = silhouetteAlpha;
-            ctx.drawImage(silhouetteCanvas, tlx, tly, sw, sh);
-            ctx.globalAlpha = 1;
-        }
-    }
-
-    /* ── LAYER 2: Edges (midground, drawn before nodes) ── */
-    ctx.lineCap = 'round';
-    for (let i = 0; i < edges.length; i++) {
-        if (!edgeShouldShow(i, band)) continue;
-        const e = edges[i];
-        const s = nodeMap[e.source], t = nodeMap[e.target];
-        if (!s || !t) continue;
-        const ss = worldToScreen(s.x, s.y), ts = worldToScreen(t.x, t.y);
-        const w = edgeWeights[i];
-        const baseOpacity = clamp((w / maxEdgeWeight) * 0.3, 0.1, 0.3);
-
-        const incident = (hoveredNode && (hoveredNode.id === e.source || hoveredNode.id === e.target)) ||
-                         (selectedNode && (selectedNode.id === e.source || selectedNode.id === e.target));
-
-        let strokeStyle, lineWidth;
-        if (incident) {
-            // Highlight: tint with hovered/selected community colour, opacity 0.6
-            const ref = hoveredNode || selectedNode;
-            const tint = getCategoryColor(ref.category);
-            strokeStyle = hexToRGBA(tint, 0.6);
-            lineWidth = clamp(1.0 * cam.z, 0.6, 1.6);
-        } else if (hoveredNode) {
-            // Dim others to 0.05 when hovering
-            strokeStyle = hexToRGBA('#4a4a4a', 0.05);
-            lineWidth = clamp(0.5 * cam.z, 0.3, 1.0);
-        } else {
-            strokeStyle = hexToRGBA('#4a4a4a', baseOpacity);
-            lineWidth = clamp(0.75 * cam.z, 0.4, 1.2);
-        }
-        ctx.beginPath();
-        ctx.moveTo(ss.x, ss.y);
-        ctx.lineTo(ts.x, ts.y);
-        ctx.strokeStyle = strokeStyle;
-        ctx.lineWidth = lineWidth;
-        ctx.stroke();
-    }
-
-    /* Potential link line (link mode) */
-    if (linkMode && linkSourceNode && hoveredNode && linkSourceNode !== hoveredNode) {
-        const ss = worldToScreen(linkSourceNode.x, linkSourceNode.y), ts = worldToScreen(hoveredNode.x, hoveredNode.y);
-        ctx.beginPath(); ctx.moveTo(ss.x, ss.y); ctx.lineTo(ts.x, ts.y);
-        ctx.strokeStyle = hexToRGBA('#9b7eb0', 0.5); ctx.lineWidth = 1.6;
-        ctx.setLineDash([6, 4]); ctx.stroke(); ctx.setLineDash([]);
-    }
-
-    /* ── LAYER 3: Nodes (foreground, matte velvet) ── */
-    // First pass: drop shadows for all nodes (lifts them from canvas)
-    ctx.save();
-    for (let i = 0; i < nodes.length; i++) {
-        const n = nodes[i];
-        const s = worldToScreen(n.x, n.y);
-        const isH = hoveredNode === n, isSel = selectedNode === n;
-        const baseR = nodeRadius(n);
-        const r = Math.max(2, baseR * cam.z);
-        // Cull offscreen
-        if (s.x + r + 20 < 0 || s.x - r - 20 > W || s.y + r + 20 < 0 || s.y - r - 20 > H) continue;
-        const shadowBlur = isH ? 12 : 6;
-        const shadowOffset = isH ? 4 : 2;
-        ctx.shadowColor = `rgba(0,0,0,${isH ? 0.7 : 0.5})`;
-        ctx.shadowBlur = shadowBlur * (cam.z > 1 ? 1 : cam.z);
-        ctx.shadowOffsetY = shadowOffset;
-        ctx.fillStyle = getCategoryColor(n.category);
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
-        ctx.fill();
-    }
-    ctx.restore();
-
-    // Second pass: fills + strokes (no shadow)
-    for (let i = 0; i < nodes.length; i++) {
-        const n = nodes[i];
-        const s = worldToScreen(n.x, n.y);
-        const isH = hoveredNode === n, isSel = selectedNode === n, isLS = linkSourceNode === n;
-        const baseR = nodeRadius(n);
-        const r = Math.max(2, (baseR + (isH ? 1 : 0)) * cam.z);
-        if (s.x + r + 20 < 0 || s.x - r - 20 > W || s.y + r + 20 < 0 || s.y - r - 20 > H) continue;
-        const color = getCategoryColor(n.category);
-
-        // Matte solid fill — velvet buttons
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Hover stroke: faint warm pencil line
-        if (isH && !isSel) {
-            ctx.strokeStyle = 'rgba(255,255,255,0.25)';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
-            ctx.stroke();
-        }
-        // Selected stroke: thin gilt edge — fine bookbinding
-        if (isSel) {
-            ctx.strokeStyle = '#C4B998';
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.arc(s.x, s.y, r + 1.5, 0, Math.PI * 2);
-            ctx.stroke();
-        }
-        // Search highlight: glowing cyan ring
-        if (searchHighlightNodes.has(n.id)) {
-            ctx.save();
-            ctx.shadowColor = '#4dd4c4';
-            ctx.shadowBlur = 15;
-            ctx.strokeStyle = '#4dd4c4';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(s.x, s.y, r + 5, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.restore();
-        }
-        // Link source: plum dashed ring
-        if (isLS) {
-            ctx.strokeStyle = hexToRGBA('#9b7eb0', 0.6);
-            ctx.lineWidth = 1.6;
-            ctx.setLineDash([4, 4]);
-            ctx.beginPath();
-            ctx.arc(s.x, s.y, r + 4, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.setLineDash([]);
-        }
-    }
-
-    /* ── LAYER 4: Labels (parchment text with protective dark mask) ── */
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    for (let i = 0; i < nodes.length; i++) {
-        const n = nodes[i];
-        const target = labelTargetOpacity(n, band);
-        const cur = labelOpacity[n.id] || 0;
-        // Tween opacity over ~200ms (approx 12 frames)
-        const next = cur + (target - cur) * 0.15;
-        labelOpacity[n.id] = next;
-        if (next < 0.02) continue;
-        const s = worldToScreen(n.x, n.y);
-        const baseR = nodeRadius(n);
-        const r = Math.max(2, baseR * cam.z);
-        const tier = labelTiers[n.id] || 'micro';
-        const weight = tier === 'always' ? 500 : 400;
-        const fontSize = clamp(tier === 'always' ? r * 1.3 : r * 1.1, 9, 13);
-        ctx.font = `${weight} ${fontSize}px Inter, system-ui, sans-serif`;
-        let label = n.name || n.id || 'Unknown';
-        const maxChars = band === 'macro' ? 14 : 22;
-        if (label.length > maxChars) label = label.substring(0, maxChars - 1) + '…';
-
-        // Protective dark mask shadow (not a glow)
-        ctx.save();
-        ctx.shadowColor = '#0b0e14';
-        ctx.shadowBlur = 4;
-        ctx.fillStyle = hexToRGBA('#D6D1C4', Math.min(1, next));
-        ctx.fillText(label, s.x + r + 6, s.y);
-        ctx.restore();
-    }
-
-    drawMinimap();
 }
 
 function lightenColor(hex, percent) {
@@ -7893,8 +7640,15 @@ function setupEventHandlers() {
     document.getElementById('deselect-btn').addEventListener('click', resetSelection);
 
     // Click on AI status chip opens Settings modal
-    document.getElementById('ai-status').addEventListener('click', () => {
+    const aiChip = document.getElementById('ai-status');
+    aiChip.addEventListener('click', () => {
         document.getElementById('settings-btn').click();
+    });
+    aiChip.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            document.getElementById('settings-btn').click();
+        }
     });
 
     // Click on backend status chip — triggers an immediate health check

@@ -160,6 +160,35 @@
             border-radius: var(--radius-sm);
         }
 
+        /* Visually-hidden but accessible to AT / keyboard (replaces display:none on inputs). */
+        .sr-only {
+            position: absolute !important;
+            width: 1px; height: 1px;
+            padding: 0; margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0
+        }
+
+        /* Skip link — hidden until focused by keyboard. */
+        .skip-link {
+            position: absolute;
+            left: 12px; top: 12px;
+            z-index: 1000;
+            padding: 8px 14px;
+            background: var(--accent-copper);
+            color: var(--bg-void);
+            font-family: var(--font-body);
+            font-size: var(--text-label);
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            transform: translateY(-150%);
+            transition: transform .2s var(--ease-std)
+        }
+        .skip-link:focus { transform: translateY(0); }
+
         body {
             background: var(--bg-void);
             color: var(--text-primary);
@@ -930,7 +959,13 @@
         }
 
         .toggle-item input {
-            display: none
+            position: absolute;
+            width: 1px; height: 1px;
+            padding: 0; margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0
         }
 
         .checkmark {
@@ -2480,6 +2515,7 @@
 </head>
 
 <body>
+    <a class="skip-link" href="#main">Skip to graph</a>
     <aside class="toolbox" id="sidebar">
         <div class="sb-header"><span class="sb-eyebrow">Philosophia Artium Technicarum</span>
             <h2 class="sb-title">Practice Explorer</h2>
@@ -2491,15 +2527,15 @@
                     <circle cx="11" cy="11" r="8" />
                     <line x1="21" y1="21" x2="16.65" y2="16.65" />
                 </svg><input type="text" class="search-box" id="search-input" placeholder="Search nodes..."
-                    autocomplete="off"><button class="search-clear" id="search-clear">&times;</button></div>
+                    autocomplete="off" aria-label="Search nodes"><button class="search-clear" id="search-clear" type="button" aria-label="Clear search">&times;</button></div>
             <div class="search-selected" id="search-selected"><span class="search-selected-dot"
                     id="search-selected-dot"></span><span class="search-selected-name"
                     id="search-selected-name"></span><button class="search-selected-clear"
-                    id="search-selected-clear">&times;</button></div>
+                    id="search-selected-clear" type="button" aria-label="Clear selection">&times;</button></div>
         </div>
         <div class="sb-controls">
             <div class="sb-controls-head"><span class="label">Controls</span><button class="sb-reset"
-                    id="reset-all-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    id="reset-all-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="1 4 1 10 7 10" />
                         <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
@@ -2511,7 +2547,7 @@
                     <div class="time-slider-wrap">
                         <div class="time-track"></div>
                         <div class="time-fill" id="time-fill"></div><input type="range" id="time-min" min="0" max="1000"
-                            value="0"><input type="range" id="time-max" min="0" max="1000" value="1000">
+                            value="0" aria-label="Minimum year"><input type="range" id="time-max" min="0" max="1000" value="1000" aria-label="Maximum year">
                     </div>
                     <div class="time-stats"><span class="ts-dot"></span><span class="ts-count"
                             id="time-visible-count">0</span><span>of <span id="time-total-count">0</span> nodes</span>
@@ -2529,12 +2565,12 @@
             </div>
         </div>
     </aside>
-    <main class="canvas-area">
-        <button class="sidebar-toggle" id="sidebar-toggle-btn">&#9776;</button>
-        <canvas id="graph-canvas"></canvas>
-        <div class="quick-actions"><button class="qa-btn" id="qa-fit" title="Fit View (F)">&#8862;</button><button class="qa-btn" id="qa-epistemic" title="Epistemic Artifacts (E)">&#931;</button></div>
-        <div class="minimap-wrap" id="minimap-wrap"><canvas id="minimap-canvas"></canvas></div>
-        <div class="empty-state" id="empty-state">
+    <main class="canvas-area" id="main">
+        <button class="sidebar-toggle" id="sidebar-toggle-btn" type="button" aria-label="Toggle sidebar" aria-expanded="true">&#9776;</button>
+        <canvas id="graph-canvas" role="img" aria-label="Interactive node-link graph of technical practices"></canvas>
+        <div class="quick-actions"><button class="qa-btn" id="qa-fit" type="button" aria-label="Fit view" title="Fit View (F)">&#8862;</button><button class="qa-btn" id="qa-epistemic" type="button" aria-label="Epistemic artifacts" title="Epistemic Artifacts (E)">&#931;</button></div>
+        <div class="minimap-wrap" id="minimap-wrap" role="button" tabindex="0" aria-label="Graph overview — activate to recenter"><canvas id="minimap-canvas"></canvas></div>
+        <div class="empty-state" id="empty-state" role="status">
             <div class="empty-state-icon">&#9675;</div>
             <div class="empty-state-text">No nodes match current filters</div>
             <div class="empty-state-hint">Adjust temporal scope, layers, categories, or families</div>
@@ -2549,9 +2585,9 @@
             <div class="tt-year" id="tt-year"></div>
             <div class="tt-meta" id="tt-meta"></div>
         </div>
-        <div id="inspect-panel">
+        <div id="inspect-panel" role="dialog" aria-modal="false" aria-label="Node details">
             <div class="ip-accent-bar" id="ip-accent-bar"></div>
-            <div class="ip-header"><button class="ip-close" id="ip-close-btn">&times;</button>
+            <div class="ip-header"><button class="ip-close" id="ip-close-btn" type="button" aria-label="Close details">&times;</button>
                 <div class="ip-category-badge" id="ip-badge"><span class="ip-category-dot"
                         id="ip-badge-dot"></span><span id="ip-badge-text"></span></div>
                 <div class="ip-layer-badge" id="ip-layer-badge"><span class="ip-layer-dot"
@@ -2565,11 +2601,11 @@
         </div>
         <div id="epistemic-overlay" class="epistemic-overlay">
             <div class="eo-backdrop"></div>
-            <div class="eo-panel">
+            <div class="eo-panel" role="dialog" aria-modal="true" aria-label="Epistemic artifacts">
                 <div class="eo-header">
                     <div class="eo-eyebrow">Epistemic Artifacts</div>
                     <div class="eo-title">A Guide Connecting Reality & Representation</div>
-                    <button class="eo-close" id="eo-close-btn">&times;</button>
+                    <button class="eo-close" id="eo-close-btn" type="button" aria-label="Close">&times;</button>
                 </div>
                 <div class="eo-body" id="eo-body"></div>
                 <div class="eo-footer">
@@ -2579,11 +2615,11 @@
         </div>
         <div id="kb-help-overlay" class="kb-help-overlay">
             <div class="kb-help-backdrop"></div>
-            <div class="kb-help-panel">
+            <div class="kb-help-panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
                 <div class="kb-help-header">
                     <div class="kb-help-eyebrow">Keyboard</div>
                     <div class="kb-help-title">Shortcuts</div>
-                    <button class="kb-help-close" id="kb-help-close-btn">&times;</button>
+                    <button class="kb-help-close" id="kb-help-close-btn" type="button" aria-label="Close">&times;</button>
                 </div>
                 <div class="kb-help-body">
                     <ul class="kb-help-list">
@@ -2604,7 +2640,7 @@
     <div class="search-dropdown" id="search-dropdown">
         <div class="search-dropdown-header"><span class="search-dropdown-label">Results</span><span
                 class="search-dropdown-count" id="search-dropdown-count"></span></div>
-        <div class="search-dropdown-inner" id="search-dropdown-inner"></div>
+        <div class="search-dropdown-inner" id="search-dropdown-inner" role="listbox" aria-label="Search results"></div>
     </div>
     <div id="loading-overlay">
         <div class="loader-dots"><span></span><span></span><span></span></div>
@@ -2984,122 +3020,6 @@
         function w2s(wx,wy){return{x:wx*cam.z+cam.x,y:wy*cam.z+cam.y}}
         function s2w(sx,sy){return{x:(sx-cam.x)/cam.z,y:(sy-cam.y)/cam.z}}
 
-        function drawShape(x,y,r,shape){
-            r=Math.max(1,r);
-            switch(shape){
-                case'triangle':ctx.beginPath();ctx.moveTo(x,y-r);ctx.lineTo(x-r*.866,y+r*.5);ctx.lineTo(x+r*.866,y+r*.5);ctx.closePath();break;
-                case'square':ctx.beginPath();var s=r*.82;ctx.rect(x-s,y-s,s*2,s*2);break;
-                case'diamond':ctx.beginPath();ctx.moveTo(x,y-r);ctx.lineTo(x+r*.7,y);ctx.lineTo(x,y+r);ctx.lineTo(x-r*.7,y);ctx.closePath();break;
-                case'hexagon':ctx.beginPath();for(var i=0;i<6;i++){var a=i*Math.PI/3-Math.PI/6;ctx.lineTo(x+Math.cos(a)*r,y+Math.sin(a)*r)}ctx.closePath();break;
-                default:ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);break
-            }
-        }
-
-        function drawEdges(){
-            var showFlow=document.getElementById('lens-flow').checked;
-            var showHeat=document.getElementById('lens-heatmap').checked;
-            gE.forEach(function(e){
-                if(!e.visible)return;
-                var s=nM[e.source],t=nM[e.target];if(!s||!t)return;
-                var sp=w2s(s.x,s.y),tp=w2s(t.x,t.y);
-                if(sp.x<-50&&tp.x<-50)return;if(sp.x>W+50&&tp.x>W+50)return;
-                if(sp.y<-50&&tp.y<-50)return;if(sp.y>H+50&&tp.y>H+50)return;
-                var isHov=hovN&&(hovN.id===e.source||hovN.id===e.target);
-                var isSel=selN&&(selN.id===e.source||selN.id===e.target);
-                var isPin=pinN&&(pinN.id===e.source||pinN.id===e.target);
-                var famC=FC[e.family]||'#6b8caa';
-                var highlight=isHov||isSel||isPin;
-                var baseA=highlight?0.3:0.07;
-                ctx.strokeStyle=hexToRGBA(famC,baseA);
-                ctx.lineWidth=highlight?1.4:0.6;
-                if(showFlow){
-                    var dx=tp.x-sp.x,dy=tp.y-sp.y,d=Math.sqrt(dx*dx+dy*dy);
-                    if(d>10){
-                        var nx=-dy/d,ny=dx/d;
-                        var cpx=(sp.x+tp.x)/2+nx*d*0.08,cpy=(sp.y+tp.y)/2+ny*d*0.08;
-                        ctx.beginPath();ctx.moveTo(sp.x,sp.y);ctx.quadraticCurveTo(cpx,cpy,tp.x,tp.y);ctx.stroke();
-                        if(highlight){
-                            var gt=0.4+0.3*Math.sin(performance.now()*0.003);
-                            var grd=ctx.createLinearGradient(sp.x,sp.y,tp.x,tp.y);
-                            grd.addColorStop(0,hexToRGBA(famC,0));
-                            grd.addColorStop(0.5,hexToRGBA(famC,gt));
-                            grd.addColorStop(1,hexToRGBA(famC,0));
-                            ctx.strokeStyle=grd;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(sp.x,sp.y);ctx.quadraticCurveTo(cpx,cpy,tp.x,tp.y);ctx.stroke()
-                        }
-                    }else{ctx.beginPath();ctx.moveTo(sp.x,sp.y);ctx.lineTo(tp.x,tp.y);ctx.stroke()}
-                }else{ctx.beginPath();ctx.moveTo(sp.x,sp.y);ctx.lineTo(tp.x,tp.y);ctx.stroke()}
-                if(showHeat&&e.family==='NormativeAndRegulative'){
-                    ctx.strokeStyle=hexToRGBA('#c47d8a',0.09);ctx.lineWidth=3.5;ctx.beginPath();ctx.moveTo(sp.x,sp.y);ctx.lineTo(tp.x,tp.y);ctx.stroke()
-                }
-            })
-        }
-
-        function drawHulls(){
-            if(!document.getElementById('lens-hulls').checked)return;
-            if(SP.indexOf(curProj)>=0)return;
-            Object.keys(catC).forEach(function(cat){
-                var pts=catC[cat];if(pts.length<3)return;
-                var sPts=pts.map(function(p){return w2s(p.x,p.y)});
-                var cx=0,cy=0;sPts.forEach(function(p){cx+=p.x;cy+=p.y});cx/=sPts.length;cy/=sPts.length;
-                sPts.sort(function(a,b){return Math.atan2(a.y-cy,a.x-cx)-Math.atan2(b.y-cy,b.x-cx)});
-                ctx.beginPath();ctx.moveTo(sPts[0].x,sPts[0].y);
-                for(var i=1;i<sPts.length;i++)ctx.lineTo(sPts[i].x,sPts[i].y);
-                ctx.closePath();
-                var hullCol=CC[cat]||'#888';
-                var hgrd=ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(100,Math.sqrt((cx-sPts[0].x)**2+(cy-sPts[0].y)**2)));
-                hgrd.addColorStop(0,hexToRGBA(hullCol,0.025));
-                hgrd.addColorStop(1,hexToRGBA(hullCol,0.005));
-                ctx.fillStyle=hgrd;ctx.fill();
-                ctx.strokeStyle=hexToRGBA(hullCol,0.08);ctx.lineWidth=1;ctx.stroke()
-            })
-        }
-
-        function drawNodes(){
-            var showCent=document.getElementById('lens-centrality').checked;
-            var showConfCol=document.getElementById('lens-confidence-color').checked;
-            var showObs=document.getElementById('lens-observability').checked;
-            var maxDeg=Math.max(1,nodes.reduce(function(a,n){return Math.max(a,n.degree)},0));
-            nodes.forEach(function(nd){
-                if(!nd.visible)return;
-                var sp=w2s(nd.x,nd.y);
-                if(sp.x<-40||sp.x>W+40||sp.y<-40||sp.y>H+40)return;
-                var isHov=hovN&&hovN.id===nd.id;
-                var isSel=selN&&selN.id===nd.id;
-                var isPin=pinN&&pinN.id===nd.id;
-                var baseR=4.5+nd.degree*0.55;if(showCent)baseR=3.5+nd.degree*1.3;
-                var r=Math.max(2.5,baseR)*cam.z;r=Math.max(2,Math.min(r,24));
-                if(isHov)r*=1.35;
-                var col=showConfCol?confidenceColor(nd.confidence):(CC[nd.category]||'#888');
-                var alpha2=1;
-                if(showObs){if(nd.observability==='latent')alpha2=0.18;else if(nd.observability==='partiallyObservable')alpha2=0.5}
-                if(isHov||isSel||isPin)alpha2=1;
-                ctx.globalAlpha=alpha2;
-                if(isHov||isSel||isPin){
-                    var glowCol=isSel?'#4dd4c4':isPin?'#C4B998':'#ffffff';
-                    ctx.strokeStyle=hexToRGBA(glowCol,isSel?0.7:isPin?0.5:0.4);
-                    ctx.lineWidth=1.5;
-                    drawShape(sp.x,sp.y,r+2,CS[nd.category]||'circle');ctx.stroke();
-                }
-                ctx.fillStyle=hexToRGBA(col,alpha2);
-                drawShape(sp.x,sp.y,r,CS[nd.category]||'circle');ctx.fill();
-
-                if(isHov){ctx.strokeStyle=hexToRGBA('#ffffff',0.5);ctx.lineWidth=1.2;drawShape(sp.x,sp.y,r+2.5,CS[nd.category]||'circle');ctx.stroke()}
-                if(isSel){ctx.strokeStyle=hexToRGBA('#4dd4c4',0.7);ctx.lineWidth=1.5;drawShape(sp.x,sp.y,r+3,CS[nd.category]||'circle');ctx.stroke()}
-                if(isPin){ctx.strokeStyle=hexToRGBA('#C4B998',0.6);ctx.lineWidth=1;ctx.setLineDash([3,3]);drawShape(sp.x,sp.y,r+4,CS[nd.category]||'circle');ctx.stroke();ctx.setLineDash([])}
-                if(cam.z>0.55&&r>3.5){
-                    var fontSize=Math.max(8.5,Math.min(11.5,r*1.1));
-                    ctx.font='500 '+fontSize+'px Inter';
-                    ctx.textAlign='center';ctx.textBaseline='top';
-                    ctx.fillStyle=hexToRGBA('#060710',alpha2*0.7);
-                    var lbl=nd.name||'';if(lbl.length>18)lbl=lbl.substring(0,16)+'…';
-                    ctx.fillText(lbl,sp.x+0.5,sp.y+r+5.5);
-                    ctx.fillStyle=hexToRGBA('#D6D1C4',alpha2*(isHov?0.92:0.6));
-                    ctx.fillText(lbl,sp.x,sp.y+r+5)
-                }
-                ctx.globalAlpha=1
-            })
-        }
-
         function drawMinimap(){
             var mw=180,mh=125;mmC.width=mw*devicePixelRatio;mmC.height=mh*devicePixelRatio;
             mmX.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);mmX.clearRect(0,0,mw,mh);
@@ -3117,14 +3037,6 @@
             var vx1=-cam.x/cam.z,vy1=-cam.y/cam.z;var vx2=(W-cam.x)/cam.z,vy2=(H-cam.y)/cam.z;
             var rx=vx1*s+ox,ry=vy1*s+oy,rw=(vx2-vx1)*s,rh=(vy2-vy1)*s;
             mmX.strokeStyle=hexToRGBA('#c9956c',0.3);mmX.lineWidth=1;mmX.strokeRect(rx,ry,rw,rh)
-        }
-
-        function drawUMAPInfo(){
-            if(curProj!=='umap')return;
-            ctx.save();ctx.font='400 9px "JetBrains Mono"';ctx.textAlign='left';
-            ctx.fillStyle=hexToRGBA('#6b8caa',0.35);
-            ctx.fillText('UMAP \u00B7 k='+umapK+' \u00B7 min_dist=0.1',16,H-38);
-            ctx.fillText('n_neighbors='+umapK+' \u00B7 euclidean metric',16,H-24);ctx.restore()
         }
 
         /* ═══════ MAIN LOOP ═══════ */
@@ -3326,7 +3238,7 @@
             document.getElementById('search-dropdown-count').textContent=fRes.length;
             var html='';fRes.forEach(function(nd,i){
                 var isAct=selN&&selN.id===nd.id;
-                html+='<div class="search-result'+(isAct?' active':'')+'" data-idx="'+i+'"><div class="sr-cat-line" style="background:'+(CC[nd.category]||'#888')+'"></div><div class="sr-body"><div class="sr-top"><span class="sr-name">'+hlMatch(nd.name,q)+'</span><span class="sr-cat-label" style="color:'+(CC[nd.category]||'#888')+'">'+(nd.layer||'')+'</span></div><div class="sr-desc">'+(nd.description||'')+'</div><div class="sr-foot"><span>Conf. '+((nd.confidence||0)*100).toFixed(0)+'%</span><span>Deg. '+nd.degree+'</span>'+(nd.year?'<span>c. '+nd.year+'</span>':'')+'</div></div></div>'
+                html+='<div class="search-result'+(isAct?' active':'')+'" data-idx="'+i+'" role="option" aria-selected="'+(isAct?'true':'false')+'"><div class="sr-cat-line" style="background:'+(CC[nd.category]||'#888')+'"></div><div class="sr-body"><div class="sr-top"><span class="sr-name">'+hlMatch(nd.name,q)+'</span><span class="sr-cat-label" style="color:'+(CC[nd.category]||'#888')+'">'+(nd.layer||'')+'</span></div><div class="sr-desc">'+(nd.description||'')+'</div><div class="sr-foot"><span>Conf. '+((nd.confidence||0)*100).toFixed(0)+'%</span><span>Deg. '+nd.degree+'</span>'+(nd.year?'<span>c. '+nd.year+'</span>':'')+'</div></div></div>'
             });
             inner.innerHTML=html;
             inner.querySelectorAll('.search-result').forEach(function(el){
@@ -3389,6 +3301,10 @@
             var ox=90-((x1+x2)/2)*s,oy=62.5-((y1+y2)/2)*s;
             var wx=(sx-ox)/s,wy=(sy-oy)/s;cam.x=W/2-wx*cam.z;cam.y=H/2-wy*cam.z;camTgt=null
         });
+        /* Keyboard equivalent for the minimap "recenter" affordance. */
+        document.getElementById('minimap-wrap').addEventListener('keydown',function(e){
+            if(e.key==='Enter'||e.key===' '){e.preventDefault();fCam()}
+        });
 
         /* ═══════ CONSOLIDATED KEYBOARD SHORTCUTS ═══════ */
         /* Single handler for all keyboard shortcuts. Priority:
@@ -3435,7 +3351,8 @@
             if(key==='F1'){e.preventDefault();kbHelpOpen?kbHelpClose():kbHelpOpenOverlay();return}
         });
 
-        document.getElementById('sidebar-toggle-btn').addEventListener('click',function(){document.body.classList.toggle('sidebar-collapsed');setTimeout(resize,550)});
+        var sbToggleBtn=document.getElementById('sidebar-toggle-btn');
+        sbToggleBtn.addEventListener('click',function(){var collapsed=document.body.classList.toggle('sidebar-collapsed');sbToggleBtn.setAttribute('aria-expanded',String(!collapsed));setTimeout(resize,550)});
         document.getElementById('qa-fit').addEventListener('click',function(){fCam()});
         document.getElementById('ip-close-btn').addEventListener('click',closeInspect);
 
@@ -3493,15 +3410,17 @@
                 var label=(FLB[f]||friendlyLabel(f));
                 if(f==='unknown')label='Unspecified';
                 var col=FC[f]||'#888';
-                html+='<div class="chip active" data-family="'+f+'" style="border-left-color:'+col+'">'+label+'</div>'
+                html+='<div class="chip active" data-family="'+f+'" role="button" tabindex="0" aria-pressed="true" style="border-left-color:'+col+'">'+label+'</div>'
             });
             document.getElementById('family-chips').innerHTML=html;
             document.getElementById('family-chips').querySelectorAll('.chip').forEach(function(el){
-                el.addEventListener('click',function(){
+                var toggle=function(){
                     var f=el.dataset.family;
-                    if(el.classList.contains('active')){aFams.delete(f);el.classList.remove('active')}else{aFams.add(f);el.classList.add('active')}
+                    if(el.classList.contains('active')){aFams.delete(f);el.classList.remove('active');el.setAttribute('aria-pressed','false')}else{aFams.add(f);el.classList.add('active');el.setAttribute('aria-pressed','true')}
                     uFilt()
-                })
+                };
+                el.addEventListener('click',toggle);
+                el.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}})
             })
         }
 

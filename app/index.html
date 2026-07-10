@@ -14,7 +14,7 @@
             --bg-card: #11141D;
             --text-primary: #E2E4EB;
             --text-secondary: #8A8FA6;
-            --text-muted: #4A4F64;
+            --text-muted: #737891;
             --accent-gold: #C5A467;
             --accent-gold-dim: rgba(197, 164, 103, 0.15);
             --accent-cyan: #5BF0E7;
@@ -109,6 +109,12 @@
             border: 1px solid var(--border-subtle);
             padding: 0.4rem 0.75rem; cursor: pointer;
             transition: all 0.2s; user-select: none;
+            -webkit-appearance: none; appearance: none;
+            text-align: left; font: inherit;
+        }
+        .intent-chip:focus-visible {
+            outline: 2px solid var(--accent-cyan);
+            outline-offset: 2px;
         }
         .intent-chip:hover, .intent-chip.active {
             color: var(--accent-cyan);
@@ -336,11 +342,28 @@
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: var(--bg-void); }
         ::-webkit-scrollbar-thumb { background: var(--bg-card); border-radius: 3px; }
+
+        /* Visually-hidden (accessible) helper. */
+        .sr-only {
+            position: absolute !important; width: 1px; height: 1px;
+            padding: 0; margin: -1px; overflow: hidden;
+            clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+        }
+        /* Skip link — revealed on keyboard focus. */
+        .skip-link {
+            position: absolute; left: 12px; top: 12px; z-index: 1000;
+            padding: 8px 14px; background: var(--accent-gold); color: var(--bg-void);
+            font-family: var(--font-body); font-size: 0.8rem; font-weight: 600;
+            text-decoration: none; border-radius: 4px;
+            transform: translateY(-150%); transition: transform 0.2s ease;
+        }
+        .skip-link:focus { transform: translateY(0); }
     </style>
 </head>
 <body>
 
-<canvas id="ambientCanvas"></canvas>
+<canvas id="ambientCanvas" aria-hidden="true"></canvas>
+<a class="skip-link" href="#main">Skip to content</a>
 
 <div class="content-layer">
 
@@ -352,18 +375,19 @@
             An analysis of purposeful operation and its primary driver — technique: the structured process by which an agent transforms, constructs, operates, and maintains material or informational artifacts to bring about desired states in the world.
         </div>
         <div class="intent-resolver reveal">
-            <input type="text" class="intent-input" id="intentInput" placeholder="Describe your intent (e.g., 'How does a blueprint become an artifact?')..." autocomplete="off">
+            <input type="text" class="intent-input" id="intentInput" placeholder="Describe your intent (e.g., 'How does a blueprint become an artifact?')..." autocomplete="off" aria-label="Describe your intent">
             <div class="intent-chips" id="intentChips">
-                <div class="intent-chip" data-route="02">How does a blueprint become an artifact?</div>
-                <div class="intent-chip" data-route="04">What constrains this process?</div>
-                <div class="intent-chip" data-route="05">What is a Technical Agent?</div>
-                <div class="intent-chip" data-route="01">Reveal the system's topology</div>
-                <div class="intent-chip" data-route="03">Trace the assembly sequence</div>
-                <div class="intent-chip" data-route="06">Find all governed-by relations</div>
+                <button type="button" class="intent-chip" data-route="02">How does a blueprint become an artifact?</button>
+                <button type="button" class="intent-chip" data-route="04">What constrains this process?</button>
+                <button type="button" class="intent-chip" data-route="05">What is a Technical Agent?</button>
+                <button type="button" class="intent-chip" data-route="01">Reveal the system's topology</button>
+                <button type="button" class="intent-chip" data-route="03">Trace the assembly sequence</button>
+                <button type="button" class="intent-chip" data-route="06">Find all governed-by relations</button>
             </div>
         </div>
     </header>
 
+    <main id="main">
     <section class="core-definition reveal">
         <div class="core-def-label">Founding Definition</div>
         <p class="core-def-text">
@@ -426,6 +450,7 @@
         </div>
         <div class="routing-grid reveal" id="routingGrid"></div>
     </section>
+    </main>
 
     <footer class="grand-footer">
         <div class="footer-top">
@@ -433,34 +458,34 @@
                 <h3>The Map Is Not the Territory.</h3>
                 <p>This taxonomy is itself a technical artifact — subject to the same constraints of perspective, historical situatedness, and potential obsolescence it attempts to categorize. It does not replace the practice it describes. It renders it intelligible.</p>
             </div>
-            <div class="footer-col">
+            <nav class="footer-col" aria-label="System views">
                 <h4>System Views</h4>
                 <ul>
-                    <li><a href="#overview">Overview Diagnostics</a></li>
-                    <li><a href="#graph">Graph Representation</a></li>
-                    <li><a href="#query">Query Interface</a></li>
-                    <li><a href="#timeline">Temporal Evolution</a></li>
+                    <li><a href="edit.html">Overview Diagnostics</a></li>
+                    <li><a href="graph.html">Graph Representation</a></li>
+                    <li><a href="graph.html">Query Interface</a></li>
+                    <li><a href="graph.html">Temporal Evolution</a></li>
                 </ul>
-            </div>
-            <div class="footer-col">
+            </nav>
+            <nav class="footer-col" aria-label="Core categories">
                 <h4>Core Categories</h4>
                 <ul>
-                    <li><a href="#nodes">Artifacts &amp; Blueprints</a></li>
-                    <li><a href="#nodes">Agents &amp; Competence</a></li>
-                    <li><a href="#nodes">Processes &amp; Techniques</a></li>
-                    <li><a href="#nodes">Standards &amp; Constraints</a></li>
-                    <li><a href="#nodes">Feedback &amp; Maintenance</a></li>
+                    <li><a href="graph.html">Artifacts &amp; Blueprints</a></li>
+                    <li><a href="graph.html">Agents &amp; Competence</a></li>
+                    <li><a href="graph.html">Processes &amp; Techniques</a></li>
+                    <li><a href="graph.html">Standards &amp; Constraints</a></li>
+                    <li><a href="graph.html">Feedback &amp; Maintenance</a></li>
                 </ul>
-            </div>
-            <div class="footer-col">
+            </nav>
+            <nav class="footer-col" aria-label="Meta-system">
                 <h4>Meta-System</h4>
                 <ul>
-                    <li><a href="#documentation">Documentation</a></li>
-                    <li><a href="#documentation">Schema Specification</a></li>
-                    <li><a href="#documentation">Data Provenance</a></li>
-                    <li><a href="#about">About the Project</a></li>
+                    <li><a href="../spec.md">Documentation</a></li>
+                    <li><a href="../spec.md">Schema Specification</a></li>
+                    <li><a href="../README.md">Data Provenance</a></li>
+                    <li><a href="../README.md">About the Project</a></li>
                 </ul>
-            </div>
+            </nav>
         </div>
         <div class="footer-bottom">
             <div class="footer-bottom-inner">
@@ -549,31 +574,31 @@ const PATHWAYS = [
         keywords: ['structure','architecture','system','topology','how works','diagnose','overview','reveal']
     },
     {
-        id: '02', title: 'Explore Relations', href: '#graph',
+        id: '02', title: 'Explore Relations', href: 'graph.html',
         desc: 'Hypergraph traversal, community cluster maps, embedding projections, and neighborhood exploration across all 25 relation types and 9 families.',
         cta: 'Graph Representation',
         keywords: ['graph','hypergraph','embedding','relate','connect','blueprint','artifact','become','explore']
     },
     {
-        id: '03', title: 'Trace Knowledge Flow', href: '#timeline',
+        id: '03', title: 'Trace Knowledge Flow', href: 'graph.html',
         desc: 'Process sequences, feedback propagation paths, assembly tracing from raw resource to production object, and temporal dynamics of justification.',
         cta: 'Temporal Pathways',
         keywords: ['flow','trace','evolve','history','time','evolution','sequence','assembly']
     },
     {
-        id: '04', title: 'Investigate Limits', href: '#constraints',
+        id: '04', title: 'Investigate Limits', href: 'edit.html',
         desc: 'Boundary analysis of the technically achievable — bottlenecks, failure modes, noise models, and intractability within physical and logical constraints.',
         cta: 'Constraint Analysis',
         keywords: ['fail','limit','constraint','boundary','noise','why fail','bottleneck','constrains']
     },
     {
-        id: '05', title: 'Inspect Entities', href: '#nodes',
+        id: '05', title: 'Inspect Entities', href: 'edit.html',
         desc: 'Deep inspection of any concept type — its category, epistemic role, connections, centrality metrics, and position within the technical taxonomy.',
         cta: 'Node Explorer',
         keywords: ['inspect','node','artifact','detail','specific','what is','agent','technique']
     },
     {
-        id: '06', title: 'Query Architecture', href: '#query',
+        id: '06', title: 'Query Architecture', href: 'graph.html',
         desc: 'Formal graph-pattern queries using edge semantics, inheritance levels, and category filters to extract structural motifs from the taxonomy.',
         cta: 'Query Interface',
         keywords: ['query','search','find','where','filter','governed','relations','all']
@@ -604,7 +629,7 @@ function renderAtlas() {
 
 function renderRouting() {
     document.getElementById('routingGrid').innerHTML = PATHWAYS.map(p => `
-        <a href="${p.href}"  target="_blank" class="route-card" id="route-${p.id}" data-target="${p.id}">
+        <a href="${p.href}" target="_blank" rel="noopener noreferrer" class="route-card" id="route-${p.id}" data-target="${p.id}">
             <div>
                 <span class="card-id">${p.id} / SUBSYSTEM</span>
                 <h3 class="card-title">${p.title}</h3>

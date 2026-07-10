@@ -64,6 +64,16 @@
     return c;
   }
 
+  /* Lift an rgb triplet toward white by amt (0..1). Used for a subtle,
+   * identity-preserving hover accent (never recolours to pure white). */
+  function brighten(rgb, amt) {
+    return [
+      Math.min(255, Math.round(rgb[0] + (255 - rgb[0]) * amt)),
+      Math.min(255, Math.round(rgb[1] + (255 - rgb[1]) * amt)),
+      Math.min(255, Math.round(rgb[2] + (255 - rgb[2]) * amt)),
+    ];
+  }
+
   /* ── node radius (world units), degree-driven like the legacy renderer ── */
   function nodeRadius(n, maxDegree) {
     var t = maxDegree > 0 ? (n.degree || 0) / maxDegree : 0;
@@ -219,7 +229,10 @@
       radiusMinPixels: 2,
       getFillColor: function (d) {
         var c = colorFor(d);
-        if (hoveredId && d.id === hoveredId) return [255, 255, 255, 255];
+        if (hoveredId && d.id === hoveredId) {
+          var b = brighten(c, 0.15);
+          return [b[0], b[1], b[2], 235];
+        }
         return [c[0], c[1], c[2], 235];
       },
       stroked: false,
@@ -242,7 +255,7 @@
       if (nd.id === selectedId) rings.push({ position: nd.position, color: [196, 185, 152, 255], radius: baseR + 5, width: 2.5 });
       if (searchSet[nd.id]) rings.push({ position: nd.position, color: [77, 212, 196, 230], radius: baseR + 7, width: 2 });
       if (nd.id === lsId) rings.push({ position: nd.position, color: [155, 126, 176, 200], radius: baseR + 6, width: 1.6 });
-      if (nd.id === hoveredId) rings.push({ position: nd.position, color: [255, 255, 255, 90], radius: baseR + 4, width: 1.2 });
+      if (nd.id === hoveredId) rings.push({ position: nd.position, color: [255, 255, 255, 64], radius: baseR + 2, width: 1.0 });
     }
     var ringsLayer = new deck.ScatterplotLayer({
       id: "rings",
@@ -279,14 +292,14 @@
       data: labelData,
       getPosition: function (d) { return d.position; },
       getText: function (d) { return d.text; },
-      getColor: function (d) { return [20, 24, 34, 235]; },
+      getColor: function (d) { return [214, 209, 196, 240]; },
       getSize: function () { return 12; },
       sizeUnits: "pixels",
       getPixelOffset: [0, -14],
       getTextAnchor: "middle",
       getAlignmentBaseline: "bottom",
       outlineWidth: 3,
-      outlineColor: [240, 236, 222, 230],
+      outlineColor: [11, 14, 20, 235],
       background: false,
       parameters: { depthTest: false },
       pickable: false,

@@ -196,6 +196,58 @@ class SyncHandler(SimpleHTTPRequestHandler):
         )
 
 
+def _couchdb_ready(cfg):
+    """Preflight: refuse to start unless CouchDB and the database are reachable."""
+    client = couchdb_client.Client(cfg)
+
+    try:
+        status, body = client.get(cfg.url + "/")
+    except Exception as exc:
+        print(
+            "[fatal] CouchDB unreachable at %s: %s" % (cfg.url, exc),
+            file=sys.stderr,
+        )
+        return False
+
+    if status != 200:
+        print(
+            "[fatal] CouchDB at %s returned HTTP %s" % (cfg.url, status),
+            file=sys.stderr,
+        )
+        return False
+
+    version = body.get("version") if isinstance(body, dict) else None
+    print("[ok] CouchDB reachable: %s (version %s)" % (cfg.url, version))
+
+    try:
+        status, body = client.get(cfg.db_url)
+    except Exception as exc:
+        print(
+            "[fatal] Cannot check database '%s' on %s: %s" % (cfg.db, cfg.url, exc),
+            file=sys.stderr,
+        )
+        return False
+
+    if status == 404:
+        print(
+            "[fatal] Database '%s' not found on %s (run bin/couchdb_setup.py)"
+            % (cfg.db, cfg.url),
+            file=sys.stderr,
+        )
+        return False
+
+    if status != 200:
+        print(
+            "[fatal] Database '%s' check returned HTTP %s" % (cfg.db, status),
+            file=sys.stderr,
+        )
+        return False
+
+    doc_count = body.get("doc_count") if isinstance(body, dict) else None
+    print("[ok] Database ready: %s (doc_count=%s)" % (cfg.db, doc_count))
+    return True
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="sync.py",
@@ -237,6 +289,13 @@ def main():
         return 1
 
     cfg = envutil.couch()
+
+    if not _couchdb_ready(cfg):
+        print(
+            "[fatal] Startup aborted: CouchDB backend is required.",
+            file=sys.stderr,
+        )
+        return 1
 
     handler = partial(
         SyncHandler,

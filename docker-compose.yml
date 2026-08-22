@@ -1,0 +1,13 @@
+services:
+  tecnica:
+    build: .
+    image: tecnica:latest
+    container_name: tecnica
+    network_mode: host
+    command: ["python", "bin/sync.py", "--root", "app", "--port", "${TECNICA_PORT:-8090}"]
+    environment:
+      COUCHDB_URL: ${COUCHDB_URL:-http://127.0.0.1:5984}
+      COUCHDB_DB: ${COUCHDB_DB:-tecnica}
+      COUCHDB_USER: ${COUCHDB_USER:-}
+      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD:-}
+    restart: unless-stopped

@@ -1,0 +1,2 @@
+> **Apache NiFi** is an open-source data integration tool designed to automate the flow of data between systems by providing a web-based user interface for managing data routing, transformation, and system mediation logic.
+>Meilisearch.

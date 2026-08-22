@@ -46,6 +46,6 @@ jobs:
 #          key: ${{ secrets.SERVER_SSH_KEY }}
 #          script: |
 #            cd /opt/arbitriologia
-#            docker compose pull
-#            docker compose up -d
-#            docker image prune -f
+#            git pull
+#            pkill -f bin/sync.py || true
+#            ./deploy.sh

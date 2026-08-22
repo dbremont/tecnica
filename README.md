@@ -20,6 +20,22 @@ in a gitignored `.env` (see `.env.example`).
 - `python bin/sync.py` — static server + write proxy: the editor POSTs `/api/graph/save`, which upserts to CouchDB (`_bulk_docs`). Reads go straight from the browser to CouchDB via `app/js/couch.js`.
 - `python bin/layout.py` — precomputes `app/data/layout.json`, reading nodes from CouchDB by default (`--source couch`).
 
+## Deployment
+
+CI (`.github/workflows/deploy.yml`) builds the image on every push to `main`
+and pushes it to GHCR as `ghcr.io/dbremont/tecnica:latest`.
+
+On the server, `./deploy.sh` pulls the latest image and (re)spawns the
+container:
+
+- Port: the container runs with `--network host` and serves directly on
+  `TECNICA_PORT` (default `8000`).
+- CouchDB config: the repo's `.env` is mounted read-only into the container
+  at `/srv/.env`, where `bin/envutil.py` reads it. Real environment
+  variables override `.env` values.
+- With host networking, `COUCHDB_URL=http://127.0.0.1:5984` in `.env` works
+  as-is — the container shares the host's network stack.
+
 ## TODO
 
 - [x] Save things to the database - and implement the server mechanism similar to autoregia.

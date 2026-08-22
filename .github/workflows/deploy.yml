@@ -30,8 +30,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/csiglab/tecnica:${{ github.sha }}
-            ghcr.io/csiglab/tecnica:latest
+            ghcr.io/dbremont/tecnica:${{ github.sha }}
+            ghcr.io/dbremont/tecnica:latest
 
 #  deploy:
 #    name: Deploy to server

@@ -17,6 +17,10 @@
 ./bin/add-user.sh -u admin -p NEW_PASSWORD
 ```
 
+## QA
+
+### How does WildFly resolve and load a class when an application requests it?
+
 ## References
 
 - [WildFly](https://www.wildfly.org/)

@@ -5,6 +5,10 @@ Sync server for the Tecnica Editor.
 Serves the static app/ files and proxies graph saves to CouchDB.
 
   - GET  /api/health        -> pings CouchDB, reports db + doc count.
+  - GET  /api/layout        -> node positions {nodeId: [x, y]} from the
+                                CouchDB 'layout' doc; falls back to the
+                                static app/data/layout.json file. The source
+                                is reported in the X-Layout-Source header.
   - POST /api/graph/save    -> upserts the patch {nodes, timestamp} into
                                CouchDB via _bulk_docs (server resolves _rev).
 
@@ -34,10 +38,16 @@ import envutil  # noqa: E402
 
 SAVE_ENDPOINT = "/api/graph/save"
 HEALTH_ENDPOINT = "/api/health"
+LAYOUT_ENDPOINT = "/api/layout"
+LAYOUT_DOC_ID = "layout"
 
 
 class SyncHandler(SimpleHTTPRequestHandler):
     """Serves static files and proxies graph save requests to CouchDB."""
+
+    def __init__(self, *args, layout_file=None, **kwargs):
+        self.layout_file = Path(layout_file) if layout_file else None
+        super().__init__(*args, **kwargs)
 
     # ------------------------------------------------------------------
     # CORS
@@ -68,6 +78,10 @@ class SyncHandler(SimpleHTTPRequestHandler):
 
         if path == HEALTH_ENDPOINT:
             self._handle_health()
+            return
+
+        if path == LAYOUT_ENDPOINT:
+            self._handle_layout()
             return
 
         super().do_GET()
@@ -104,6 +118,48 @@ class SyncHandler(SimpleHTTPRequestHandler):
                 "database": cfg.db,
                 "doc_count": doc_count,
             }
+        )
+
+    def _handle_layout(self):
+        """
+        Serve the precomputed graph layout.
+
+        Primary source is the CouchDB doc _id "layout" (written by
+        bin/layout.py). If that read fails or the doc is missing, fall back
+        to the static layout file on disk. Responds with the bare positions
+        map (same shape as layout.json); X-Layout-Source says which store
+        was used.
+        """
+        # 1. Primary: the layout doc in CouchDB.
+        try:
+            cfg = envutil.couch()
+            client = couchdb_client.Client(cfg)
+            status, doc = client.get(cfg.db_url + "/" + LAYOUT_DOC_ID)
+            positions = doc.get("positions") if (
+                status == 200 and isinstance(doc, dict)
+            ) else None
+            if isinstance(positions, dict) and positions:
+                self._send_json(positions, extra_headers={"X-Layout-Source": "db"})
+                return
+        except Exception:
+            pass
+
+        # 2. Fallback: the static layout file.
+        try:
+            payload = json.loads(self.layout_file.read_text(encoding="utf-8"))
+            if isinstance(payload, dict) and payload:
+                self._send_json(payload, extra_headers={"X-Layout-Source": "file"})
+                return
+        except Exception:
+            pass
+
+        self._send_json(
+            {
+                "status": "error",
+                "message": "layout unavailable (CouchDB doc %r unreadable and %s missing; run python bin/layout.py)"
+                % (LAYOUT_DOC_ID, self.layout_file),
+            },
+            404,
         )
 
     # ------------------------------------------------------------------
@@ -174,7 +230,7 @@ class SyncHandler(SimpleHTTPRequestHandler):
     # Helpers
     # ------------------------------------------------------------------
 
-    def _send_json(self, obj, code=200):
+    def _send_json(self, obj, code=200, extra_headers=None):
         body = json.dumps(obj).encode("utf-8")
 
         self.send_response(code)
@@ -186,6 +242,8 @@ class SyncHandler(SimpleHTTPRequestHandler):
             "Content-Length",
             str(len(body)),
         )
+        for key, value in (extra_headers or {}).items():
+            self.send_header(key, value)
         self.end_headers()
 
         self.wfile.write(body)
@@ -277,6 +335,13 @@ def main():
         help="Host/interface to bind (default: 0.0.0.0).",
     )
 
+    parser.add_argument(
+        "--layout-file",
+        default=str(repo / "app" / "data" / "layout.json"),
+        help="Static layout file used when the CouchDB layout doc is"
+             " unavailable (default: app/data/layout.json).",
+    )
+
     args = parser.parse_args()
 
     root_dir = Path(args.root).resolve()
@@ -300,6 +365,7 @@ def main():
     handler = partial(
         SyncHandler,
         directory=str(root_dir),
+        layout_file=args.layout_file,
     )
 
     server = HTTPServer(
@@ -320,6 +386,9 @@ def main():
     print("  CouchDB: %s/%s" % (cfg.url, cfg.db))
     print(
         "  Save:    http://%s:%d%s" % (display_host, args.port, SAVE_ENDPOINT)
+    )
+    print(
+        "  Layout:  http://%s:%d%s" % (display_host, args.port, LAYOUT_ENDPOINT)
     )
     print(
         "  Health:  http://%s:%d%s" % (display_host, args.port, HEALTH_ENDPOINT)

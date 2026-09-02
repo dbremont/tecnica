@@ -17,8 +17,8 @@ in a gitignored `.env` (see `.env.example`).
 
 - `python bin/couchdb_setup.py` — enable CORS, create the `tecnica` DB with public reads.
 - `python bin/seed_couchdb.py` — seed `app/data/data.json` into CouchDB (idempotent; `data.json` is the seed source, not the live store).
-- `python bin/sync.py` — static server + write proxy: the editor POSTs `/api/graph/save`, which upserts to CouchDB (`_bulk_docs`). Reads go straight from the browser to CouchDB via `app/js/couch.js`.
-- `python bin/layout.py` — precomputes `app/data/layout.json`, reading nodes from CouchDB by default (`--source couch`).
+- `python bin/sync.py` — static server + API: the editor POSTs `/api/graph/save`, which upserts to CouchDB (`_bulk_docs`); `GET /api/layout` serves the precomputed layout from the CouchDB `layout` doc with `app/data/layout.json` as fallback (`X-Layout-Source` header reports the source). Node reads go straight from the browser to CouchDB via `app/js/couch.js`.
+- `python bin/layout.py` — precomputes the node layout and stores it in **both** the CouchDB `layout` doc (primary) and `app/data/layout.json` (fallback); reads nodes from CouchDB by default (`--source couch`; `--no-db` writes the file only).
 
 ## Deployment
 
@@ -39,7 +39,7 @@ container:
 ## TODO
 
 - [x] Save things to the database - and implement the server mechanism similar to autoregia.
-- [ ] Pre-compute the layout.json
+- [x] Pre-compute the layout.json (stored in the CouchDB `layout` doc, served via `GET /api/layout`, file as fallback)
 
 ## References
 

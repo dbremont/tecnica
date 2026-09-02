@@ -12,6 +12,17 @@ changes:
     python bin/layout.py
     python bin/layout.py --data-file app/data/data.json --layout-file app/data/layout.json
 
+Storage
+-------
+The result is written to BOTH stores:
+
+  1. CouchDB doc `_id: "layout"` (type "layout") — the primary source,
+     served by `bin/sync.py GET /api/layout`.
+  2. app/data/layout.json — static fallback, used only when the CouchDB
+     doc cannot be read.
+
+Pass --no-db to write the file only.
+
 Algorithm
 ---------
 - Build an undirected graph from each node's `relationship_set` (edge only when
@@ -57,6 +68,14 @@ def load_nodes(path):
     return nodes, arr
 
 
+def is_layout_doc(rec):
+    """True for the computed-layout document (not a graph node)."""
+    return (
+        isinstance(rec, dict)
+        and (rec.get("type") == "layout" or rec.get("_id") == "layout")
+    )
+
+
 def load_nodes_from_couch():
     """Pull all node docs from CouchDB. Returns (node_ids, docs) like load_nodes."""
     docs = couchdb_client.all_docs()
@@ -64,6 +83,8 @@ def load_nodes_from_couch():
     arr = []
     for i, rec in enumerate(docs):
         if not isinstance(rec, dict):
+            continue
+        if is_layout_doc(rec):
             continue
         nid = rec.get("id") or rec.get("_id")
         if nid is None or nid == "":
@@ -301,6 +322,8 @@ def main(argv=None):
     p.add_argument("--spacing", type=float, default=80.0, help="ideal node distance")
     p.add_argument("--iterations", type=int, default=300, help="FR iterations per cluster")
     p.add_argument("--indent", type=int, default=None, help="JSON indent (default: compact)")
+    p.add_argument("--no-db", action="store_true",
+                   help="write the layout file only; skip the CouchDB layout doc")
     args = p.parse_args(argv)
 
     data_path = Path(args.data_file)
@@ -341,6 +364,44 @@ def main(argv=None):
         "layout: %d nodes (%d isolated, %d clusters, %d edges) -> %s  [%.1f ms]"
         % (len(payload), n_iso, n_clusters, len(edges), out_path, dt)
     )
+
+    # Store the layout doc in CouchDB (primary serving source); the file
+    # written above is only the static fallback.
+    if args.no_db:
+        print("layout: --no-db set; CouchDB layout doc not written")
+        return 0
+
+    layout_doc = {
+        "id": "layout",
+        "type": "layout",
+        "version": 1,
+        "positions": payload,
+        "computed_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "source": args.source,
+        "params": {
+            "seed": args.seed,
+            "spacing": args.spacing,
+            "iterations": args.iterations,
+        },
+    }
+    try:
+        result = couchdb_client.bulk_upsert([layout_doc])
+        if result["errors"]:
+            print(
+                "WARNING: CouchDB layout write reported errors: %s" % result["errors"],
+                file=sys.stderr,
+            )
+        else:
+            print(
+                "layout: stored in CouchDB as doc 'layout' (%s)"
+                % ("new" if result["new"] else "updated")
+            )
+    except Exception as exc:
+        print(
+            "WARNING: could not store layout in CouchDB "
+            "(static file fallback remains valid): %s" % exc,
+            file=sys.stderr,
+        )
     return 0
 
 

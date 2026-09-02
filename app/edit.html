@@ -4074,8 +4074,9 @@ let silhouetteDirty = true;
 let communityHulls = {};
 
 /* ═══════ DECK (WebGL) RENDER STATE ═══════ */
-/* deck.gl renders into #graph-canvas. Positions are static (read once from
-   layout.json); there is no live force simulation. Layers rebuild only when
+/* deck.gl renders into #graph-canvas. Positions are static (read from the
+   CouchDB 'layout' doc; data/layout.json is the fallback); there is no live
+   force simulation. Layers rebuild only when
    graph/highlight/zoom state changes (dirty); the view is pushed every frame
    from cam. Picking is GPU-side via SocioGraph.pickAt (hitTest delegates to it). */
 let deckInst = null, deckReady = false, currentLayers = [], dirty = false, lastZ = -1;
@@ -5500,15 +5501,14 @@ function normalizeNode(d) {
 
 async function loadData() {
     try {
-        const [dataArr, layoutRes] = await Promise.all([
+        const [dataArr, layoutData] = await Promise.all([
             CouchData.loadNodes(),
-            fetch('data/layout.json').catch(() => null)
+            CouchData.loadLayout()
         ]);
         data = dataArr;
         // Migrate legacy camelCase keys → new snake_case schema keys
         data.forEach(normalizeNode);
-        var layoutData = (layoutRes && layoutRes.ok) ? await layoutRes.json() : null;
-        if (!layoutData) console.warn('layout.json missing — run: python bin/layout.py. Using random fallback.');
+        if (!layoutData) console.warn('layout not available — run: python bin/layout.py. Using random fallback.');
     } catch (e) {
         console.warn('Could not load from CouchDB, using minimal Tecnica fallback', e);
         // Minimal Tecnica-shaped fallback so the editor stays usable if the

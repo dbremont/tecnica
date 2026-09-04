@@ -3728,13 +3728,34 @@ select:focus-visible {
                         <span id="diff-deletions">0</span> deletions
                     </div>
                 </div>
+
+                <div class="context-block" style="margin-top:22px;">
+                    <div class="context-label">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Manual LLM (copy &amp; paste)
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                        <button class="btn btn-ai btn-sm" id="ai-improve-copy-btn" title="Copy the full prompt (schema + context + this node's JSON + instructions) to paste into any LLM">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            Copy Prompt
+                        </button>
+                        <span style="font-family:var(--font-mono);font-size:0.56rem;color:var(--text-muted);line-height:1.5;">
+                            No API needed: paste the prompt into any LLM chat, then paste its JSON response below.
+                        </span>
+                    </div>
+                    <textarea class="context-textarea" id="ai-improve-paste-area" style="font-family:var(--font-mono);font-size:0.68rem;min-height:90px;" placeholder="Paste the LLM's JSON response here..." spellcheck="false"></textarea>
+                    <div style="margin-top:10px;">
+                        <button class="btn btn-sm" id="ai-improve-use-pasted-btn" title="Parse the pasted response and show it in the diff for review">Use Pasted Result</button>
+                    </div>
+                </div>
+
                 <div id="ai-improve-error" class="json-error" style="display:none;margin-top:14px;"></div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-ghost btn-sm" id="ai-improve-cancel">Cancel</button>
                 <button class="btn btn-ai btn-sm" id="ai-improve-generate-btn">
                     <span class="loading-spinner" id="ai-improve-spinner" style="display:none;"></span>
-                    Generate
+                    Generate (API)
                 </button>
                 <button class="btn btn-success btn-sm" id="ai-apply-improve-btn" disabled>Apply Changes</button>
             </div>
@@ -3752,7 +3773,7 @@ select:focus-visible {
                 <div class="docs-body">
                     <p>The <strong>AI Improve</strong> workflow intentionally excludes the <code>relationships</code> field from every stage of the process:</p>
                     <ol>
-                        <li><strong>Not sent to the model.</strong> Before calling DeepSeek, the node's <code>relationships</code> array is stripped (<code>stripRelationships()</code>), so the model never sees your existing links and cannot alter them.</li>
+                        <li><strong>Not sent to the model.</strong> Before calling DeepSeek — or before copying the prompt for manual use in any external LLM (the <em>Copy Prompt</em> button) — the node's <code>relationships</code> array is stripped (<code>stripRelationships()</code>), so the model never sees your existing links and cannot alter them.</li>
                         <li><strong>Not shown in the diff.</strong> Both the <em>Original</em> and <em>Improved</em> panels display the relationship-free payload, keeping the comparison focused on content fields only.</li>
                         <li><strong>Not updated on apply.</strong> When you click <em>Apply Changes</em>, your existing <code>relationships</code> are preserved and re-attached after the improved data is written back to the node.</li>
                     </ol>
@@ -4524,33 +4545,76 @@ async function aiCreateNode(specificContext) {
     ];
     
     const result = await callDeepSeekAPI(messages);
-    
-    let jsonStr = result;
-    const jsonMatch = result.match(/\{[\s\S]*\}/);
+
+    return extractJSONObject(result);
+}
+
+/**
+ * Extract the first JSON object embedded in an LLM response and parse it.
+ * Tolerates markdown fences and surrounding prose.
+ */
+function extractJSONObject(text) {
+    let jsonStr = text;
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
         jsonStr = jsonMatch[0];
     }
-    
     return JSON.parse(jsonStr);
 }
 
-async function aiImproveNode(nodeData, instructions) {
+/**
+ * Build the improve conversation (system + user messages). Shared by the
+ * direct-API path (callDeepSeekAPI) and the manual path (Copy Prompt), so
+ * both transports always send exactly the same content.
+ */
+function buildImproveMessages(nodeData, instructions) {
     const systemPrompt = buildSystemPrompt(false);
-    
-    const messages = [
+
+    return [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: `Current node data:\n${JSON.stringify(stripRelationships(nodeData), null, 2)}\n\nImprovement instructions: ${instructions}` }
     ];
-    
-    const result = await callDeepSeekAPI(messages);
-    
-    let jsonStr = result;
-    const jsonMatch = result.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-        jsonStr = jsonMatch[0];
+}
+
+/* Default instruction used by the manual Copy Prompt path when the user
+ * leaves the instructions field empty (the API path requires explicit
+ * instructions). */
+const DEFAULT_IMPROVE_INSTRUCTIONS = "Improve and complete this node's content according to the schema: fill missing fields, deepen the short and long descriptions, and tighten wording. Keep id, layer and category unless they are clearly wrong.";
+
+/**
+ * Flatten the improve conversation into a single copy-paste block for
+ * manual LLM use (web chat, CLI, etc.) — same content the API path sends.
+ */
+function buildImprovePromptText(nodeData, instructions) {
+    const messages = buildImproveMessages(nodeData, instructions);
+    return messages.map(m => `${m.role.toUpperCase()}:\n${m.content}`).join('\n\n');
+}
+
+/**
+ * Copy text to the clipboard. Uses the async Clipboard API when available
+ * and falls back to a hidden-textarea execCommand for non-secure origins.
+ */
+async function copyToClipboard(text) {
+    try {
+        await navigator.clipboard.writeText(text);
+        return true;
+    } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        let ok = false;
+        try { ok = document.execCommand('copy'); } catch (e2) { ok = false; }
+        document.body.removeChild(ta);
+        return ok;
     }
-    
-    return JSON.parse(jsonStr);
+}
+
+async function aiImproveNode(nodeData, instructions) {
+    const result = await callDeepSeekAPI(buildImproveMessages(nodeData, instructions));
+    return extractJSONObject(result);
 }
 
 async function aiDiscoverRelations(sourceNode, otherNodes, instructions) {
@@ -4649,6 +4713,21 @@ function stripRelationships(nodeData) {
     const copy = { ...nodeData };
     delete copy.relationship_set;
     return copy;
+}
+
+/**
+ * Render the Original/Improved diff panels for an improved node payload and
+ * enable Apply. Shared by the API path (Generate) and the manual path
+ * (Use Pasted Result) so both feed the exact same review + apply flow.
+ */
+function showImprovedDiff(originalNodeData, improvedNodeData) {
+    const diff = computeDiff(stripRelationships(originalNodeData), stripRelationships(improvedNodeData));
+    document.getElementById('diff-original').innerHTML = diff.origHtml;
+    document.getElementById('diff-modified').innerHTML = diff.modHtml;
+    document.getElementById('diff-additions').textContent = diff.additions;
+    document.getElementById('diff-deletions').textContent = diff.deletions;
+    document.getElementById('diff-stats').style.display = 'flex';
+    document.getElementById('ai-apply-improve-btn').disabled = false;
 }
 
 function computeDiff(original, modified) {
@@ -4923,7 +5002,6 @@ function setupModals() {
         const spinner = document.getElementById('ai-improve-spinner');
         const errorEl = document.getElementById('ai-improve-error');
         const instructions = document.getElementById('ai-improve-instructions').value;
-        const statsEl = document.getElementById('diff-stats');
         const applyBtn = document.getElementById('ai-apply-improve-btn');
         
         if (!instructions.trim()) {
@@ -4953,13 +5031,7 @@ function setupModals() {
             // Unified: always use the improve path. For new/empty nodes the
             // "original" is the near-empty scaffold, and the model fills it in.
             improvedNodeData = await aiImproveNode(selectedNode._data, instructions);
-            const diff = computeDiff(stripRelationships(selectedNode._data), stripRelationships(improvedNodeData));
-            document.getElementById('diff-original').innerHTML = diff.origHtml;
-            document.getElementById('diff-modified').innerHTML = diff.modHtml;
-            document.getElementById('diff-additions').textContent = diff.additions;
-            document.getElementById('diff-deletions').textContent = diff.deletions;
-            statsEl.style.display = 'flex';
-            applyBtn.disabled = false;
+            showImprovedDiff(selectedNode._data, improvedNodeData);
         } catch (e) {
             errorEl.textContent = 'Error: ' + e.message;
             errorEl.style.display = 'block';
@@ -4992,8 +5064,64 @@ function setupModals() {
         updateStats();
         markGraphDirty();
         renderForm(selectedNode._data);
-        
+
         closeModal('ai-improve-modal');
+    });
+
+    // Manual LLM path — Copy Prompt: flatten the improve conversation
+    // (same content the API path sends) and copy it for pasting into any
+    // external LLM. Instructions are optional here; a sensible default is
+    // substituted when the field is left empty.
+    document.getElementById('ai-improve-copy-btn').addEventListener('click', async () => {
+        const btn = document.getElementById('ai-improve-copy-btn');
+        const errorEl = document.getElementById('ai-improve-error');
+        if (!selectedNode) return;
+
+        const instructions = document.getElementById('ai-improve-instructions').value.trim()
+            || DEFAULT_IMPROVE_INSTRUCTIONS;
+
+        const prev = btn.textContent;
+        try {
+            const ok = await copyToClipboard(buildImprovePromptText(selectedNode._data, instructions));
+            errorEl.style.display = 'none';
+            btn.textContent = ok ? 'Copied ✓' : 'Copy failed';
+        } catch (e) {
+            errorEl.textContent = 'Error: ' + e.message;
+            errorEl.style.display = 'block';
+        }
+        setTimeout(() => { btn.textContent = prev; }, 1500);
+    });
+
+    // Manual LLM path — Use Pasted Result: parse the pasted LLM response
+    // into improvedNodeData and route it through the same diff + Apply
+    // review flow as the API path.
+    document.getElementById('ai-improve-use-pasted-btn').addEventListener('click', () => {
+        const btn = document.getElementById('ai-improve-use-pasted-btn');
+        const errorEl = document.getElementById('ai-improve-error');
+        if (!selectedNode) return;
+
+        const raw = document.getElementById('ai-improve-paste-area').value;
+        if (!raw.trim()) {
+            errorEl.textContent = 'Paste the LLM response first.';
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        try {
+            const parsed = extractJSONObject(raw);
+            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed) || !(parsed.id || parsed.name)) {
+                throw new Error('expected a JSON object with at least id/name');
+            }
+            improvedNodeData = parsed;
+            showImprovedDiff(selectedNode._data, improvedNodeData);
+            errorEl.style.display = 'none';
+            const prev = btn.textContent;
+            btn.textContent = 'Loaded into diff ✓';
+            setTimeout(() => { btn.textContent = prev; }, 1500);
+        } catch (e) {
+            errorEl.textContent = 'Invalid pasted JSON: ' + e.message;
+            errorEl.style.display = 'block';
+        }
     });
 }
 

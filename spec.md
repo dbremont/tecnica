@@ -113,6 +113,14 @@ rings (selected/search/link-source/hover) and the link rubber-band `LineLayer`. 
 fallback position and are picked up by the next manual `python bin/layout.py`. The old Canvas2D
 `draw()` / `simulate()` / silhouette code remains in the file as dead code.
 
+**AI assist** ✅: the editor ships LLM-assisted authoring against a configurable OpenAI-compatible
+endpoint (default DeepSeek; token + model in Settings). *AI Improve/Generate* (Enhance button)
+rewrites the selected node via a schema-bearing prompt (`relationship_set` is always stripped and
+preserved), shows a diff, and applies on review. Two transports: direct API calls, or the manual
+**Copy Prompt** flow — copy the identical prompt into any external LLM chat and paste its JSON
+back (*Use Pasted Result*) through the same diff + Apply path. *AI Discover Relations* (Find
+Relations) suggests cross-node links for curation.
+
 ### Scalability
 
 Both pages: no live simulation, O(1) GPU picking, GPU-side filtering (`DataFilterExtension`) → the

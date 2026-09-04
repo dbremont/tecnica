@@ -3851,7 +3851,7 @@ select:focus-visible {
 
     <script src="vendor/deck.min.js"></script>
     <script src="vendor/socio-graph.js"></script>
-    <script src="js/couch.js"></script>
+    <script src="js/api.js"></script>
     <script>
 /* ═══════ UTILITIES ═══════ */
 function hexToRGBA(hex, alpha) {
@@ -4075,7 +4075,8 @@ let communityHulls = {};
 
 /* ═══════ DECK (WebGL) RENDER STATE ═══════ */
 /* deck.gl renders into #graph-canvas. Positions are static (read from the
-   CouchDB 'layout' doc; data/layout.json is the fallback); there is no live
+   sync server's /api/layout — the CouchDB 'layout' doc; data/layout.json is
+   the fallback); there is no live
    force simulation. Layers rebuild only when
    graph/highlight/zoom state changes (dirty); the view is pushed every frame
    from cam. Picking is GPU-side via SocioGraph.pickAt (hitTest delegates to it). */
@@ -5502,15 +5503,15 @@ function normalizeNode(d) {
 async function loadData() {
     try {
         const [dataArr, layoutData] = await Promise.all([
-            CouchData.loadNodes(),
-            CouchData.loadLayout()
+            Api.loadNodes(),
+            Api.loadLayout()
         ]);
         data = dataArr;
         // Migrate legacy camelCase keys → new snake_case schema keys
         data.forEach(normalizeNode);
-        if (!layoutData) console.warn('layout not available — run: python bin/layout.py. Using random fallback.');
+        if (!layoutData) console.warn('layout not available — using random fallback.');
     } catch (e) {
-        console.warn('Could not load from CouchDB, using minimal Tecnica fallback', e);
+        console.warn('Could not load from the sync server, using minimal Tecnica fallback', e);
         // Minimal Tecnica-shaped fallback so the editor stays usable if the
         // dataset cannot be fetched. Field shapes mirror app/data/schema/schema.json.
         data = [{

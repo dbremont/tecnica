@@ -2,15 +2,23 @@
 """
 Sync server for the Tecnica Editor.
 
-Serves the static app/ files and proxies graph saves to CouchDB.
+Serves the static app/ files and is the only frontend-facing surface:
+the browser never talks to CouchDB directly.
 
   - GET  /api/health        -> pings CouchDB, reports db + doc count.
+  - GET  /api/nodes         -> all graph nodes as a flat JSON array
+                               (proxied from CouchDB; _id/_rev stripped,
+                               the layout doc excluded).
   - GET  /api/layout        -> node positions {nodeId: [x, y]} from the
-                                CouchDB 'layout' doc; falls back to the
-                                static app/data/layout.json file. The source
-                                is reported in the X-Layout-Source header.
+                               CouchDB 'layout' doc; falls back to the
+                               static app/data/layout.json file. The source
+                               is reported in the X-Layout-Source header.
   - POST /api/graph/save    -> upserts the patch {nodes, timestamp} into
                                CouchDB via _bulk_docs (server resolves _rev).
+
+API paths under /app/api/... are treated as /api/... so the default dev
+layout (--root ., pages under /app/) reaches the same endpoints as the
+production layout (--root app).
 
 CouchDB connection is read from .env (see bin/envutil.py). No file is written —
 the old save-to-data.json code path has been removed; CouchDB is the backend.
@@ -38,12 +46,14 @@ import envutil  # noqa: E402
 
 SAVE_ENDPOINT = "/api/graph/save"
 HEALTH_ENDPOINT = "/api/health"
+NODES_ENDPOINT = "/api/nodes"
 LAYOUT_ENDPOINT = "/api/layout"
 LAYOUT_DOC_ID = "layout"
+APP_PREFIX = "/app"
 
 
 class SyncHandler(SimpleHTTPRequestHandler):
-    """Serves static files and proxies graph save requests to CouchDB."""
+    """Serves static files and proxies all graph data to/from CouchDB."""
 
     def __init__(self, *args, layout_file=None, **kwargs):
         self.layout_file = Path(layout_file) if layout_file else None
@@ -74,10 +84,14 @@ class SyncHandler(SimpleHTTPRequestHandler):
     # ------------------------------------------------------------------
 
     def do_GET(self):
-        path = self.path.split("?", 1)[0]
+        path = self._api_path(self.path.split("?", 1)[0])
 
         if path == HEALTH_ENDPOINT:
             self._handle_health()
+            return
+
+        if path == NODES_ENDPOINT:
+            self._handle_nodes()
             return
 
         if path == LAYOUT_ENDPOINT:
@@ -85,6 +99,15 @@ class SyncHandler(SimpleHTTPRequestHandler):
             return
 
         super().do_GET()
+
+    def _api_path(self, path):
+        """
+        Map /app/api/... to /api/... so the default dev layout (--root .,
+        pages under /app/) hits the same endpoints as --root app.
+        """
+        if path.startswith(APP_PREFIX + "/api/"):
+            return path[len(APP_PREFIX):]
+        return path
 
     def _handle_health(self):
         cfg = envutil.couch()
@@ -119,6 +142,41 @@ class SyncHandler(SimpleHTTPRequestHandler):
                 "doc_count": doc_count,
             }
         )
+
+    def _handle_nodes(self):
+        """
+        Serve all graph nodes as a flat JSON array.
+
+        Proxies CouchDB server-side (the browser never talks to it): every
+        non-design doc, the 'layout' doc excluded, _id/_rev stripped — the
+        same shape app/js/api.js consumes. Hard-fails with 502 when CouchDB
+        is unreachable; there is deliberately no file fallback (the seed
+        data.json is a snapshot, not the live store).
+        """
+        try:
+            cfg = envutil.couch()
+            docs = couchdb_client.all_docs(cfg)
+        except Exception as exc:
+            self._send_json(
+                {
+                    "status": "error",
+                    "message": "CouchDB unavailable: %s" % exc,
+                },
+                502,
+            )
+            return
+
+        nodes = []
+        for doc in docs:
+            if not isinstance(doc, dict):
+                continue
+            if doc.get("_id") == LAYOUT_DOC_ID or doc.get("type") == "layout":
+                continue
+            nodes.append(
+                {k: v for k, v in doc.items() if k not in ("_id", "_rev")}
+            )
+
+        self._send_json(nodes)
 
     def _handle_layout(self):
         """
@@ -167,7 +225,7 @@ class SyncHandler(SimpleHTTPRequestHandler):
     # ------------------------------------------------------------------
 
     def do_POST(self):
-        path = self.path.split("?", 1)[0]
+        path = self._api_path(self.path.split("?", 1)[0])
 
         if path == SAVE_ENDPOINT:
             self._handle_save()
@@ -288,8 +346,9 @@ def _couchdb_ready(cfg):
 
     if status == 404:
         print(
-            "[fatal] Database '%s' not found on %s (run bin/couchdb_setup.py)"
-            % (cfg.db, cfg.url),
+            "[fatal] Database '%s' not found on %s"
+            " (create it: curl -u <user>:<pass> -X PUT %s/%s — see README)"
+            % (cfg.db, cfg.url, cfg.url, cfg.db),
             file=sys.stderr,
         )
         return False
@@ -386,6 +445,9 @@ def main():
     print("  CouchDB: %s/%s" % (cfg.url, cfg.db))
     print(
         "  Save:    http://%s:%d%s" % (display_host, args.port, SAVE_ENDPOINT)
+    )
+    print(
+        "  Nodes:   http://%s:%d%s" % (display_host, args.port, NODES_ENDPOINT)
     )
     print(
         "  Layout:  http://%s:%d%s" % (display_host, args.port, LAYOUT_ENDPOINT)

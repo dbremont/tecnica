@@ -11,9 +11,9 @@
 - (Finance) Terminal Value
 - Formal Verification: Why3 -- Why3, Lean, Coq.
 - CouchDB is now the data backend (DONE):
-  - `bin/couchdb_setup.py` enables CORS + creates the `tecnica` DB with public reads.
+  - CouchDB bootstrap is manual (create the `tecnica` DB + clear its `_security`; two curl steps in the README). CORS stays disabled (default).
   - `bin/seed_couchdb.py` seeded `app/data/data.json` into CouchDB (40 docs). `data.json` is kept as the seed source, NOT deleted.
-  - Reads: the browser fetches CouchDB directly via `app/js/couch.js` (`CouchData.loadNodes()`).
+  - Reads: served by `bin/sync.py` (`GET /api/nodes`, `GET /api/layout`) via `app/js/api.js` (`Api.loadNodes()`); the browser never touches CouchDB.
   - Writes: the editor POSTs to `bin/sync.py` `/api/graph/save`, which proxies to CouchDB (`_bulk_docs`, server resolves `_rev`).
   - `bin/layout.py` now reads nodes from CouchDB (`--source couch`, default) instead of `data.json`.
   - The save-to-file code path (`edit.html` `saveJSON()` JSON-download fallback) is marked `@deprecated` and slated for removal once CouchDB is confirmed everywhere.

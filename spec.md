@@ -89,8 +89,8 @@ pushed every frame.
 
 ### Viewer — `app/graph.html` ✅ (deck.gl)
 
-Loads nodes from **CouchDB** (via `app/js/couch.js`) **and** the layout together (`Promise.all`,
-layout via `CouchData.loadLayout()`: `/api/layout` first, `data/layout.json` as last resort), seeds positions via
+Loads nodes from the sync server (`GET /api/nodes`, via `app/js/api.js`) **and** the layout together (`Promise.all`,
+layout via `Api.loadLayout()`: `/api/layout` first, `data/layout.json` as last resort), seeds positions via
 `SocioGraph.seedPositions`, creates the deck instance, and drives it from `cam`. The render loop
 (`render()`): advance the camera tween → rebuild layers only if `dirty` or zoom band changed → push
 `viewState` → redraw the (Canvas2D) minimap. Preserved from the Canvas2D version: `cam` pan/zoom/fit,
@@ -101,8 +101,8 @@ panel, the HTML tooltip, the minimap, and keybindings (F=fit, E=epistemic, S=sid
 
 ### Editor — `app/edit.html` ✅ (deck.gl)
 
-Migrated to the same `SocioGraph` module as the viewer. It loads nodes from **CouchDB** + the layout (via
-`CouchData.loadLayout()`), seeds positions, creates the deck instance, and drives it from `cam`. The render loop (`animate()`):
+Migrated to the same `SocioGraph` module as the viewer. It loads nodes from the sync server (`GET /api/nodes`) + the layout (via
+`Api.loadLayout()`), seeds positions, creates the deck instance, and drives it from `cam`. The render loop (`animate()`):
 advance the camera tween → rebuild layers only if `dirty` or zoom band changed → push `viewState` →
 redraw the (Canvas2D) minimap. **Every editor behavior is preserved**: click-to-select (opens the
 form panel), node drag, link-mode (plum source ring + rubber-band line to the cursor, click a target
@@ -122,19 +122,19 @@ is typed-array position attributes + per-node `updateTriggers` instead of full l
 
 ### Data + layout contract
 
-The pages read node content from CouchDB and the layout from the CouchDB layout doc (static file
-fallbacks for both):
+The pages read all graph data from the sync server (`bin/sync.py`); the browser never
+talks to CouchDB directly. The server reads CouchDB; static file fallbacks where noted:
 
 | Source | Purpose | Origin |
 |--------|---------|--------|
-| **CouchDB `tecnica`** ✅ | Node/edge content (the schema above); one doc per node. | Authored / edited; seeded from `app/data/data.json`. |
+| **CouchDB `tecnica`** ✅ | Node/edge content (the schema above); one doc per node. Served by `GET /api/nodes` (`_id`/`_rev` stripped, layout doc excluded). | Authored / edited; seeded from `app/data/data.json`. |
 | **CouchDB doc `_id: "layout"`** ✅ | Precomputed `[x, y]` per node id (+ `computed_at`, `params` metadata); served by `GET /api/layout`. | `python bin/layout.py` |
 | `app/data/data.json` ✅ | Seed source for CouchDB. | `python bin/seed_couchdb.py` |
 | `app/data/layout.json` ✅ | Static fallback copy of the layout, served when the layout doc is unreadable. | `python bin/layout.py` (written alongside the doc) |
 
-If CouchDB is unreachable/empty the page shows an actionable loader error (editor: minimal fallback
-graph). If the layout is unavailable from both CouchDB and the file, pages fall back to random
-placement (with a console warning) so the page still renders.
+If the sync server is unreachable or CouchDB is empty the page shows an actionable loader error
+(editor: minimal fallback graph). If the layout is unavailable from both CouchDB and the file,
+pages fall back to random placement (with a console warning) so the page still renders.
 
 ### Notes
 - Node docs carry no spatial fields; the layout lives in its own CouchDB doc (`_id: "layout"`),
@@ -143,6 +143,10 @@ placement (with a console warning) so the page still renders.
   camera — verified by a headless pick test).
 - Recompute is still manual (`python bin/layout.py`); a `/api/layout/recompute` endpoint is a future
   convenience.
-- `bin/sync.py` no longer reads/writes `data.json`: it serves static files, `GET /api/layout`
-  (layout doc → file fallback, `X-Layout-Source` header says which), and proxies
-  `/api/graph/save` to CouchDB (CouchDB connection from `.env` via `bin/envutil.py`).
+- `bin/sync.py` no longer reads/writes `data.json`: it serves static files, `GET /api/nodes`
+  (node array from CouchDB; hard 502 when CouchDB is down — no file fallback),
+  `GET /api/layout` (layout doc → file fallback, `X-Layout-Source` header says which), and proxies
+  `/api/graph/save` to CouchDB (CouchDB connection from `.env` via `bin/envutil.py`). It is the only
+  frontend-facing surface: browser CORS on CouchDB stays disabled (CouchDB default), and API
+  paths under `/app/api/...` are normalized to `/api/...` so dev (`--root .`) and prod (`--root app`)
+  behave the same.

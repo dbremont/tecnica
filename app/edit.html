@@ -5501,11 +5501,13 @@ function normalizeNode(d) {
 }
 
 async function loadData() {
+    let layoutData = null;
     try {
-        const [dataArr, layoutData] = await Promise.all([
+        const [dataArr, layout] = await Promise.all([
             Api.loadNodes(),
             Api.loadLayout()
         ]);
+        layoutData = layout;
         data = dataArr;
         // Migrate legacy camelCase keys → new snake_case schema keys
         data.forEach(normalizeNode);

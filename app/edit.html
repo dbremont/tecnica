@@ -3638,7 +3638,7 @@ select:focus-visible {
                         <span id="backend-health-text" style="color:var(--text-muted);font-size:0.74rem;">Not checked</span>
                     </div>
                     <div class="settings-row">
-                        <span class="settings-hint">Queries the backend <code>/health</code> endpoint (derived from the Save URL) to verify the sync service is reachable and the data file is accessible. Health is polled automatically every 60 seconds and shown in the status bar.</span>
+                        <span class="settings-hint">Queries the backend <code>/health</code> endpoint (derived from the Save URL) to verify the sync service is reachable and its CouchDB database is answering. Health is polled automatically every 60 seconds and shown in the status bar.</span>
                     </div>
                 </div>
             </div>
@@ -4279,11 +4279,11 @@ async function checkBackendHealth() {
         }
 
         const data = await response.json();
-        const exists = data.data_file_exists;
-        const size = data.data_file_size;
-        const sizeStr = size != null ? ` (${(size / 1024).toFixed(1)} KB)` : '';
-        const label = exists ? `Backend: Online${sizeStr}` : `Backend: No data file`;
-        updateBackendStatus('online', label);
+        const couchOk = data.couchdb_ok === true;
+        const docs = data.doc_count;
+        const docStr = docs != null ? ` (${docs} docs)` : '';
+        const label = couchOk ? `Backend: Online${docStr}` : 'Backend: DB unreachable';
+        updateBackendStatus(couchOk ? 'online' : 'offline', label);
         return data;
     } catch (e) {
         clearTimeout(timeout);
